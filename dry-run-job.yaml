@@ -16,7 +16,7 @@ spec:
       serviceAccountName: volume-cleaner
       containers:
         - name: cleaner
-          image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner:54c9adbab1582c2ef04b2016b760714a4bfde3cf
+          image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner:latest
           command: ["/volume-cleaner", "-dry-run"]
           envFrom:
             - configMapRef:

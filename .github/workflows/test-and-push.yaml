@@ -47,13 +47,13 @@ jobs:
       - name: Build and Push Image
         uses: docker/build-push-action@v5
         with:
-          tags: ${{ env.REGISTRY }}/volume-cleaner:${{ github.sha }}
+          tags: ${{ env.REGISTRY }}/volume-cleaner:latest
           push: true
 
       - name: Security Scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/volume-cleaner:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY }}/volume-cleaner:latest
           severity: "CRITICAL"
           ignore-unfixed: true
           exit-code: 1
