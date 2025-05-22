@@ -65,11 +65,13 @@ func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
 }
 
 func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
-	volumesList, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
+	ns, err := kube.CoreV1().Namespaces().List(ctx, metav1.ListOptions{LabelSelector: "kubernetes.io/metadata.name=das"})
+
+	// volumesList, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error listing volumes: %v", err)
 	}
 
-	fmt.Println(volumesList)
+	fmt.Println(ns)
 
 }
