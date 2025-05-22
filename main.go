@@ -29,11 +29,13 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 
 	// Try in-cluster config (only available inside Kubernetes pods)
 	if inClusterCfg, err := rest.InClusterConfig(); err == nil {
+		fmt.Println("using in cluster config")
 		return kubernetes.NewForConfig(inClusterCfg)
 	}
 
 	// Fall back to mockable out-of-cluster config if KUBECONFIG is set
 	if kubeconfig := os.Getenv("KUBECONFIG"); kubeconfig != "" {
+		fmt.Println("out of cluster")
 		return kubernetes.NewForConfig(&rest.Config{
 			Host: "http://localhost:8080",
 		})
@@ -61,6 +63,8 @@ func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraph
 }
 
 func main() {
+	fmt.Println("Starting...")
+
 	cfg := Config{
 		ClientID:       os.Getenv("CLIENT_ID"),
 		ClientSecret:   os.Getenv("CLIENT_SECRET"),
