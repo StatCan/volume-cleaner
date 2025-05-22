@@ -25,4 +25,5 @@ stop:
 		-f serviceaccount.yaml \
 		-f netpol.yaml \
 		-f dry-run-config.yaml \
+		-f dry-run-job.yaml \
 		--ignore-not-found > /dev/null 2>&1 || true
