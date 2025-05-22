@@ -13,6 +13,12 @@ rules:
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pv"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["pvc"]
+    verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -23,47 +22,8 @@ type Config struct {
 	GracePeriod    int
 }
 
-// pointers?
-
-func initKubeClient() (*kubernetes.Clientset, error) {
-
-	// Try in-cluster config (only available inside Kubernetes pods)
-	if inClusterCfg, err := rest.InClusterConfig(); err == nil {
-		fmt.Println("using in cluster config")
-		return kubernetes.NewForConfig(inClusterCfg)
-	}
-
-	// Fall back to mockable out-of-cluster config if KUBECONFIG is set
-	if kubeconfig := os.Getenv("KUBECONFIG"); kubeconfig != "" {
-		fmt.Println("out of cluster")
-		return kubernetes.NewForConfig(&rest.Config{
-			Host: "http://localhost:8080",
-		})
-	}
-
-	// Default failure case
-	return nil, errors.New("no valid Kubernetes config found")
-}
-
-func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
-	return &msgraphsdk.GraphServiceClient{}, nil
-}
-
-func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
-	fmt.Println(graph)
-	fmt.Println(kube)
-
-	volumesList, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
-	if err != nil {
-		log.Fatalf("Error listing volumes: %v", err)
-	}
-
-	fmt.Println(volumesList)
-
-}
-
 func main() {
-	fmt.Println("Starting...")
+	fmt.Println("Volume cleaner started.")
 
 	cfg := Config{
 		ClientID:       os.Getenv("CLIENT_ID"),
@@ -85,5 +45,31 @@ func main() {
 	}
 
 	cleanVolumes(context.Background(), kubeClient, graphClient, cfg)
+
+}
+
+// pointers?
+
+func initKubeClient() (*kubernetes.Clientset, error) {
+	// uses in-cluster config
+	cfg, err := rest.InClusterConfig()
+	if err == nil {
+		return kubernetes.NewForConfig(cfg)
+	}
+	return nil, err
+}
+
+func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
+	// currently just mocks an empty client
+	return &msgraphsdk.GraphServiceClient{}, nil
+}
+
+func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
+	volumesList, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		log.Fatalf("Error listing volumes: %v", err)
+	}
+
+	fmt.Println(volumesList)
 
 }
