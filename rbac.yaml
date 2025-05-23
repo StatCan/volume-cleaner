@@ -14,10 +14,10 @@ rules:
     resources: ["configmaps"]
     verbs: ["get", "list"]
   - apiGroups: [""]
-    resources: ["pv"]
+    resources: ["persistentvolumes"]
     verbs: ["get", "list"]
   - apiGroups: [""]
-    resources: ["pvc"]
+    resources: ["persistentvolumeclaims"]
     verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

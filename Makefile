@@ -1,3 +1,6 @@
+first: # prevents accidental running of make rules
+	@echo "Please use explicit make commands with volume cleaner."
+
 dry-run: _dry-run-setup
 	@echo "🚧 Starting dry run..."
 	@kubectl create namespace das || true
@@ -18,8 +21,7 @@ _dry-run-setup:
 		-f netpol.yaml \
 		-f dry-run-config.yaml
 
-# Stop target (clean up dry-run resources)
-stop:
+clean:
 	@echo "🧼 Cleaning up leftover dry-run resources..."
 	@kubectl delete -f rbac.yaml \
 		-f serviceaccount.yaml \
