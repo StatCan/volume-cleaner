@@ -3,10 +3,9 @@ first: # prevents accidental running of make rules
 
 dry-run: _dry-run-setup
 	@echo "🚧 Starting dry run..."
-	@kubectl create namespace das || true
 	@kubectl -n das apply -f dry-run-job.yaml
-	@echo "⏱️ Waiting for job to start (up to 5 minutes)..."
-	@kubectl -n das wait --for=condition=ready pod -l job-name=volume-cleaner-dry-run --timeout=300s || \
+	@echo "⏱️ Waiting for job to finish (up to 5 minutes)..."
+	@kubectl -n das wait --for=condition=completed pod -l job-name=volume-cleaner-dry-run --timeout=300s || \
 		(echo "❌ Pod did not become ready"; exit 1)
 	@echo "📋 Pod logs:"
 	@kubectl -n das logs -f -l job-name=volume-cleaner-dry-run
