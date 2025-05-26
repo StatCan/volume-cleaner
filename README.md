@@ -6,7 +6,7 @@
 
 A Kubernetes CronJob that automatically identifies and cleans up stale Persistent Volume Claims and Persistent Volumes (K8S) linked to an associated Azure disk.
 
-## Contents
+# Contents
 
 - [Requirements](#-requirements)
 - [Documentation](#-documentation)
@@ -14,21 +14,21 @@ A Kubernetes CronJob that automatically identifies and cleans up stale Persisten
 - [Code of Conduct](#code-of-conduct)
 - [License](#-license)
 
-## Requirements
+# Requirements
 
-## Documentation
+# Documentation
 
-## How to Contribute
+# How to Contribute
 
-### [Code of Conduct][code]
+## Code of Conduct
 
-### [Contributing Guide][contribute]
+## Contributing Guide
 
-**Git Branching Strategy**
+### Git Branching Strategy
 
 - Volume Cleaner follows a [Github Flow Branching Strategy](https://www.gitkraken.com/learn/git/best-practices/git-branch-strategy#github-flow-branch-strategy)
 
-**Branch Naming Convention**
+### Branch Naming Convention
 
 Branch names follow the following guidelines when naming branches
 
@@ -59,11 +59,11 @@ Here are some sample branch names:
 
 - `feature/btis-1000-go-graph-client`
 
-**Commit Messages**
+### Commit Messages
 
 - Commit Messages are to follow the structure of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification)
 
-**Pull Request Structure**
+### Pull Request Structure
 
 Pull Requests (PRs) are to be structured with the following headings
 
