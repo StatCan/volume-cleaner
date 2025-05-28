@@ -69,7 +69,7 @@ Pull Requests (PRs) are to be structured with the following headings
 
 - Title - _Concise Summary of the change_
 
-- Description - _Details on what the PR does, Why the change is needed, and any additiona context about this PR_
+- Description - _Details on what the PR does, Why the change is needed, and any additional context about this PR_
 
 - Testing - _Steps to reproduce the issue and verify the change/fix_
 
