@@ -8,7 +8,7 @@ dry-run: _dry-run-setup
 	@kubectl -n das wait --for=condition=complete job/volume-cleaner-dry-run --timeout=300s || \
 		(echo "❌ Pod did not become ready"; exit 1)
 	@echo "📋 Pod logs:"
-	@kubectl -n das logs -f -l job-name=volume-cleaner-dry-run > output.yaml
+	@kubectl -n das logs -f -l job-name=volume-cleaner-dry-run
 	@kubectl -n das delete -f manifests/dry-run-job.yaml || true
 	@$(MAKE) clean
 	@echo "✅ Dry run completed"

@@ -70,6 +70,8 @@ func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraph
 		log.Fatalf("Error listing volume claims: %v", err)
 	}
 
+	fmt.Println(volClaims.String())
+
 	fmt.Println(volClaims)
 
 	// vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
