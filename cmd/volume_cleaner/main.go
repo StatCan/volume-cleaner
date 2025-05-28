@@ -57,7 +57,7 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 	}
 
 	for _, vol := range vols.Items {
-		fmt.Println(vol.Name, vol.Spec.ClaimRef.Name, vol.Status.LastPhaseTransitionTime.Time.String())
+		fmt.Println(vol.Name, vol.Spec.ClaimRef.Name)
 	}
 
 }
