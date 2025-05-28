@@ -71,7 +71,7 @@ func cleanVolumes(kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClien
 	}
 
 	for _, vol := range vols.Items {
-		fmt.Println(vol.Name, vol.Spec.ClaimRef)
+		fmt.Println(vol.Name, vol.Spec.ClaimRef.Name, vol.Status.LastPhaseTransitionTime.Time)
 	}
 
 }
