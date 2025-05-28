@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -66,29 +64,14 @@ func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
 	return &msgraphsdk.GraphServiceClient{}, nil
 }
 
-func prettify(json_str string) (string, error) {
-	var prettyJSON bytes.Buffer
-	err := json.Indent(&prettyJSON, []byte(json_str), "", "\t")
-	if err != nil {
-		return "", err
-	}
-
-	return prettyJSON.String(), nil
-}
-
 func cleanVolumes(kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
-	volClaims, err := kube.CoreV1().PersistentVolumeClaims("bryan-paget").List(context.TODO(), metav1.ListOptions{})
+	vols, err := kube.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("Error listing volume claims: %v", err)
+		log.Fatalf("Error listing volumes: %v", err)
 	}
 
-	fmt.Println(prettify(volClaims.String()))
-
-	// vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
-	// if err != nil {
-	// 	log.Fatalf("Error listing volumes: %v", err)
-	// }
-
-	// fmt.Println(vols)
+	for _, vol := range vols.Items {
+		fmt.Println(vol.Name, vol.Spec.ClaimRef)
+	}
 
 }
