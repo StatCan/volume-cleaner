@@ -72,11 +72,11 @@ func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraph
 
 	fmt.Println(volClaims)
 
-	vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
-	if err != nil {
-		log.Fatalf("Error listing volumes: %v", err)
-	}
+	// vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
+	// if err != nil {
+	// 	log.Fatalf("Error listing volumes: %v", err)
+	// }
 
-	fmt.Println(vols)
+	// fmt.Println(vols)
 
 }
