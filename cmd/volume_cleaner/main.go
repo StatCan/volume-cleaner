@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -44,14 +46,14 @@ func main() {
 		log.Fatalf("Error creating graph client: %v", err)
 	}
 
-	cleanVolumes(context.Background(), kubeClient, graphClient, cfg)
+	cleanVolumes(kubeClient, graphClient, cfg)
 
 }
 
 // pointers?
 
 func initKubeClient() (*kubernetes.Clientset, error) {
-	// uses in-cluster config
+	// service runs inside cluster as a pod
 	cfg, err := rest.InClusterConfig()
 	if err == nil {
 		return kubernetes.NewForConfig(cfg)
@@ -64,17 +66,23 @@ func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
 	return &msgraphsdk.GraphServiceClient{}, nil
 }
 
-func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
-	volClaims, err := kube.CoreV1().PersistentVolumeClaims("bryan-paget").List(ctx, metav1.ListOptions{})
+func prettify(json_str string) (string, error) {
+	var prettyJSON bytes.Buffer
+	err := json.Indent(&prettyJSON, []byte(json_str), "", "\t")
+	if err != nil {
+		return "", err
+	}
+
+	return prettyJSON.String(), nil
+}
+
+func cleanVolumes(kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
+	volClaims, err := kube.CoreV1().PersistentVolumeClaims("bryan-paget").List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error listing volume claims: %v", err)
 	}
 
-	fmt.Println(volClaims.Marshal())
-
-	fmt.Println(volClaims.String())
-
-	fmt.Println(volClaims)
+	fmt.Println(prettify(volClaims.String()))
 
 	// vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
 	// if err != nil {
