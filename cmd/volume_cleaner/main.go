@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
-	msgraphsdk "github.com/microsoftgraph/msgraph-sdk-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -26,12 +24,8 @@ func main() {
 	fmt.Println("Volume cleaner started.")
 
 	cfg := Config{
-		ClientID:       os.Getenv("CLIENT_ID"),
-		ClientSecret:   os.Getenv("CLIENT_SECRET"),
-		TenantID:       os.Getenv("TENANT_ID"),
-		DryRun:         os.Getenv("DRY_RUN") == "true",
-		AllowedDomains: strings.Split(os.Getenv("ALLOWED_DOMAINS"), ","),
-		GracePeriod:    30,
+		DryRun:      os.Getenv("DRY_RUN") == "true",
+		GracePeriod: 30,
 	}
 
 	kubeClient, err := initKubeClient()
@@ -39,19 +33,16 @@ func main() {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	graphClient, err := initGraphClient()
-	if err != nil {
-		log.Fatalf("Error creating graph client: %v", err)
-	}
-
-	cleanVolumes(context.Background(), kubeClient, graphClient, cfg)
+	cleanVolumes(kubeClient, cfg)
 
 }
 
 // pointers?
 
 func initKubeClient() (*kubernetes.Clientset, error) {
-	// uses in-cluster config
+	// service runs inside cluster as a pod, therefore will use in-cluster config
+	// to connect with cluster
+
 	cfg, err := rest.InClusterConfig()
 	if err == nil {
 		return kubernetes.NewForConfig(cfg)
@@ -59,24 +50,14 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 	return nil, err
 }
 
-func initGraphClient() (*msgraphsdk.GraphServiceClient, error) {
-	// currently just mocks an empty client
-	return &msgraphsdk.GraphServiceClient{}, nil
-}
-
-func cleanVolumes(ctx context.Context, kube kubernetes.Interface, graph *msgraphsdk.GraphServiceClient, cfg Config) {
-	volClaims, err := kube.CoreV1().PersistentVolumeClaims("bryan-paget").List(ctx, metav1.ListOptions{})
-	if err != nil {
-		log.Fatalf("Error listing volume claims: %v", err)
-	}
-
-	fmt.Println(volClaims)
-
-	vols, err := kube.CoreV1().PersistentVolumes().List(ctx, metav1.ListOptions{})
+func cleanVolumes(kube kubernetes.Interface, cfg Config) {
+	vols, err := kube.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error listing volumes: %v", err)
 	}
 
-	fmt.Println(vols)
+	for _, vol := range vols.Items {
+		fmt.Println(vol.Name, vol.Spec.ClaimRef.Name)
+	}
 
 }
