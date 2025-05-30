@@ -49,6 +49,7 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 func findUnattachedPVCs(kube kubernetes.Interface) {
 	allPVCs := NewSet()
 	attachedPVCs := NewSet()
+	bindings := make(map[string]string)
 
 	log.Print("Scanning namespaces...")
 
@@ -75,12 +76,12 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 		// e.g pvc-d88040d...
 
 		for _, claim := range pvcs.Items {
+			// claim.Spec.VolumeName will be an empty string if not bound
 			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
-			allPVCs.Add(claim.Name)
 
-			if claim.Spec.VolumeName == "" {
-				log.Print("Orphaned PVC!")
-			}
+			allPVCs.Add(claim.Name)
+			bindings[claim.Name] = claim.Spec.VolumeName
+
 		}
 
 		log.Print("Scanning stateful sets...")
@@ -99,8 +100,31 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		}
 
+		unattachedPVCs := allPVCs.Difference(attachedPVCs)
+
 		log.Printf("Found %d total volume claims.", allPVCs.Length())
-		log.Printf("Found %d unattached volume claims.", allPVCs.Difference(attachedPVCs).Length())
+		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
+
+		// PVCs with no PVs
+		orphanedPVCs := 0
+
+		attachedOrphanedPVCs := 0
+		unattachedOrphanedPVCs := 0
+
+		for v := range allPVCs.list {
+			if bindings[v] == "" {
+				orphanedPVCs++
+				if !unattachedPVCs.Has(v) {
+					attachedOrphanedPVCs++
+				} else {
+					unattachedOrphanedPVCs++
+				}
+			}
+		}
+
+		log.Printf("Found %d orhpaned PVCs.", orphanedPVCs)
+		log.Printf("Found %d attached orhpaned PVCs.", attachedOrphanedPVCs)
+		log.Printf("Found %d unattached orhpaned PVCs.", unattachedOrphanedPVCs)
 
 	}
 
