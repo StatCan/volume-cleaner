@@ -4,14 +4,14 @@ first: # prevents accidental running of make rules
 dry-run: _dry-run-setup
 	@echo "🚧 Starting dry run..."
 	@kubectl -n das apply -f manifests/dry-run-job.yaml
-	# @echo "⏱️ Waiting for job to finish (up to 5 minutes)..."
-	# @kubectl -n das wait --for=condition=complete job/volume-cleaner-dry-run --timeout=300s || \
-	# 	(echo "❌ Pod did not become ready"; exit 1)
-	# @echo "📋 Pod logs:"
-	# @kubectl -n das logs -f -l job-name=volume-cleaner-dry-run
-	# @kubectl -n das delete -f manifests/dry-run-job.yaml || true
-	# @$(MAKE) clean
-	# @echo "✅ Dry run completed"
+	@echo "⏱️ Waiting for job to finish (up to 5 minutes)..."
+	@kubectl -n das wait --for=condition=complete job/volume-cleaner-dry-run --timeout=300s || \
+		(echo "❌ Pod did not become ready"; exit 1)
+	@echo "📋 Pod logs:"
+	@kubectl -n das logs -l job-name=volume-cleaner-dry-run --tail 500
+	@kubectl -n das delete -f manifests/dry-run-job.yaml || true
+	@$(MAKE) clean
+	@echo "✅ Dry run completed"
 
 _dry-run-setup:
 	@echo "🧰 Setting up dry-run dependencies..."

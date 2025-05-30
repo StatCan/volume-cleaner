@@ -47,7 +47,9 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
+	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
+	})
 	if err != nil {
 		log.Fatalf("Error listing namespaces: %v", err)
 	}
@@ -66,6 +68,8 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 		for _, claim := range pvcs.Items {
 			fmt.Println(claim.Name, claim.Spec.VolumeName)
 		}
+
+		fmt.Println(namespace.Labels["app.kubernetes.io/part-of"])
 
 	}
 
