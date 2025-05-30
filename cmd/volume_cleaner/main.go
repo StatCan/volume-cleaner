@@ -55,7 +55,7 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 	}
 
 	for _, namespace := range ns.Items {
-		fmt.Println(namespace.Name)
+		log.Printf("Kubeflow namespace: %v", namespace.Name)
 
 		pvcs, err := kube.CoreV1().PersistentVolumeClaims(namespace.Name).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
@@ -66,10 +66,8 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 		// e.g pvc-d88040d...
 
 		for _, claim := range pvcs.Items {
-			fmt.Println(claim.Name, claim.Spec.VolumeName)
+			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
 		}
-
-		fmt.Println(namespace.Labels["app.kubernetes.io/part-of"])
 
 	}
 
