@@ -78,7 +78,7 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		log.Print("Scanning stateful sets...")
 
-		sts, err := kube.AppsV1beta1().StatefulSets(namespace.Name).List(context.TODO(), metav1.ListOptions{})
+		sts, err := kube.AppsV1().StatefulSets(namespace.Name).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			log.Fatalf("Error listing stateful sets: %v", err)
 		}
