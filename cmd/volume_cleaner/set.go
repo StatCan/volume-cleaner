@@ -21,6 +21,10 @@ func (s *Set) Length() int {
 	return len(s.list)
 }
 
+func (s *Set) Clear() {
+	s.list = make(map[string]struct{})
+}
+
 func (s *Set) Difference(otherSet *Set) *Set {
 	newSet := NewSet()
 

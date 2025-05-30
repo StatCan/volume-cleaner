@@ -63,6 +63,9 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 		log.Printf("Found Kubeflow namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
+		allPVCs.Clear()
+		attachedPVCs.Clear()
+
 		pvcs, err := kube.CoreV1().PersistentVolumeClaims(namespace.Name).List(context.TODO(), metav1.ListOptions{})
 		if err != nil {
 			log.Fatalf("Error listing volume claims: %v", err)
@@ -74,6 +77,10 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 		for _, claim := range pvcs.Items {
 			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
 			allPVCs.Add(claim.Name)
+
+			if claim.Spec.VolumeName == "" {
+				log.Print("Orphaned PVC!")
+			}
 		}
 
 		log.Print("Scanning stateful sets...")
@@ -92,8 +99,8 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		}
 
-		log.Printf("Found %d total volumes.", allPVCs.Length())
-		log.Printf("Found %d unattached volumes.", allPVCs.Difference(attachedPVCs).Length())
+		log.Printf("Found %d total volume claims.", allPVCs.Length())
+		log.Printf("Found %d unattached volume claims.", allPVCs.Difference(attachedPVCs).Length())
 
 	}
 
