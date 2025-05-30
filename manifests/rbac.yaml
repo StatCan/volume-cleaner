@@ -6,7 +6,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["namespaces"]
-    verbs: ["get", "list", "patch", "delete"]
+    verbs: ["get"]
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list"]
@@ -18,6 +18,9 @@ rules:
     verbs: ["get", "list"]
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list"]
+  - apiGroups: ["app"]
+    resources: ["statefulsets"]
     verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
