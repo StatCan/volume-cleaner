@@ -88,6 +88,7 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		for _, statefulset := range sts.Items {
 			log.Printf("Found stateful set: %v", statefulset.Name)
+			log.Println(statefulset.Spec.VolumeClaimTemplates)
 
 			for _, claim := range statefulset.Spec.VolumeClaimTemplates {
 				attachedPVCs.Add(claim.Name)
