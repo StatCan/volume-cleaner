@@ -92,7 +92,11 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		}
 
-		log.Printf("Unattached PVCs: %v", allPVCs.Difference(attachedPVCs))
+		// log.Printf("Unattached PVCs: %v", allPVCs.Difference(attachedPVCs))
+
+		for v := range allPVCs.Difference(attachedPVCs).list {
+			log.Printf("Unattached PVC: %v", v)
+		}
 
 	}
 
