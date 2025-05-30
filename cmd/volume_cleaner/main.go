@@ -60,9 +60,6 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 	}
 
 	for _, namespace := range ns.Items {
-		if namespace.Name != "anray-liu" {
-			continue
-		}
 		log.Printf("Found Kubeflow namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
@@ -95,13 +92,8 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 
 		}
 
-		log.Println(allPVCs)
-		log.Println("")
-		log.Println(attachedPVCs)
-		log.Println("")
-		log.Println(allPVCs.Difference(attachedPVCs))
-
-		break
+		log.Printf("Found %d total volumes.", allPVCs.Length())
+		log.Printf("Found %d unattached volumes.", allPVCs.Difference(attachedPVCs).Length())
 
 	}
 
