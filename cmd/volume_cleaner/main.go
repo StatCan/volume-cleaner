@@ -99,5 +99,5 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-
+	findUnattachedPVCs(kube)
 }
