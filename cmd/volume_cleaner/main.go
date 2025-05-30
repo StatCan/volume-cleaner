@@ -56,7 +56,7 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 		fmt.Println(namespace.Name)
 
 		pvcs, err := kube.CoreV1().PersistentVolumeClaims(namespace.Name).List(context.TODO(), metav1.ListOptions{
-			LabelSelector: "app.kubernetes.io/part-of: kubeflow-profile",
+			LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
 		})
 		if err != nil {
 			log.Fatalf("Error listing volume claims: %v", err)
