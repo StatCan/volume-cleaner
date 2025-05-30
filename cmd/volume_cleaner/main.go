@@ -71,6 +71,4 @@ func cleanVolumes(kube kubernetes.Interface, cfg Config) {
 
 	}
 
-	fmt.Println(ns.Items)
-
 }
