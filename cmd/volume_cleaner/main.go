@@ -12,12 +12,8 @@ import (
 )
 
 type Config struct {
-	ClientID       string
-	ClientSecret   string
-	TenantID       string
-	DryRun         bool
-	AllowedDomains []string
-	GracePeriod    int
+	DryRun      bool
+	GracePeriod int
 }
 
 func main() {
@@ -51,13 +47,26 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	vols, err := kube.CoreV1().PersistentVolumes().List(context.TODO(), metav1.ListOptions{})
+	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("Error listing volumes: %v", err)
+		log.Fatalf("Error listing namespaces: %v", err)
 	}
 
-	for _, vol := range vols.Items {
-		fmt.Println(vol.Name, vol.Spec.ClaimRef.Name)
+	for _, namespace := range ns.Items {
+		fmt.Println(namespace.Name)
+
+		pvcs, err := kube.CoreV1().PersistentVolumeClaims(namespace.Name).List(context.TODO(), metav1.ListOptions{})
+		if err != nil {
+			log.Fatalf("Error listing volume claims: %v", err)
+		}
+
+		// azure disk will have the same name as the volume
+		// e.g pvc-d88040d...
+
+		for _, claim := range pvcs.Items {
+			fmt.Println(claim.Name, claim.Spec.VolumeName)
+		}
+
 	}
 
 }
