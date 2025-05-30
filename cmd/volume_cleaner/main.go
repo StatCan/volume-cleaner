@@ -60,6 +60,9 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 	}
 
 	for _, namespace := range ns.Items {
+		if namespace.Name != "anray-liu" {
+			continue
+		}
 		log.Printf("Found Kubeflow namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
