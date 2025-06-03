@@ -9,17 +9,18 @@ assignees: ''
 
 #### Is your feature request related to a problem? Please link issue ticket
 
-Link to existing project ticket that contains a clear and concise description of
+Provide a link to an existing project ticket that contains a clear and concise description of
 what the problem is. Ex. I'm always frustrated when [...]
 
-#### Describe the solution you'd like
+#### Describe the solution you would like
 
-A clear and concise description of what you want to happen.
+Provide a description of your desired solution.
 
-#### Describe alternatives you've considered
+Ex. Adjust X to produce result Y.
 
-A clear and concise description of any alternative solutions or features you've
-considered.
+#### Describe alternatives you have considered
+
+A clear and concise description of any alternative solutions or features you've considered.
 
 #### Additional context
 

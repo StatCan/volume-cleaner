@@ -11,19 +11,24 @@ What types of changes does your code introduce to volume-cleaner? Put an `x` in 
 - [ ] Bugfix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation Update (if none of the other choices apply
+- [ ] Documentation Update 
+- [ ] Other (if none of the other choices apply)
 
 ### Testing
 
-- Steps to reproduce the issue and verify the change/fix
+Steps to reproduce the issue and verify the change/fix
+
+1. Step 1 
+2. Step 2 
+3. Step 3
 
 ### Screenshots (if applicable) 
 
-- Include before/after screenshots or links 
+Include before/after screenshots or links 
 
 ### Related Issue/Ticket
 
-- Link to the related issue(s) on Github or Jira
+Link to the related issue(s) on Github or Jira
 
 ### Checklist
 
