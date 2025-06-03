@@ -32,6 +32,6 @@ Link to the related issue(s) on Github or Jira
 
 ### Checklist
 
-- [ ] I have documented this change either in the project README.md or the Github Wiki of this project (if appropriate)
-- [ ] I have written tests that prove my fix is effective or that my feature works (unit and/or integration tests)
+- [ ] README.md or the Github Wiki documentation updated - if appropriate
+- [ ] Unit and/or integration tests added/modified
 - [ ] Lint and Unit tests pass locally with my changes

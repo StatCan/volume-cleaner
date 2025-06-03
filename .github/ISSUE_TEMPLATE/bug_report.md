@@ -13,9 +13,9 @@ A clear and concise description of what the bug is.
 
 #### Environment info
 
-#### Files
+#### Relevant Code Files
 
-A list of relevant files for this issue. This will help people navigate the project and offer some clues of where to start.
+List the code files you think are relevant to this issue. This will help people navigate the project and offer some clues of where to start.
 
 #### Steps to reproduce
 
