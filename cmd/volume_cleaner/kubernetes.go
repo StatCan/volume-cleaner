@@ -21,6 +21,9 @@ func nsList(kube kubernetes.Interface) []corev1.Namespace {
 	if err != nil {
 		log.Fatalf("Error listing namespaces: %v", err)
 	}
+
+	log.Println(len(ns.Items))
+
 	return ns.Items
 }
 
