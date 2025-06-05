@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"maps"
+	"slices"
 
 	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -42,30 +44,27 @@ func stsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	return sts.Items
 }
 
-func findUnattachedPVCs(kube kubernetes.Interface) {
-	allPVCs := NewSet()
-	attachedPVCs := NewSet()
-	bindings := make(map[string]string)
+func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+	pvcObjects := make(map[string]corev1.PersistentVolumeClaim)
 
 	log.Print("Scanning namespaces...")
 
 	for _, namespace := range nsList(kube) {
-		log.Printf("Found Kubeflow namespace: %v", namespace.Name)
+		log.Printf("Found namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
-		allPVCs.Clear()
-		attachedPVCs.Clear()
+		allPVCs := NewSet()
+		attachedPVCs := NewSet()
 
 		// azure disk will have the same name as the volume
-		// e.g pvc-d88040d...
+		// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
 
 		for _, claim := range pvcList(kube, namespace.Name) {
 			// claim.Spec.VolumeName will be an empty string if not bound
 			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
 
 			allPVCs.Add(claim.Name)
-			bindings[claim.Name] = claim.Spec.VolumeName
-
+			pvcObjects[claim.Name] = claim
 		}
 
 		log.Print("Scanning stateful sets...")
@@ -84,27 +83,8 @@ func findUnattachedPVCs(kube kubernetes.Interface) {
 		log.Printf("Found %d total volume claims.", allPVCs.Length())
 		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
 
-		// PVCs with no PVs
-		orphanedPVCs := 0
-
-		attachedOrphanedPVCs := 0
-		unattachedOrphanedPVCs := 0
-
-		for v := range allPVCs.list {
-			if bindings[v] == "" {
-				orphanedPVCs++
-				if !unattachedPVCs.Has(v) {
-					attachedOrphanedPVCs++
-				} else {
-					unattachedOrphanedPVCs++
-				}
-			}
-		}
-
-		log.Printf("Found %d orhpaned PVCs.", orphanedPVCs)
-		log.Printf("Found %d attached orhpaned PVCs.", attachedOrphanedPVCs)
-		log.Printf("Found %d unattached orhpaned PVCs.", unattachedOrphanedPVCs)
-
 	}
+
+	return slices.Collect(maps.Values(pvcObjects))
 
 }
