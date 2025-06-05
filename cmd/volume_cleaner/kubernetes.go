@@ -16,7 +16,7 @@ import (
 
 func nsList(kube kubernetes.Interface) []corev1.Namespace {
 	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
-		LabelSelector: "app.kubernetes.ip/part-of=kubeflow-profile",
+		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
 	})
 	if err != nil {
 		log.Fatalf("Error listing namespaces: %v", err)
