@@ -45,6 +45,8 @@ func stsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	return sts.Items
 }
 
+// returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
+
 func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
 	pvcObjects := make(map[string]corev1.PersistentVolumeClaim)
 
