@@ -25,6 +25,7 @@ func (s *Set) Clear() {
 	s.list = make(map[string]struct{})
 }
 
+// returns a new set with values in self but not in otherSet
 func (s *Set) Difference(otherSet *Set) *Set {
 	newSet := NewSet()
 
