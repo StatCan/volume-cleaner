@@ -128,5 +128,14 @@ func TestSetDifference(t *testing.T) {
 			actual := s.Difference(test.otherSet)
 			assert.Equal(t, test.expected, actual)
 		}
+
+		assert.Equal(t, NewSet().Difference(func() *Set {
+			s := NewSet()
+			s.Add("1")
+			s.Add("2")
+			s.Add("3")
+			return s
+		}()), NewSet())
+
 	})
 }

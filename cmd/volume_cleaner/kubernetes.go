@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"maps"
-	"slices"
 
 	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -14,7 +12,7 @@ import (
 
 // returns a slice of corev1.Namespace structs
 
-func nsList(kube kubernetes.Interface) []corev1.Namespace {
+func NsList(kube kubernetes.Interface) []corev1.Namespace {
 	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
 		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
 	})
@@ -27,7 +25,8 @@ func nsList(kube kubernetes.Interface) []corev1.Namespace {
 
 // returns a slice of corev1.PersistentVolumeClaim structs
 
-func pvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
+
+func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error listing volume claims: %v", err)
@@ -37,7 +36,7 @@ func pvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeCl
 
 // returns a slice of appv1.StatefulSet structs
 
-func stsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
+func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	sts, err := kube.AppsV1().StatefulSets(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("Error listing stateful sets: %v", err)
@@ -47,12 +46,18 @@ func stsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 
-func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+
+func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+	// map each pvc name to its pvc object
+	// names are used to calculate set difference but the pvc objects are returned
 	pvcObjects := make(map[string]corev1.PersistentVolumeClaim)
+
+	// list of pvc objects to be concated to with each namespace
+	fullList := make([]corev1.PersistentVolumeClaim, 0)
 
 	log.Print("Scanning namespaces...")
 
-	for _, namespace := range nsList(kube) {
+	for _, namespace := range NsList(kube) {
 		log.Printf("Found namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
@@ -62,7 +67,7 @@ func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 		// azure disk will have the same name as the volume
 		// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
 
-		for _, claim := range pvcList(kube, namespace.Name) {
+		for _, claim := range PvcList(kube, namespace.Name) {
 			// claim.Spec.VolumeName will be an empty string if not bound
 			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
 
@@ -72,7 +77,7 @@ func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 
 		log.Print("Scanning stateful sets...")
 
-		for _, statefulset := range stsList(kube, namespace.Name) {
+		for _, statefulset := range StsList(kube, namespace.Name) {
 			log.Printf("Found stateful set: %v", statefulset.Name)
 
 			for _, claim := range statefulset.Spec.Template.Spec.Volumes {
@@ -83,11 +88,15 @@ func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 
 		unattachedPVCs := allPVCs.Difference(attachedPVCs)
 
+		for pvc := range unattachedPVCs.list {
+			fullList = append(fullList, pvcObjects[pvc])
+		}
+
 		log.Printf("Found %d total volume claims.", allPVCs.Length())
 		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
 
 	}
 
-	return slices.Collect(maps.Values(pvcObjects))
+	return fullList
 
 }
