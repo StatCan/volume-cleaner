@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -30,14 +28,11 @@ func main() {
 	}
 
 	cleanVolumes(kubeClient, cfg)
-
 }
-
-// pointers?
 
 func initKubeClient() (*kubernetes.Clientset, error) {
 	// service runs inside cluster as a pod, therefore will use in-cluster config
-	// to connect with cluster
+	// to connect with kubernetes API
 
 	cfg, err := rest.InClusterConfig()
 	if err == nil {
@@ -47,28 +42,5 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
-		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
-	})
-	if err != nil {
-		log.Fatalf("Error listing namespaces: %v", err)
-	}
-
-	for _, namespace := range ns.Items {
-		log.Printf("Kubeflow namespace: %v", namespace.Name)
-
-		pvcs, err := kube.CoreV1().PersistentVolumeClaims(namespace.Name).List(context.TODO(), metav1.ListOptions{})
-		if err != nil {
-			log.Fatalf("Error listing volume claims: %v", err)
-		}
-
-		// azure disk will have the same name as the volume
-		// e.g pvc-d88040d...
-
-		for _, claim := range pvcs.Items {
-			log.Printf("PVC: %v, PV: %v", claim.Name, claim.Spec.VolumeName)
-		}
-
-	}
-
+	findUnattachedPVCs(kube)
 }
