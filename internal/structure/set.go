@@ -25,8 +25,8 @@ func (s *Set) Clear() {
 	s.list = make(map[string]struct{})
 }
 
-// returns a list of items (HACK: the returned list is mutable and breaks encapsulation)
-func (s *Set) GetList() map[string]struct{} {
+// returns the set (HACK: the returned set is mutable and breaks encapsulation)
+func (s *Set) GetSet() map[string]struct{} {
 	return s.list
 }
 

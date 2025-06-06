@@ -90,7 +90,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 
 		unattachedPVCs := allPVCs.Difference(attachedPVCs)
 
-		for pvc := range unattachedPVCs.GetList() {
+		for pvc := range unattachedPVCs.GetSet() {
 			fullList = append(fullList, pvcObjects[pvc])
 		}
 
