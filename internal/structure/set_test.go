@@ -1,6 +1,7 @@
-package main
+package structure
 
 import (
+	// External Imports
 	"testing"
 
 	"github.com/stretchr/testify/assert"

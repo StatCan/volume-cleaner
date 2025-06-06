@@ -1,6 +1,7 @@
-package main
+package kubernetes
 
 import (
+	// External Imports
 	"context"
 	"testing"
 
