@@ -63,13 +63,43 @@ Here are some sample branch names:
 
 - Commit Messages are to follow the structure of [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#specification)
 
+### Issue Structure
+
+Bug Reports are to be structured with the following headings
+
+- Describe the bug - _A clear and concise description of what the bug is_ 
+
+- Environment Info - _Details on what environment used when the bug was encountered_
+
+- Files - _A list of relevant files for this issue_
+
+- Steps to reproduce - _Steps to reproduce the behaviour_
+
+- Expected Behaviour - _A clear and concise description of what you expected to happen_
+
+- Screenshots - _Screenshots of the problem_
+
+- Additional Context - _Other details_ 
+
+Feature Requests are to be structured with the following headings
+
+- Is your feature request related to a problem? Please link issue ticket
+
+- Describe the solution you'd like - _A clear and concise description of what you want to happen_
+
+- Describe alternatives you've considered - _A clear and concise description of any alternative solutions or features you've considered_
+
+- Additional Context - _Other details_
+
 ### Pull Request Structure
 
 Pull Requests (PRs) are to be structured with the following headings
 
 - Title - _Concise Summary of the change_
 
-- Description - _Details on what the PR does, Why the change is needed, and any additiona context about this PR_
+- Proposed Changes/Description - _Details on what the PR does, Why the change is needed, and any additional context about this PR_
+
+- Type of Change - _labels for the change, based on the PR template in the project (i.e., bugfix, new feature, breaking change, documentation update)_
 
 - Testing - _Steps to reproduce the issue and verify the change/fix_
 

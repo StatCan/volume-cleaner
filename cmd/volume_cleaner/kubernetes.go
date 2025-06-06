@@ -25,6 +25,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 
 // returns a slice of corev1.PersistentVolumeClaim structs
 
+
 func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -44,6 +45,7 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 }
 
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
+
 
 func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
 	// map each pvc name to its pvc object

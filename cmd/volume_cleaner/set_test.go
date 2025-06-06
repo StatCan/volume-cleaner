@@ -136,5 +136,6 @@ func TestSetDifference(t *testing.T) {
 			s.Add("3")
 			return s
 		}()), NewSet())
+
 	})
 }
