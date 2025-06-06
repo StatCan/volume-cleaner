@@ -109,3 +109,5 @@ Pull Requests (PRs) are to be structured with the following headings
 
 ## License
 
+Volume Cleaner is distributed under [AGPL-3.0.only](LICENSE).
+
