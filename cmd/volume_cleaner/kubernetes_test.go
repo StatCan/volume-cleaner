@@ -62,10 +62,10 @@ func TestStsList(t *testing.T) {
 
 		// inject fake stateful sets
 		for _, name := range names {
-			ns := &appv1.StatefulSet{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
-			_, err := client.AppsV1().StatefulSets("test").Create(context.TODO(), ns, metav1.CreateOptions{})
+			sts := &appv1.StatefulSet{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
+			_, err := client.AppsV1().StatefulSets("test").Create(context.TODO(), sts, metav1.CreateOptions{})
 			if err != nil {
-				t.Fatalf("Error injecting namespace add: %v", err)
+				t.Fatalf("Error injecting sts add: %v", err)
 			}
 		}
 
@@ -99,10 +99,10 @@ func TestPvcList(t *testing.T) {
 
 		// inject fake pvcs
 		for _, name := range names {
-			ns := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
-			_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), ns, metav1.CreateOptions{})
+			pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
+			_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvc, metav1.CreateOptions{})
 			if err != nil {
-				t.Fatalf("Error injecting namespace add: %v", err)
+				t.Fatalf("Error injecting pvc add: %v", err)
 			}
 		}
 
@@ -111,10 +111,72 @@ func TestPvcList(t *testing.T) {
 		// check right length
 		assert.Equal(t, len(list), len(names))
 
-		// check that each sts is found
-		for i, sts := range list {
-			assert.Equal(t, sts.Name, names[i])
+		// check that each pvc is found
+		for i, pvc := range list {
+			assert.Equal(t, pvc.Name, names[i])
 		}
+
+	})
+}
+
+func TestFindUnattachedPVCs(t *testing.T) {
+
+	t.Run("successfully find unattached pvcs", func(t *testing.T) {
+		// create fake client
+		client := fake.NewClientset()
+
+		ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "test",
+			Labels: map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}}}
+		_, err := client.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
+		if err != nil {
+			t.Fatalf("Error injecting namespace add: %v", err)
+		}
+
+		names := []string{"pvc1", "pvc2"}
+
+		// inject fake pvcs
+		for _, name := range names {
+			pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
+			_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvc, metav1.CreateOptions{})
+			if err != nil {
+				t.Fatalf("Error injecting pvc add: %v", err)
+			}
+		}
+
+		assert.Equal(t, len(FindUnattachedPVCs(client)), 2)
+
+		// mock a stateful set attached to a pvc1
+
+		sts := &appv1.StatefulSet{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sts1",
+				Namespace: "test",
+			},
+			Spec: appv1.StatefulSetSpec{
+				Template: corev1.PodTemplateSpec{
+					Spec: corev1.PodSpec{
+						Volumes: []corev1.Volume{
+							{
+								Name: "pvc1",
+								VolumeSource: corev1.VolumeSource{
+									PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+										ClaimName: "pvc1",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		_, err = client.AppsV1().StatefulSets("test").Create(context.TODO(), sts, metav1.CreateOptions{})
+		if err != nil {
+			t.Fatalf("Error injecting sts add: %v", err)
+
+		}
+
+		assert.Equal(t, len(FindUnattachedPVCs(client)), 1)
 
 	})
 }

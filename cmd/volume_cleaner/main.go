@@ -42,5 +42,5 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	findUnattachedPVCs(kube)
+	FindUnattachedPVCs(kube)
 }

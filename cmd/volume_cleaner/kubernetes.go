@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"maps"
-	"slices"
 
 	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -47,8 +45,13 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 
-func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+	// map each pvc name to its pvc object
+	// names are used to calculate set difference but the pvc objects are returned
 	pvcObjects := make(map[string]corev1.PersistentVolumeClaim)
+
+	// list of pvc objects to be concated to with each namespace
+	fullList := make([]corev1.PersistentVolumeClaim, 0)
 
 	log.Print("Scanning namespaces...")
 
@@ -83,11 +86,15 @@ func findUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 
 		unattachedPVCs := allPVCs.Difference(attachedPVCs)
 
+		for pvc := range unattachedPVCs.list {
+			fullList = append(fullList, pvcObjects[pvc])
+		}
+
 		log.Printf("Found %d total volume claims.", allPVCs.Length())
 		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
 
 	}
 
-	return slices.Collect(maps.Values(pvcObjects))
+	return fullList
 
 }
