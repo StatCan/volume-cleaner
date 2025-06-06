@@ -81,3 +81,40 @@ func TestStsList(t *testing.T) {
 
 	})
 }
+
+func TestPvcList(t *testing.T) {
+
+	t.Run("successful pvc listing", func(t *testing.T) {
+		// create fake client
+		client := fake.NewClientset()
+
+		ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "test",
+			Labels: map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}}}
+		_, err := client.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
+		if err != nil {
+			t.Fatalf("Error injecting namespace add: %v", err)
+		}
+
+		names := []string{"pvc1", "pvc2"}
+
+		// inject fake pvcs
+		for _, name := range names {
+			ns := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "test"}}
+			_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), ns, metav1.CreateOptions{})
+			if err != nil {
+				t.Fatalf("Error injecting namespace add: %v", err)
+			}
+		}
+
+		list := PvcList(client, "test")
+
+		// check right length
+		assert.Equal(t, len(list), len(names))
+
+		// check that each sts is found
+		for i, sts := range list {
+			assert.Equal(t, sts.Name, names[i])
+		}
+
+	})
+}
