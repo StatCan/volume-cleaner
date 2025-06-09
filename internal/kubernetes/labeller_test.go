@@ -31,8 +31,21 @@ func TestAddPvcLabel(t *testing.T) {
 			}
 		}
 
-		PatchPvcLabel(client, "volume-cleaner/unattached-time", "foo", "test", "pvc1")
+		// test adding new label
+		SetPvcLabel(client, "volume-cleaner/unattached-time", "foo", "test", "pvc1")
 
 		assert.Equal(t, PvcList(client, "test")[0].Labels["volume-cleaner/unattached-time"], "foo")
+
+		// test changing existing label
+		SetPvcLabel(client, "volume-cleaner/unattached-time", "bar", "test", "pvc1")
+
+		assert.Equal(t, PvcList(client, "test")[0].Labels["volume-cleaner/unattached-time"], "bar")
+
+		// test removing label
+		RemovePvcLabel(client, "volume-cleaner/unattached-time", "test", "pvc1")
+
+		_, ok := PvcList(client, "test")[0].Labels["volume-cleaner/unattached-time"]
+
+		assert.Equal(t, ok, false)
 	})
 }
