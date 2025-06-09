@@ -10,7 +10,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	// Internal Packages
-	kuber "volume-cleaner/internal/kubernetes"
+	kubeInternal "volume-cleaner/internal/kubernetes"
 )
 
 type Config struct {
@@ -46,5 +46,5 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 }
 
 func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	kuber.FindUnattachedPVCs(kube)
+	kubeInternal.FindUnattachedPVCs(kube)
 }
