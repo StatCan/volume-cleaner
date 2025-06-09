@@ -10,8 +10,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func PatchPvcLabel(kube kubernetes.Interface, label string, value string, ns string, pvc string) {
-	patch := []byte(fmt.Sprintf(`{"metadata":{"labels":{"%s":"%s"}}}`, label, value))
+func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns string, pvc string) {
+	patch := []byte(fmt.Sprintf(`{"metadata":{"labels":{"%s":%s}}}`, label, value))
 	_, err := kube.CoreV1().PersistentVolumeClaims(ns).Patch(
 		context.TODO(),
 		pvc,
@@ -23,4 +23,12 @@ func PatchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 		log.Fatalf("Error patching PVC %s from namespace %s: %v", pvc, ns, err)
 	}
 
+}
+
+func SetPvcLabel(kube kubernetes.Interface, label string, value string, ns string, pvc string) {
+	patchPvcLabel(kube, label, fmt.Sprintf(`"%s"`, value), ns, pvc)
+}
+
+func RemovePvcLabel(kube kubernetes.Interface, label string, ns string, pvc string) {
+	patchPvcLabel(kube, label, "null", ns, pvc)
 }
