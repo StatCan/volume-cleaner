@@ -3,13 +3,13 @@ first: # prevents accidental running of make rules
 
 dry-run: _dry-run-setup
 	@echo "🚧 Starting dry run..."
-	@kubectl -n das apply -f manifests/dry-run-job.yaml
+	@kubectl -n das apply -f manifests/dry_run/dry_run_job.yaml
 	@echo "⏱️ Waiting for job to finish (up to 5 minutes)..."
 	@kubectl -n das wait --for=condition=complete job/volume-cleaner-dry-run --timeout=300s || \
 		(echo "❌ Pod did not become ready"; exit 1)
 	@echo "📋 Pod logs:"
 	@kubectl -n das logs -l job-name=volume-cleaner-dry-run --tail 500
-	@kubectl -n das delete -f manifests/dry-run-job.yaml || true
+	@kubectl -n das delete -f manifests/dry_run/dry_run_job.yaml || true
 	@$(MAKE) clean
 	@echo "✅ Dry run completed"
 
@@ -18,10 +18,11 @@ _dry-run-setup:
 	@kubectl apply -f manifests/rbac.yaml \
 		-f manifests/serviceaccount.yaml \
 		-f manifests/netpol.yaml \
-		-f manifests/dry-run-config.yaml
+		-f manifests/dry_run/dry_run_config.yaml
 
 clean:
 	@echo "🧼 Cleaning up leftover dry-run resources..."
 	@kubectl delete -f manifests/ --ignore-not-found > /dev/null 2>&1 || true
-	@kubectl delete -f manifests/dry-run-job.yaml --ignore-not-found > /dev/null 2>&1 || true
+	@kubectl delete -f manifests/dry_run/ --ignore-not-found > /dev/null 2>&1 || true
+	@kubectl delete -f manifests/dry_run/dry_run_job.yaml --ignore-not-found > /dev/null 2>&1 || true
 	@echo "Cleaning complete"
