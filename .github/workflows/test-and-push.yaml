@@ -26,6 +26,7 @@ jobs:
       - name: Build and Push Image
         uses: docker/build-push-action@v5
         with:
+          context: ./cmd/controller
           file: ./cmd/controller/.Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
           push: true
