@@ -23,12 +23,10 @@ func TestAddPvcLabel(t *testing.T) {
 			t.Fatalf("Error injecting namespace add: %v", err)
 		}
 
-		{
-			pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: "pvc1", Namespace: "test"}}
-			_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvc, metav1.CreateOptions{})
-			if err != nil {
-				t.Fatalf("Error injecting pvc add: %v", err)
-			}
+		pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: "pvc1", Namespace: "test"}}
+		_, err = client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvc, metav1.CreateOptions{})
+		if err != nil {
+			t.Fatalf("Error injecting pvc add: %v", err)
 		}
 
 		// test adding new label
