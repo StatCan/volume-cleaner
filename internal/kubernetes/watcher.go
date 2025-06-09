@@ -31,7 +31,7 @@ func watchSts(kube *kubernetes.Clientset) {
 			continue
 		}
 
-		stsPvcs := PvcListBySts(kube, sts)
+		// stsPvcs := PvcListBySts(kube, sts)
 
 		switch event.Type {
 		case watch.Added:
