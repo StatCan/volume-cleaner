@@ -27,7 +27,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 	return ns.Items
 }
 
-// returns a slice of corev1.PersistentVolumeClaim structs
+// returns a slice of corev1.PersistentVolumeClaim structs in a given namespace
 
 func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
@@ -37,7 +37,7 @@ func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeCl
 	return pvcs.Items
 }
 
-// returns a slice of appv1.StatefulSet structs
+// returns a slice of appv1.StatefulSet structs in a given namespace
 
 func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	sts, err := kube.AppsV1().StatefulSets(name).List(context.TODO(), metav1.ListOptions{})
