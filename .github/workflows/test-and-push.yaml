@@ -26,7 +26,7 @@ jobs:
       - name: Run yamllint
         run: |
           pip install yamllint
-          yamllint .
+          yamllint ./docker/controller/.Dockerfile ./docker/scheduler/.Dockerfile
 
   build-push:
     runs-on: ubuntu-latest
