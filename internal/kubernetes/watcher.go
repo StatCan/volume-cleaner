@@ -5,8 +5,10 @@ import (
 	"context"
 	"log"
 
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/kubernetes"
 )
 
 // Watches for when statefulsets are created or deleted across all namespaces
@@ -30,8 +32,10 @@ func watchSts(kube *kubernetes.Clientset) {
 		}
 
 		switch event.Type {
-		case (watch.Added || watch.Deleted):
-			// fmt.Printf("Pod added/deleted: %s\n", sts)
+		case watch.Added:
+			log.Print("Pod added: %s\n", sts)
+		case watch.Deleted:
+			log.Print("Pod deleted: %s\n", sts)
 		}
 
 	}
