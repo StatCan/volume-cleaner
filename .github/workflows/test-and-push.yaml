@@ -17,8 +17,8 @@ jobs:
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile:  |
-            ./docker/controller/.Dockerfile
-            ./docker/scheduler/.Dockerfile
+            ./docker/controller/Dockerfile
+            ./docker/scheduler/Dockerfile
 
       - name: Lint YAML
         uses: actions/setup-python@v4
