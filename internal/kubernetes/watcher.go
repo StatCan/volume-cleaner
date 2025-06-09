@@ -31,11 +31,15 @@ func watchSts(kube *kubernetes.Clientset) {
 			continue
 		}
 
+		stsPvcs := PvcListBySts(kube, sts)
+
 		switch event.Type {
 		case watch.Added:
-			log.Printf("Pod added: %s\n", sts)
+			log.Printf("sts added: %s\n", sts)
+			// Call Labeler
 		case watch.Deleted:
-			log.Printf("Pod deleted: %s\n", sts)
+			log.Printf("sts deleted: %s\n", sts)
+			// Call Labeler
 		}
 
 	}
