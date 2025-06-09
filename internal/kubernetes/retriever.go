@@ -47,18 +47,18 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	return sts.Items
 }
 
-// returns a pointer to a slice of corev1.PersistentVolumeClaim structs
+// returns a slice of corev1.PersistentVolumeClaim structs
 // NOTE: each PVC has an OwnerReference pointing to its attached StatefulSet
 
-func PvcListBySts(kube kubernetes.Interface, sts *appv1.StatefulSet) []*corev1.PersistentVolumeClaim {
+func PvcListBySts(kube kubernetes.Interface, sts *appv1.StatefulSet) []corev1.PersistentVolumeClaim {
 	pvcList := PvcList(kube, sts.Namespace)
 
-	var owned []*corev1.PersistentVolumeClaim
+	var owned []corev1.PersistentVolumeClaim
 
 	for pvc := range pvcList {
 		for _, owner := range pvcList[pvc].OwnerReferences {
 			if owner.UID == sts.UID {
-				owned = append(owned, &pvcList[pvc])
+				owned = append(owned, pvcList[pvc])
 				break
 			}
 		}
