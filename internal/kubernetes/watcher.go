@@ -33,9 +33,9 @@ func watchSts(kube *kubernetes.Clientset) {
 
 		switch event.Type {
 		case watch.Added:
-			log.Print("Pod added: %s\n", sts)
+			log.Printf("Pod added: %s\n", sts)
 		case watch.Deleted:
-			log.Print("Pod deleted: %s\n", sts)
+			log.Printf("Pod deleted: %s\n", sts)
 		}
 
 	}
