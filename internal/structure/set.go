@@ -1,4 +1,4 @@
-package main
+package structure
 
 type Set struct {
 	list map[string]struct{}
@@ -23,6 +23,11 @@ func (s *Set) Length() int {
 
 func (s *Set) Clear() {
 	s.list = make(map[string]struct{})
+}
+
+// returns the set (HACK: the returned set is mutable and breaks encapsulation)
+func (s *Set) GetSet() map[string]struct{} {
+	return s.list
 }
 
 // returns a new set with values in self but not in otherSet

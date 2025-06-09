@@ -1,6 +1,7 @@
-package main
+package kubernetes
 
 import (
+	// External Imports
 	"context"
 	"log"
 
@@ -8,6 +9,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	// Internal Imports
+	structure "volume-cleaner/internal/structure"
 )
 
 // returns a slice of corev1.Namespace structs
@@ -24,7 +28,6 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 }
 
 // returns a slice of corev1.PersistentVolumeClaim structs
-
 
 func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
@@ -46,7 +49,6 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 
-
 func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
 	// map each pvc name to its pvc object
 	// names are used to calculate set difference but the pvc objects are returned
@@ -61,8 +63,8 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 		log.Printf("Found namespace: %v", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
-		allPVCs := NewSet()
-		attachedPVCs := NewSet()
+		allPVCs := structure.NewSet()
+		attachedPVCs := structure.NewSet()
 
 		// azure disk will have the same name as the volume
 		// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
@@ -88,7 +90,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 
 		unattachedPVCs := allPVCs.Difference(attachedPVCs)
 
-		for pvc := range unattachedPVCs.list {
+		for pvc := range unattachedPVCs.GetSet() {
 			fullList = append(fullList, pvcObjects[pvc])
 		}
 
@@ -98,5 +100,4 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 	}
 
 	return fullList
-
 }
