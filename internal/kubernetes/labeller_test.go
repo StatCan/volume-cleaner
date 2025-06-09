@@ -10,9 +10,9 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 )
 
-func TestAddPvcLabel(t *testing.T) {
+func TestLabelFunctions(t *testing.T) {
 
-	t.Run("add label to pvc", func(t *testing.T) {
+	t.Run("test add, remove, edit labels", func(t *testing.T) {
 		// create fake client
 		client := fake.NewClientset()
 
