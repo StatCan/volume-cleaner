@@ -18,6 +18,31 @@ A Kubernetes CronJob that automatically identifies and cleans up stale Persisten
 
 # Documentation
 
+## File Structure
+
+This project follows the [golang-standard project layout](https://github.com/golang-standards/project-layout). Furthermore, file and directory names are written in `snake_case`
+
+```
+.github/
+├─ ISSUE_TEMPLATE/
+├─ workflows/
+├─ PULL_REQUEST_TEMPLATE.md
+assets/
+cmd/
+├─ volume_cleaner/
+configs/
+internal/
+├─ kubernetes/
+├─ structure/
+├─ ...
+manifests/
+├─ dry_run/
+├─ ...
+scripts/
+```
+
+Exception: This project does not use a `test` folder, `_test.go` files are keep in their package folders
+
 # How to Contribute
 
 ## Code of Conduct
