@@ -14,6 +14,7 @@ import (
 
 // Watches for when statefulsets are created or deleted across all namespaces
 func WatchSts(kube *kubernetes.Clientset) {
+	// leaving namespace as anray-liu for now until more rigorous testing is done
 	watcher, err := kube.AppsV1().StatefulSets("anray-liu").Watch(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
@@ -39,13 +40,13 @@ func WatchSts(kube *kubernetes.Clientset) {
 			log.Printf("sts added: %s\n", sts.Name)
 			for _, vol := range sts.Spec.Template.Spec.Volumes {
 				log.Printf("removing label")
-				RemovePvcLabel(kube, "volume-cleaner/unattached-time", "anray-liu", vol.PersistentVolumeClaim.ClaimName)
+				RemovePvcLabel(kube, "volume-cleaner/unattached-time", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 			}
 		case watch.Deleted:
 			log.Printf("sts deleted: %s\n", sts.Name)
 			for _, vol := range sts.Spec.Template.Spec.Volumes {
 				log.Printf("adding label")
-				SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().Format("2006-01-02_15-04-05Z"), "anray-liu", vol.PersistentVolumeClaim.ClaimName)
+				SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().Format("2006-01-02_15-04-05Z"), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 			}
 		}
 
