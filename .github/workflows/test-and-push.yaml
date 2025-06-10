@@ -8,6 +8,26 @@ env:
   GO_VERSION: 1.24
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile:  ./cmd/controller/Dockerfile
+
+      - name: Lint YAML
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Run yamllint
+        run: |
+          pip install yamllint
+          yamllint .
+
   build-push:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +49,7 @@ jobs:
           context: .
           file: ./cmd/controller/Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
-          push: false 
+          push: true
 
       - name: Security Scan
         uses: aquasecurity/trivy-action@master
