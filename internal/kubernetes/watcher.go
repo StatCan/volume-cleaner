@@ -4,6 +4,7 @@ import (
 	// External Imports
 	"context"
 	"log"
+	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -36,10 +37,10 @@ func WatchSts(kube *kubernetes.Clientset) {
 		switch event.Type {
 		case watch.Added:
 			log.Printf("sts added: %s\n", sts)
-			// Call Labeler
+			RemovePvcLabel(kube, "volume-cleaner/unattached-time", "anray-liu", sts.Name)
 		case watch.Deleted:
 			log.Printf("sts deleted: %s\n", sts)
-			// Call Labeler
+			SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().String(), "anray-liu", sts.Name)
 		}
 
 	}
