@@ -2,6 +2,7 @@ package main
 
 import (
 	// External Packages
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -31,8 +32,9 @@ func main() {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	kubeInternal.WatchSts(kubeClient)
+	kubeInternal.WatchSts(context.TODO(), kubeClient)
 
+	// useless for now
 	cleanVolumes(kubeClient, cfg)
 }
 
