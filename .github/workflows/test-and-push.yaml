@@ -26,10 +26,10 @@ jobs:
       - name: Build and Push Image
         uses: docker/build-push-action@v5
         with:
-          context: ./cmd/controller
+          context: .
           file: ./cmd/controller/Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
-          push: true
+          push: false 
 
       - name: Security Scan
         uses: aquasecurity/trivy-action@master
