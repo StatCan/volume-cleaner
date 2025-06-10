@@ -43,10 +43,9 @@ func WatchSts(kube *kubernetes.Clientset) {
 			}
 		case watch.Deleted:
 			log.Printf("sts deleted: %s\n", sts.Name)
-			log.Print(sts.Spec.Template.Spec.Volumes)
-			for _, pvc := range sts.Spec.VolumeClaimTemplates {
+			for _, vol := range sts.Spec.Template.Spec.Volumes {
 				log.Printf("adding label to sts")
-				SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().String(), "anray-liu", pvc.Name)
+				SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().String(), "anray-liu", vol.Name)
 			}
 		}
 
