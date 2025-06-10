@@ -37,10 +37,14 @@ func WatchSts(kube *kubernetes.Clientset) {
 		switch event.Type {
 		case watch.Added:
 			log.Printf("sts added: %s\n", sts)
-			RemovePvcLabel(kube, "volume-cleaner/unattached-time", "anray-liu", sts.Name)
+			for _, pvc := range PvcListBySts(kube, sts) {
+				RemovePvcLabel(kube, "volume-cleaner/unattached-time", "anray-liu", pvc.Name)
+			}
 		case watch.Deleted:
 			log.Printf("sts deleted: %s\n", sts)
-			SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().String(), "anray-liu", sts.Name)
+			for _, pvc := range PvcListBySts(kube, sts) {
+				SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().String(), "anray-liu", pvc.Name)
+			}
 		}
 
 	}
