@@ -52,20 +52,12 @@ func PvcListBySts(kube kubernetes.Interface, sts *appv1.StatefulSet) []corev1.Pe
 
 	var owned []corev1.PersistentVolumeClaim
 
-	found := false
-
 	for _, pvc := range pvcList {
 		for _, owner := range pvc.OwnerReferences {
 			if owner.UID == sts.UID {
 				owned = append(owned, pvc)
-				found = true
-			}
-			if found {
 				break
 			}
-		}
-		if found {
-			break
 		}
 	}
 
