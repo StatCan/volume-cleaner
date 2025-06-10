@@ -12,7 +12,7 @@ import (
 )
 
 // Watches for when statefulsets are created or deleted across all namespaces
-func watchSts(kube *kubernetes.Clientset) {
+func WatchSts(kube *kubernetes.Clientset) {
 	watcher, err := kube.AppsV1().StatefulSets("anray-liu").Watch(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
