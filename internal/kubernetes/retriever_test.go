@@ -9,7 +9,6 @@ import (
 	appv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
@@ -118,71 +117,6 @@ func TestPvcList(t *testing.T) {
 			assert.Equal(t, pvc.Name, names[i])
 		}
 
-	})
-}
-
-func TestPvcListBySts(t *testing.T) {
-	t.Run("successfully pvc listing based on its associated sts", func(t *testing.T) {
-		// create fake client
-		client := fake.NewClientset()
-
-		// create test StatefulSet
-		stsUID := types.UID("sts-uid-test")
-		sts := &appv1.StatefulSet{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "sts-test",
-				Namespace: "test",
-				UID:       stsUID,
-			},
-		}
-
-		// create a PVC owned by sts-test
-		pvcOwned := &corev1.PersistentVolumeClaim{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "pvc-owned",
-				Namespace: "test",
-				OwnerReferences: []metav1.OwnerReference{{
-					APIVersion: "apps/v1",
-					Kind:       "StatefulSet",
-					Name:       sts.Name,
-					UID:        stsUID,
-				}},
-			},
-		}
-
-		_, err := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvcOwned, metav1.CreateOptions{})
-		if err != nil {
-			t.Fatalf("Error creating owned pvc: %v", err)
-		}
-
-		// create a PVC not owned by sts-test
-		pvcNotOwned := &corev1.PersistentVolumeClaim{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "pvc-not-owned",
-				Namespace: "test",
-				OwnerReferences: []metav1.OwnerReference{{
-					APIVersion: "apps/v1",
-					Kind:       "StatefulSet",
-					Name:       "other-sts",
-					UID:        types.UID("other-uid"),
-				}},
-			},
-		}
-
-		_, err = client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvcNotOwned, metav1.CreateOptions{})
-		if err != nil {
-			t.Fatalf("Error creating not owned pvc: %v", err)
-		}
-
-		// testing PvcListBySts
-		// check that only 1 PVC is owned by sts
-		assert.Equal(t, len(PvcListBySts(client, sts)), 1)
-
-		// check that the PVC gotten has the name pvc-owned
-		assert.Equal(t, PvcListBySts(client, sts)[0].Name, "pvc-owned")
-
-		// check that the PVC gotten has the UID sts-uid-test
-		assert.Equal(t, PvcListBySts(client, sts)[0].OwnerReferences[0].UID, stsUID)
 	})
 }
 

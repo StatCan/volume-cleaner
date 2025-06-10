@@ -47,23 +47,6 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	return sts.Items
 }
 
-func PvcListBySts(kube kubernetes.Interface, sts *appv1.StatefulSet) []corev1.PersistentVolumeClaim {
-	pvcList := PvcList(kube, sts.Namespace)
-
-	var owned []corev1.PersistentVolumeClaim
-
-	for _, pvc := range pvcList {
-		for _, owner := range pvc.OwnerReferences {
-			if owner.UID == sts.UID {
-				owned = append(owned, pvc)
-				break
-			}
-		}
-	}
-
-	return owned
-}
-
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 
 func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
