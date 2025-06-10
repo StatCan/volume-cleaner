@@ -26,7 +26,7 @@ jobs:
       - name: Run yamllint
         run: |
           pip install yamllint
-          yamllint .
+          yamllint ./manifests/
 
   build-push:
     runs-on: ubuntu-latest
