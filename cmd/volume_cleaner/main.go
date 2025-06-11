@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -21,20 +22,16 @@ type Config struct {
 func main() {
 	fmt.Println("Volume cleaner started.")
 
-	// cfg := Config{
-	// 	DryRun:      os.Getenv("DRY_RUN") == "true",
-	// 	GracePeriod: 30,
-	// }
-
 	kubeClient, err := initKubeClient()
 	if err != nil {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	kubeInternal.WatchSts(context.TODO(), kubeClient, "anray-liu")
+	for _, pvc := range kubeInternal.FindUnattachedPVCs(kubeClient) {
+		kubeInternal.SetPvcLabel(kubeClient, "volume-cleaner/unattached-time", time.Now().Format("2006-01-02_15-04-05Z"), pvc.Namespace, pvc.Name)
+	}
 
-	// useless for now
-	// kubeInternal.FindUnattachedPVCs(kube)
+	kubeInternal.WatchSts(context.TODO(), kubeClient, "anray-liu")
 
 }
 
