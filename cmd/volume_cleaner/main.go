@@ -14,11 +14,6 @@ import (
 	kubeInternal "volume-cleaner/internal/kubernetes"
 )
 
-type Config struct {
-	DryRun      bool
-	GracePeriod int
-}
-
 func main() {
 	fmt.Println("Volume cleaner started.")
 
