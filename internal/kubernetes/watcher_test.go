@@ -11,6 +11,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+
+	internalStructure "volume-cleaner/internal/structure"
 )
 
 func TestWatcherLabelling(t *testing.T) {
@@ -39,7 +41,14 @@ func TestWatcherLabelling(t *testing.T) {
 		}
 
 		ctx := context.Background()
-		go WatchSts(ctx, client, "test")
+
+		cfg := internalStructure.Config{
+			Namespace:  "test",
+			Label:      "volume-cleaner/unattached-time",
+			TimeFormat: "2006-01-02_15-04-05Z",
+		}
+
+		go WatchSts(ctx, client, cfg)
 
 		time.Sleep(2 * time.Second)
 
