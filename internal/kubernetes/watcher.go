@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	internalStructure "volume-cleaner/internal/structure"
+	structInternal "volume-cleaner/internal/structure"
 
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,7 +15,7 @@ import (
 )
 
 // Watches for when statefulsets are created or deleted across all namespaces
-func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg internalStructure.Config) {
+func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.Config) {
 	// leaving namespace as anray-liu for now until more rigorous testing is done
 	// reminder to not hard code namspace after unit tests are done
 
@@ -62,4 +62,17 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg internalStruct
 		}
 	}
 
+}
+
+func InitialScan(kube kubernetes.Interface, cfg structInternal.Config) {
+	log.Print("Checking for unattached PVCs...")
+	for _, pvc := range FindUnattachedPVCs(kube) {
+		_, ok := pvc.Labels[cfg.Label]
+		if !ok {
+			log.Print("PVC labelled.")
+			SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+		} else {
+			log.Print("PVC is attached. Skipping.")
+		}
+	}
 }

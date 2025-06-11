@@ -6,21 +6,20 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	// Internal Packages
 	kubeInternal "volume-cleaner/internal/kubernetes"
-	kubeStructure "volume-cleaner/internal/structure"
+	structInternal "volume-cleaner/internal/structure"
 )
 
 func main() {
 
 	fmt.Println("Volume cleaner started.")
 
-	cfg := kubeStructure.Config{
+	cfg := structInternal.Config{
 		Namespace:  os.Getenv("NAMESPACE"),
 		Label:      os.Getenv("LABEL"),
 		TimeFormat: os.Getenv("TIME_FORMAT"),
@@ -31,12 +30,7 @@ func main() {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	for _, pvc := range kubeInternal.FindUnattachedPVCs(kubeClient) {
-		_, ok := pvc.Labels[cfg.Label]
-		if !ok {
-			kubeInternal.SetPvcLabel(kubeClient, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
-		}
-	}
+	kubeInternal.InitialScan(kubeClient, cfg)
 
 	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
 
