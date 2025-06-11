@@ -29,15 +29,18 @@ This project follows the [golang-standard project layout](https://github.com/gol
 ├─ PULL_REQUEST_TEMPLATE.md
 assets/
 cmd/
-├─ volume_cleaner/
+├─ controller/
+├─ scheduler/
 configs/
+├─ controller/
+├─ scheduler/
 internal/
 ├─ kubernetes/
 ├─ structure/
 ├─ ...
 manifests/
-├─ dry_run/
-├─ ...
+├─ controller/
+├─ scheduler/
 scripts/
 ```
 
