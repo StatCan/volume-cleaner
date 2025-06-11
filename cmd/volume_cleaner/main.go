@@ -32,7 +32,10 @@ func main() {
 	}
 
 	for _, pvc := range kubeInternal.FindUnattachedPVCs(kubeClient) {
-		kubeInternal.SetPvcLabel(kubeClient, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+		_, ok := pvc.Labels[cfg.Label]
+		if !ok {
+			kubeInternal.SetPvcLabel(kubeClient, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+		}
 	}
 
 	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
