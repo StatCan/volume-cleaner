@@ -13,9 +13,11 @@ import (
 )
 
 // Watches for when statefulsets are created or deleted across all namespaces
-func WatchSts(ctx context.Context, kube *kubernetes.Clientset) {
+func WatchSts(ctx context.Context, kube kubernetes.Interface, ns string) {
 	// leaving namespace as anray-liu for now until more rigorous testing is done
-	watcher, err := kube.AppsV1().StatefulSets("anray-liu").Watch(context.TODO(), metav1.ListOptions{})
+	// reminder to not hard code namspace after unit tests are done
+
+	watcher, err := kube.AppsV1().StatefulSets(ns).Watch(context.TODO(), metav1.ListOptions{})
 
 	if err != nil {
 		log.Fatalf("Error creating a watcher for statefulsets: %v", err)
@@ -38,8 +40,6 @@ func WatchSts(ctx context.Context, kube *kubernetes.Clientset) {
 			if !ok {
 				continue
 			}
-
-			// stsPvcs := PvcListBySts(kube, sts)
 
 			switch event.Type {
 			case watch.Added:
