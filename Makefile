@@ -19,7 +19,10 @@ run-scheduler:
 		-f manifests/netpol.yaml \
 		-f manifests/scheduler/scheduler_config.yaml
 	@kubectl -n das apply -f manifests/scheduler/scheduler_job.yaml
-	@echo "Ready to go!"
+	@kubectl -n das wait --for=condition=complete job volume-cleaner-scheduler --timeout=300s || \
+		(echo "Pod did not become ready"; exit 1)
+	@echo "Pod logs:"
+	@kubectl -n das logs -f -l job-name=volume-cleaner-scheduler
 
 clean:
 	@echo "🧼 Cleaning up leftover resources..."
