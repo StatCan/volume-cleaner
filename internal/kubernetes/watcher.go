@@ -49,14 +49,14 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
 					log.Printf("removing label")
 
-					RemovePvcLabel(kube, "volume-cleaner/unattached-time", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					RemovePvcLabel(kube, cfg.Label, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			case watch.Deleted:
 				log.Printf("sts deleted: %s", sts.Name)
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
 					log.Printf("adding label")
 
-					SetPvcLabel(kube, "volume-cleaner/unattached-time", time.Now().Format("2006-01-02_15-04-05Z"), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			}
 		}
