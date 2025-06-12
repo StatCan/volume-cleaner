@@ -34,3 +34,18 @@ func SetPvcLabel(kube kubernetes.Interface, label string, value string, ns strin
 func RemovePvcLabel(kube kubernetes.Interface, label string, ns string, pvc string) {
 	patchPvcLabel(kube, label, "null", ns, pvc)
 }
+
+// function has no unit tests, unused but might be later in the future
+// refer to #67
+
+// func GetPvcLabel(kube kubernetes.Interface, label string, ns string, pvc string) (string, error) {
+// 	obj, err := kube.CoreV1().PersistentVolumeClaims(ns).Get(context.TODO(), pvc, metav1.GetOptions{})
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	value, ok := obj.GetLabels()[label]
+// 	if !ok {
+// 		return "", errors.New("Label does not exist")
+// 	}
+// 	return value, nil
+// }

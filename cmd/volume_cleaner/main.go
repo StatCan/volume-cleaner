@@ -3,38 +3,35 @@ package main
 import (
 	// External Packages
 	"context"
-	"fmt"
 	"log"
+	"os"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
 	// Internal Packages
 	kubeInternal "volume-cleaner/internal/kubernetes"
+	structInternal "volume-cleaner/internal/structure"
 )
 
-type Config struct {
-	DryRun      bool
-	GracePeriod int
-}
-
 func main() {
-	fmt.Println("Volume cleaner started.")
 
-	// cfg := Config{
-	// 	DryRun:      os.Getenv("DRY_RUN") == "true",
-	// 	GracePeriod: 30,
-	// }
+	log.Print("Volume cleaner started.")
+
+	cfg := structInternal.Config{
+		Namespace:  os.Getenv("NAMESPACE"),
+		Label:      os.Getenv("LABEL"),
+		TimeFormat: os.Getenv("TIME_FORMAT"),
+	}
 
 	kubeClient, err := initKubeClient()
 	if err != nil {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	kubeInternal.WatchSts(context.TODO(), kubeClient, "anray-liu")
+	kubeInternal.InitialScan(kubeClient, cfg)
 
-	// useless for now
-	// kubeInternal.FindUnattachedPVCs(kube)
+	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
 
 }
 
