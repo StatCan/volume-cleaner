@@ -18,7 +18,7 @@ spec:
       containers:
         - name: controller
           image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner-controller:latest
-          command: ["/volume-cleaner"]
+          command: ["/volume-cleaner-controller"]
           envFrom:
             - configMapRef:
                 name: volume-cleaner-controller-config

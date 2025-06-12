@@ -2,16 +2,27 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: volume-cleaner-allow-egress
+  name: volume-cleaner-controller-egress
   namespace: das
 spec:
-  - podSelector:
-      matchLabels:
-        app: volume-cleaner-controller
-  - podSelector:
-      matchLabels:
-        app: volume-cleaner-scheduler
-egress:
+  podSelector:
+    matchLabels:
+      app: volume-cleaner-controller
+  egress:
     - {}
-policyTypes:
-  - Egress
+  policyTypes:
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: volume-cleaner-scheduler-egress
+  namespace: das
+spec:
+  podSelector:
+    matchLabels:
+      app: volume-cleaner-scheduler
+  egress:
+    - {}
+  policyTypes:
+    - Egress

@@ -15,7 +15,7 @@ spec:
       containers:
         - name: cleaner
           image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner-scheduler:latest
-          command: ["/volume-cleaner"]
+          command: ["/volume-cleaner-scheduler"]
           envFrom:
             - configMapRef:
                 name: volume-cleaner-scheduler-config
