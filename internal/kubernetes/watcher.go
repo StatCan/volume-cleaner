@@ -15,7 +15,7 @@ import (
 )
 
 // Watches for when statefulsets are created or deleted across all namespaces
-func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.Config) {
+func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	// leaving namespace as anray-liu for now until more rigorous testing is done
 	// reminder to not hard code namspace after unit tests are done
 
@@ -64,7 +64,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 }
 
-func InitialScan(kube kubernetes.Interface, cfg structInternal.Config) {
+func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Checking for unattached PVCs...")
 	for _, pvc := range FindUnattachedPVCs(kube) {
 		_, ok := pvc.Labels[cfg.Label]

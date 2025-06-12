@@ -16,9 +16,9 @@ import (
 
 func main() {
 
-	log.Print("Volume cleaner started.")
+	log.Print("Volume cleaner controller started.")
 
-	cfg := structInternal.Config{
+	cfg := structInternal.ControllerConfig{
 		Namespace:  os.Getenv("NAMESPACE"),
 		Label:      os.Getenv("LABEL"),
 		TimeFormat: os.Getenv("TIME_FORMAT"),

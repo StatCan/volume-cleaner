@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-cleaner-scheduler-config
+  namespace: das
+data:
+  NAMESPACE: "anray-liu"
+  LABEL: "volume-cleaner/unattached-time"
+  GRACE_PERIOD: "180"
