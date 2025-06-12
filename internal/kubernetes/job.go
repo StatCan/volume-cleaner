@@ -21,6 +21,11 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			diff := time.Now().Sub(time_obj)
 
 			log.Printf("This PVC is %f hours old.", diff.Hours())
+
+			if cfg.DryRun {
+
+			}
+
 		} else {
 			log.Print("Not labelled. Skipping.")
 		}

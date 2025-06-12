@@ -10,5 +10,6 @@ type SchedulerConfig struct {
 	Namespace   string
 	Label       string
 	TimeFormat  string
-	GracePeriod string
+	GracePeriod int
+	DryRun      bool
 }
