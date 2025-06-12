@@ -20,7 +20,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 			diff := time.Now().Sub(time_obj)
 
-			log.Printf("This PVC is %f hours old.", diff.Hours())
+			log.Printf("This PVC is %f days old.", diff.Hours()/24)
 
 			if cfg.DryRun {
 
