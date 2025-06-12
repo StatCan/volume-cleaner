@@ -18,12 +18,18 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				log.Fatalf("Could not parse time: %s", err)
 			}
 
-			diff := time.Now().Sub(time_obj)
+			diff := time.Now().Sub(time_obj).Hours() / 24
 
-			log.Printf("This PVC is %f days old.", diff.Hours()/24)
+			log.Printf("This PVC is %f days old.", diff)
 
-			if cfg.DryRun {
-
+			if int(diff) > cfg.GracePeriod {
+				if cfg.DryRun {
+					log.Printf("DRY RUN: delete pvc %s", pvc.Name)
+				} else {
+					// actually delete
+				}
+			} else {
+				log.Print("Grace period not passed. Skipping.")
 			}
 
 		} else {
