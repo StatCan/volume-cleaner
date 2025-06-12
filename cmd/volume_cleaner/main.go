@@ -3,7 +3,6 @@ package main
 import (
 	// External Packages
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -17,7 +16,7 @@ import (
 
 func main() {
 
-	fmt.Println("Volume cleaner started.")
+	log.Print("Volume cleaner started.")
 
 	cfg := structInternal.Config{
 		Namespace:  os.Getenv("NAMESPACE"),

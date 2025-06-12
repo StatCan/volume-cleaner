@@ -12,7 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
 
-	internalStructure "volume-cleaner/internal/structure"
+	structInternal "volume-cleaner/internal/structure"
 )
 
 func TestWatcherLabelling(t *testing.T) {
@@ -42,7 +42,7 @@ func TestWatcherLabelling(t *testing.T) {
 
 		ctx := context.Background()
 
-		cfg := internalStructure.Config{
+		cfg := structInternal.Config{
 			Namespace:  "test",
 			Label:      "volume-cleaner/unattached-time",
 			TimeFormat: "2006-01-02_15-04-05Z",
@@ -163,7 +163,7 @@ func TestInitialScan(t *testing.T) {
 
 		ctx := context.Background()
 
-		cfg := internalStructure.Config{
+		cfg := structInternal.Config{
 			Namespace:  "test",
 			Label:      "volume-cleaner/unattached-time",
 			TimeFormat: "2006-01-02_15-04-05Z",
