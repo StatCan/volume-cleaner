@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: volume-cleaner-scheduler
+  namespace: das
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app: volume-cleaner-scheduler
+    spec:
+      serviceAccountName: volume-cleaner
+      containers:
+        - name: cleaner
+          image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner-scheduler:latest
+          command: ["/volume-cleaner"]
+          envFrom:
+            - configMapRef:
+                name: volume-cleaner-scheduler-config
+      restartPolicy: Never

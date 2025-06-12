@@ -42,7 +42,7 @@ func TestWatcherLabelling(t *testing.T) {
 
 		ctx := context.Background()
 
-		cfg := structInternal.Config{
+		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
 			Label:      "volume-cleaner/unattached-time",
 			TimeFormat: "2006-01-02_15-04-05Z",
@@ -163,7 +163,7 @@ func TestInitialScan(t *testing.T) {
 
 		ctx := context.Background()
 
-		cfg := structInternal.Config{
+		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
 			Label:      "volume-cleaner/unattached-time",
 			TimeFormat: "2006-01-02_15-04-05Z",
