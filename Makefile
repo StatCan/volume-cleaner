@@ -7,12 +7,13 @@ run:
 	@kubectl apply -f manifests/rbac.yaml \
 		-f manifests/serviceaccount.yaml \
 		-f manifests/netpol.yaml \
-		-f manifests/controller_config.yaml
-	@kubectl -n das apply -f manifests/controller_deployment.yaml
+		-f manifests/controller/controller_config.yaml
+	@kubectl -n das apply -f manifests/controller/controller_deployment.yaml
 	@echo "Ready to go!"
 
 clean:
 	@echo "🧼 Cleaning up leftover resources..."
 	@kubectl delete -f manifests/ --ignore-not-found > /dev/null 2>&1 || true
-	@kubectl delete -f manifests/controller_deployment.yaml --ignore-not-found > /dev/null 2>&1 || true
+	@kubectl delete -f manifests/controller/ --ignore-not-found > /dev/null 2>&1 || true
+	@kubectl delete -f manifests/controller/controller_deployment.yaml --ignore-not-found > /dev/null 2>&1 || true
 	@echo "Cleaning complete"
