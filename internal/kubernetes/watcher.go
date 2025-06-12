@@ -19,7 +19,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 	// leaving namespace as anray-liu for now until more rigorous testing is done
 	// reminder to not hard code namspace after unit tests are done
 
-	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(context.TODO(), metav1.ListOptions{})
+	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{})
 
 	if err != nil {
 		log.Fatalf("Error creating a watcher for statefulsets: %v", err)
