@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volume-cleaner-controller
+  namespace: das
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: volume-cleaner-controller
+  template:
+    metadata:
+      labels:
+        app: volume-cleaner-controller
+    spec:
+      serviceAccountName: volume-cleaner
+      containers:
+        - name: controller
+          image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner:latest
+          command: ["/volume-cleaner"]
+          envFrom:
+            - configMapRef:
+                name: volume-cleaner-controller-config
+      restartPolicy: Always

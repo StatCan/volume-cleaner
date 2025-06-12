@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: volume-cleaner-controller-config
+  namespace: das
+data:
+  NAMESPACE: "anray-liu"
+  LABEL: "volume-cleaner/unattached-time"
+  TIME_FORMAT: "2006-01-02_15-04-05Z"
