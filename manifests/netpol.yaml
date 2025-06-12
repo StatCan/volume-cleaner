@@ -7,7 +7,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: volume-cleaner
+      app: volume-cleaner-controller
   egress:
     - {}
   policyTypes:

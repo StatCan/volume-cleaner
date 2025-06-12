@@ -2,7 +2,7 @@ package main
 
 import (
 	// External Packages
-	"fmt"
+	"context"
 	"log"
 	"os"
 
@@ -11,19 +11,17 @@ import (
 
 	// Internal Packages
 	kubeInternal "volume-cleaner/internal/kubernetes"
+	structInternal "volume-cleaner/internal/structure"
 )
 
-type Config struct {
-	DryRun      bool
-	GracePeriod int
-}
-
 func main() {
-	fmt.Println("Volume cleaner started.")
 
-	cfg := Config{
-		DryRun:      os.Getenv("DRY_RUN") == "true",
-		GracePeriod: 30,
+	log.Print("Volume cleaner started.")
+
+	cfg := structInternal.Config{
+		Namespace:  os.Getenv("NAMESPACE"),
+		Label:      os.Getenv("LABEL"),
+		TimeFormat: os.Getenv("TIME_FORMAT"),
 	}
 
 	kubeClient, err := initKubeClient()
@@ -31,7 +29,10 @@ func main() {
 		log.Fatalf("Error creating kube client: %v", err)
 	}
 
-	cleanVolumes(kubeClient, cfg)
+	kubeInternal.InitialScan(kubeClient, cfg)
+
+	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
+
 }
 
 func initKubeClient() (*kubernetes.Clientset, error) {
@@ -43,8 +44,4 @@ func initKubeClient() (*kubernetes.Clientset, error) {
 		return kubernetes.NewForConfig(cfg)
 	}
 	return nil, err
-}
-
-func cleanVolumes(kube kubernetes.Interface, cfg Config) {
-	kubeInternal.FindUnattachedPVCs(kube)
 }
