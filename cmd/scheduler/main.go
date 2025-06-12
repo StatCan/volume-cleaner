@@ -21,6 +21,7 @@ func main() {
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		Label:       os.Getenv("LABEL"),
+		TimeFormat:  os.Getenv("TIME_FORMAT"),
 		GracePeriod: os.Getenv("GRACE_PERIOD"),
 	}
 
