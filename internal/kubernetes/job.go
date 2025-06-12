@@ -22,7 +22,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 			log.Printf("This PVC is %f days old.", diff)
 
-			log.Printf("%v > %v == %v", int(diff), cfg.GracePeriod, int(diff) > cfg.GracePeriod)
+			log.Printf("int(diff) > cfg.GracePeriod: %v > %v == %v", int(diff), cfg.GracePeriod, int(diff) > cfg.GracePeriod)
 
 			if int(diff) > cfg.GracePeriod {
 				if cfg.DryRun {
