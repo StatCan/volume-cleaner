@@ -5,6 +5,7 @@ import (
 
 	"log"
 	"os"
+	"strconv"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -21,7 +22,9 @@ func main() {
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		Label:       os.Getenv("LABEL"),
-		GracePeriod: os.Getenv("GRACE_PERIOD"),
+		TimeFormat:  os.Getenv("TIME_FORMAT"),
+		GracePeriod: parseGracePeriod(os.Getenv("GRACE_PERIOD")),
+		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
 	}
 
 	kubeClient, err := initKubeClient()
@@ -31,6 +34,16 @@ func main() {
 
 	kubeInternal.FindStale(kubeClient, cfg)
 
+}
+
+func parseGracePeriod(value string) int {
+	days, err := strconv.Atoi(value)
+	if err != nil {
+		log.Fatalf("Error parsing grace period value: %v", err)
+	} else if days < 1 {
+		log.Fatal("For saftey reasons, grace period cannot be lower than one day.")
+	}
+	return days
 }
 
 func initKubeClient() (*kubernetes.Clientset, error) {
