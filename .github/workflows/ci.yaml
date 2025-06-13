@@ -23,6 +23,7 @@ jobs:
         uses: super-linter/super-linter@v7
         env:
           DEFAULT_BRANCH: main
+          MULTI_STATUS: ${{ env.ACT && 'false' || 'true' }}
           VALIDATE_ALL_CODEBASE: false 
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_GITHUB_ACTIONS: true
@@ -30,6 +31,29 @@ jobs:
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Golang Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Go mod tidy (ensure dependencies are clean)
+        run: go mod tidy -v
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run Go tests
+        run: go test -v -race ./...
 
   build-push:
     runs-on: ubuntu-latest
@@ -40,6 +64,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to ACR
+        if: ${{ !env.ACT }}
         uses: azure/docker-login@v1
         with:
           login-server: ${{ env.REGISTRY }}
@@ -52,9 +77,10 @@ jobs:
           context: .
           file: ./docker/controller/Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
-          push: true 
+          push: ${{ env.ACT && 'false' || 'true' }} 
 
       - name: Security Scan
+        if: ${{ !env.ACT }}
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
