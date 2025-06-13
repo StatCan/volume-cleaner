@@ -7,6 +7,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+func FindStale(_ kubernetes.Interface, _ structInternal.SchedulerConfig) {
 	log.Print("Job done")
 }
