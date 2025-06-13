@@ -8,6 +8,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+// will write unit test for this when whole function is done
+
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found a pvc: %s from namespace %s", pvc.Name, pvc.Namespace)
