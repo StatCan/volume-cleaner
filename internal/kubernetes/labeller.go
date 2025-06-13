@@ -21,10 +21,8 @@ func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 	)
 	if err != nil {
 		log.Fatalf("Error patching PVC %s from namespace %s: %v", pvc, ns, err)
-	} else {
-		log.Printf("Patch successfully applied to %s", pvc)
 	}
-
+	log.Printf("Patch successfully applied to %s", pvc)
 }
 
 func SetPvcLabel(kube kubernetes.Interface, label string, value string, ns string, pvc string) {
