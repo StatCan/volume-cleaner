@@ -75,7 +75,7 @@ jobs:
         with:
           # Define filters for each image 
           filters: .github/configs/paths.yaml
-          json: true
+          base: 'main'
 
   build-push:
     name: Push Docker Images
