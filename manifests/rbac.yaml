@@ -18,7 +18,7 @@ rules:
     verbs: ["get", "list"]
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]
-    verbs: ["get", "list", "patch"]
+    verbs: ["get", "list", "patch", "delete"]
   - apiGroups: ["apps"]
     resources: ["statefulsets"]
     verbs: ["get", "list", "watch"]
