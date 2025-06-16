@@ -57,15 +57,36 @@ jobs:
       - name: Run Go tests
         run: go test -v -race ./...
 
+  # This job will determine which images need to be built
+  filter:
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.filter.outputs.changes }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Used for determining which vertical has been changed
+
+      - name: Check for image-specific file changes
+        id: filter 
+        uses: dorny/paths-filter@v3
+        with:
+          # Define filters for each image 
+          filters: .github/configs/paths.yaml
+          json: true
+
   build-push:
     name: Push Docker Images
+    needs: filter # Depends on the job that figures out what to build
+    if: needs.filter.outputs.images != '[]'
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        image: # The list of images to scan
-          - controller
-          - scheduler
+        # The list of images to scan
+        image: ${{ fromJson(needs.filter.outputs.images) }}
 
     steps:
       # allows workflow to access the repo
