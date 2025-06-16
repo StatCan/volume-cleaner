@@ -1,0 +1,90 @@
+---
+name: CI Pipeline
+
+on: [push, pull_request]
+
+env:
+  REGISTRY: k8scc01covidacr.azurecr.io
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs full git history to get the list of files that changed across commits
+          fetch-depth: 0
+
+      - name: Super linter
+        uses: super-linter/super-linter@v7
+        env:
+          DEFAULT_BRANCH: main
+          MULTI_STATUS: ${{ env.ACT && 'false' || 'true' }}
+          VALIDATE_ALL_CODEBASE: false 
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_GO_MODULES: true
+          VALIDATE_GITLEAKS: true
+          VALIDATE_YAML: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Golang Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with: 
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Go mod tidy (ensure dependencies are clean)
+        run: go mod tidy -v
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run Go tests
+        run: go test -v -race ./...
+
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ACR
+        if: ${{ !env.ACT }}
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/controller/Dockerfile
+          tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
+          push: ${{ env.ACT && 'false' || 'true' }} 
+
+      - name: Security Scan
+        if: ${{ !env.ACT }}
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
+          severity: "CRITICAL"
+          ignore-unfixed: true
+          exit-code: 1
+          format: table

@@ -93,33 +93,33 @@ func TestSetDifference(t *testing.T) {
 			{
 				NewSet(),
 				func() *Set {
-					s := NewSet()
-					s.Add("1")
-					s.Add("2")
-					s.Add("3")
-					return s
+					s1 := NewSet()
+					s1.Add("1")
+					s1.Add("2")
+					s1.Add("3")
+					return s1
 				}(),
 			},
 			{
 				func() *Set {
-					s := NewSet()
-					s.Add("1")
-					return s
+					s2 := NewSet()
+					s2.Add("1")
+					return s2
 				}(),
 				func() *Set {
-					s := NewSet()
-					s.Add("2")
-					s.Add("3")
-					return s
+					s3 := NewSet()
+					s3.Add("2")
+					s3.Add("3")
+					return s3
 				}(),
 			},
 			{
 				func() *Set {
-					s := NewSet()
-					s.Add("1")
-					s.Add("2")
-					s.Add("3")
-					return s
+					s4 := NewSet()
+					s4.Add("1")
+					s4.Add("2")
+					s4.Add("3")
+					return s4
 				}(),
 				NewSet(),
 			},
