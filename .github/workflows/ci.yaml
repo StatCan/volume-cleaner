@@ -57,18 +57,20 @@ jobs:
       - name: Run Go tests
         run: go test -v -race ./...
 
-  # This job will determine which images need to be built
   filter:
+    Name: Filter Images to Build
     runs-on: ubuntu-latest
     outputs:
       images: ${{ steps.filter.outputs.changes }}
 
     steps:
+      # allows workflow to access the repo
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Used for determining which vertical has been changed
 
+      # Determine which images need to be built
       - name: Check for image-specific file changes
         id: filter 
         uses: dorny/paths-filter@v3
