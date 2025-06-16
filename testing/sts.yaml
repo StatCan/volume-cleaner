@@ -14,13 +14,13 @@ spec:
         app: myapp
     spec:
       containers:
-      - name: my-container
-        image: busybox
-        command: ["sleep", "3600"]
-        volumeMounts:
+        - name: my-container
+          image: busybox
+          command: ["sleep", "3600"]
+          volumeMounts:
         - name: storage
           mountPath: /data
       volumes:
-      - name: storage
-        persistentVolumeClaim:
-          claimName: pvc1
+        - name: storage
+          persistentVolumeClaim:
+            claimName: pvc1
