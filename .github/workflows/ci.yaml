@@ -80,7 +80,7 @@ jobs:
           base: 'main'
 
   build-push:
-    name: Push Docker Images ${{ matrix.image }}
+    name: Push Docker Images 
     needs: filter # Depends on the job that figures out what to build
     if: needs.filter.outputs.images != '[]'
     runs-on: ubuntu-latest

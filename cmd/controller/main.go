@@ -16,7 +16,7 @@ import (
 
 func main() {
 
-	log.Print("Volume cleaner controller started.")
+	log.Print("Volume cleaner controller started!")
 
 	cfg := structInternal.ControllerConfig{
 		Namespace:  os.Getenv("NAMESPACE"),
