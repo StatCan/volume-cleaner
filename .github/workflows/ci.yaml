@@ -126,3 +126,4 @@ jobs:
     name: Trivy Scans
     needs: build-push
     uses: ./.github/workflows/trivy-scan.yaml
+    secrets: inherit
