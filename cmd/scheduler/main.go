@@ -17,7 +17,7 @@ import (
 
 func main() {
 
-	log.Print("Volume cleaner scheduler started!")
+	log.Print("Volume cleaner scheduler started.")
 
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
