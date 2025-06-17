@@ -80,15 +80,22 @@ jobs:
           base: 'main'
 
   build-push:
-    name: Push Docker Images
+    name: Push Docker Images ${{ matrix.image }}
     needs: filter # Depends on the job that figures out what to build
-    if: needs.filter.outputs.images != '[]'
+    # if: needs.filter.outputs.images != '[]'
     runs-on: ubuntu-latest
+
+    # strategy:
+    #   matrix:
+    #     # The list of images to scan
+    #     image: ${{ fromJson(needs.filter.outputs.images) }}
+
 
     strategy:
       matrix:
-        # The list of images to scan
-        image: ${{ fromJson(needs.filter.outputs.images) }}
+        image: # The list of images to scan
+          - controller
+          - scheduler
 
     steps:
       # allows workflow to access the repo
@@ -118,4 +125,4 @@ jobs:
   call-trivy-scan:
     name: Trivy Scans
     needs: build-push
-    uses: ./.github/workflows/reusable/trivy-scan.yaml
+    uses: ./.github/workflows/trivy-scan.yaml

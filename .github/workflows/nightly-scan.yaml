@@ -10,6 +10,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  call-trivy-scan:
+  nightly-trivy-scan:
     name: Trivy Scans
-    uses: ./.github/workflows/reusable/trivy-scan.yaml
+    uses: ./.github/workflows/trivy-scan.yaml
