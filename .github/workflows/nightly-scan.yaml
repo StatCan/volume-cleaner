@@ -13,3 +13,4 @@ jobs:
   nightly-trivy-scan:
     name: Trivy Scans
     uses: ./.github/workflows/trivy-scan.yaml
+    secrets: inherit
