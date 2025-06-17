@@ -1,16 +1,16 @@
 # Determine which vertical (controller, scheduler) file changes trigger which workflows
 controller:
-- 'cmd/controller/**'
-- 'docker/controller/**'
-- 'internal/**'
-- 'manifests/controller/**'
-- 'manifests/*.yaml'
-- 'scripts/**'
+  - 'cmd/controller/**'
+  - 'docker/controller/**'
+  - 'internal/**'
+  - 'manifests/controller/**'
+  - 'manifests/*.yaml'
+  - 'scripts/**'
 scheduler:
-- 'cmd/scheduler/**'
-- 'docker/scheduler/**'
-- 'internal/**'
-- 'manifests/scheduler/**'
-- 'manifests/*.yaml'
-- 'scripts/**'
+  - 'cmd/scheduler/**'
+  - 'docker/scheduler/**'
+  - 'internal/**'
+  - 'manifests/scheduler/**'
+  - 'manifests/*.yaml'
+  - 'scripts/**'
 

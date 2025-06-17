@@ -9,39 +9,7 @@ on:
   # Allows you to manually trigger the workflow from the Actions tab in GitHub
   workflow_dispatch:
 
-env:
-  REGISTRY: k8scc01covidacr.azurecr.io
-
 jobs:
-  # Deep Docker Image Vulnerability Scanning
-  docker-vulnerability-scan:
-    name: Trivy Vulnerability Scan for ${{ matrix.image }}
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        image: # The list of images to scan
-          - controller
-          - scheduler
-
-    steps:
-      # allows workflow to access the repo
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Login to ACR
-        if: ${{ !env.ACT }}
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ env.REGISTRY }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Security Scan Image ${{ matrix.image }}
-        if: ${{ !env.ACT }}
-        uses: aquasecurity/trivy-action@latest
-        with:
-          image-ref: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
-          severity: "CRITICAL"
-          ignore-unfixed: true
-          exit-code: 1 # Fail the job if critical unfixed vulnerabilities are found
+  call-trivy-scan:
+    name: Trivy Scans
+    uses: ./.github/workflows/reusable/trivy-scan.yaml

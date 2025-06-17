@@ -113,3 +113,9 @@ jobs:
           file: ./docker/${{ matrix.image }}/Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
           push: ${{ env.ACT && 'false' || 'true' }} 
+
+  # Calling Reusable Workflows for Trivy Docker Image Scans
+  call-trivy-scan:
+    name: Trivy Scans
+    needs: build-push
+    uses: ./.github/workflows/reusable/trivy-scan.yaml
