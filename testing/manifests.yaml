@@ -54,8 +54,8 @@ spec:
           image: busybox
           command: ["sleep", "3600"]
           volumeMounts:
-        - name: storage
-          mountPath: /data
+            - name: storage
+              mountPath: /data
       volumes:
         - name: storage
           persistentVolumeClaim:
