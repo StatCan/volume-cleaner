@@ -82,7 +82,7 @@ jobs:
   build-push:
     name: Push Docker Images 
     needs: filter # Depends on the job that figures out what to build
-    if: needs.filter.outputs.images != '[]'
+    if: ${{needs.filter.outputs.images != '[]'}}
     runs-on: ubuntu-latest
 
     strategy:
@@ -118,5 +118,8 @@ jobs:
   call-trivy-scan:
     name: Trivy Scans
     needs: build-push
+    if: ${{needs.filter.outputs.images != '[]'}}
     uses: ./.github/workflows/trivy-scan.yaml
+    with:
+      verticals: ${{needs.filter.outputs.images}}
     secrets: inherit

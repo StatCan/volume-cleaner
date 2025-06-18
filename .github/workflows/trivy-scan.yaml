@@ -3,6 +3,10 @@ name: CI Trivy Scans
 
 on:
   workflow_call:
+    inputs:
+      verticals:
+        required: true
+        type: string
 
 env:
   REGISTRY: k8scc01covidacr.azurecr.io
@@ -12,12 +16,10 @@ jobs:
   docker-vulnerability-scan:
     name: Trivy Vulnerability Scan for ${{ matrix.image }}
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
-        image: # The list of images to scan
-          - controller
-          - scheduler
+        image: ${{ fromJSON(inputs.verticals) }}
 
     steps:
       # allows workflow to access the repo
