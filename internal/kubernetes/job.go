@@ -26,9 +26,8 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
 					if err != nil {
 						log.Fatalf("Error deleting pvc %v: %v", pvc.Name, err)
-					} else {
-						log.Print("PVC successfully deleted.")
 					}
+					log.Print("PVC successfully deleted.")
 				}
 			} else {
 				log.Print("Grace period not passed. Skipping.")
