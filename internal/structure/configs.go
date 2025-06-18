@@ -13,3 +13,10 @@ type SchedulerConfig struct {
 	GracePeriod int
 	DryRun      bool
 }
+
+type EmailConfig struct {
+	BaseUrl         string
+	Endpoint        string
+	EmailTemplateID string
+	ApiKey          string
+}
