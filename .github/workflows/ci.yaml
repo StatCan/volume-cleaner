@@ -10,7 +10,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    
     steps:
       # allows workflow to access the repo
       - name: Checkout code
@@ -33,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
-    name: Golang Unit Tests
+    name: Golang Tests
     runs-on: ubuntu-latest
     steps:
       # allows workflow to access the repo
@@ -52,13 +51,49 @@ jobs:
       - name: Download Go modules
         run: go mod download
 
+      - name: Run Go vet 
+        run: go vet -v ./...
+
       - name: Run Go tests
         run: go test -v -race ./...
 
-  build-push:
+  filter:
+    name: Filter Images to Build
     runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.filter.outputs.changes }}
+
     steps:
-      - uses: actions/checkout@v4
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Used for determining which vertical has been changed
+
+      # Determine which images need to be built
+      - name: Check for image-specific file changes
+        id: filter 
+        uses: dorny/paths-filter@v3
+        with:
+          # Define filters for each image 
+          filters: .github/configs/paths.yaml
+          base: 'main'
+
+  build-push:
+    name: Push Docker Images 
+    needs: filter # Depends on the job that figures out what to build
+    if: needs.filter.outputs.images != '[]'
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # The list of images to scan
+        image: ${{ fromJson(needs.filter.outputs.images) }}
+
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -71,20 +106,17 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and Push Image
+      - name: Build and Push Image ${{ matrix.image }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/controller/Dockerfile
-          tags: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
+          file: ./docker/${{ matrix.image }}/Dockerfile
+          tags: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
           push: ${{ env.ACT && 'false' || 'true' }} 
 
-      - name: Security Scan
-        if: ${{ !env.ACT }}
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.REGISTRY }}/volume-cleaner-controller:latest
-          severity: "CRITICAL"
-          ignore-unfixed: true
-          exit-code: 1
-          format: table
+  # Calling Reusable Workflows for Trivy Docker Image Scans
+  call-trivy-scan:
+    name: Trivy Scans
+    needs: build-push
+    uses: ./.github/workflows/trivy-scan.yaml
+    secrets: inherit
