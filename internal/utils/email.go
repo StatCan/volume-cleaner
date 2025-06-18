@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	// "time"
 
 	// internal packages
 	structInternal "volume-cleaner/internal/structure"
@@ -32,6 +31,10 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
 	req.Header.Add("Authorization", "ApiKey-v1 "+conf.APIKey)
 	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
+	}
 
 	// Send Request
 	resp, err := client.Do(req)
