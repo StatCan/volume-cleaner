@@ -21,7 +21,7 @@ import (
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("Error creating a watcher for statefulsets: %s", err)
+		log.Fatalf("Error creating a watcher for statefulsets: %s", err) // test comment
 	}
 
 	log.Print("Watching for statefulset events...")
