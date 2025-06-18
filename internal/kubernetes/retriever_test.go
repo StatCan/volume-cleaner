@@ -1,7 +1,6 @@
 package kubernetes
 
 import (
-	// External Imports
 	"context"
 	"testing"
 
