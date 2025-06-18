@@ -15,8 +15,8 @@ type SchedulerConfig struct {
 }
 
 type EmailConfig struct {
-	BaseUrl         string
+	BaseURL         string
 	Endpoint        string
 	EmailTemplateID string
-	ApiKey          string
+	APIKey          string
 }

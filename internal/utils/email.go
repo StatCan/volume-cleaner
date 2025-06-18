@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
+	// "time"
 
 	// internal packages
 	structInternal "volume-cleaner/internal/structure"
@@ -14,7 +14,7 @@ import (
 
 func sendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) bool {
 
-	url := conf.BaseUrl + conf.Endpoint
+	url := conf.BaseURL + conf.Endpoint
 
 	// Request Body
 	reqBody, err := json.Marshal(
@@ -30,7 +30,7 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	// Create the request and add the required headers
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
-	req.Header.Add("Authorization", "ApiKey-v1 "+conf.ApiKey)
+	req.Header.Add("Authorization", "ApiKey-v1 "+conf.APIKey)
 	req.Header.Add("Content-Type", "application/json")
 
 	// Send Request
@@ -63,10 +63,10 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 // 	}
 //
 // 	config := structInternal.EmailConfig{
-// 		BaseUrl:         "https://api.notification.canada.ca",
+// 		BaseURL:         "https://api.notification.canada.ca",
 // 		Endpoint:        "/v2/notifications/email",
 // 		EmailTemplateID: "Random Template",
-// 		ApiKey:          "Random APIKEY",
+// 		APIKey:          "Random APIKEY",
 // 	}
 //
 // 	client := &http.Client{Timeout: 10 * time.Second}
