@@ -1,0 +1,23 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: volume-cleaner-scheduler
+  namespace: das
+spec:
+  ttlSecondsAfterFinished: 60
+  template:
+    metadata:
+      labels:
+        app: volume-cleaner-scheduler
+    spec:
+      serviceAccountName: volume-cleaner
+      containers:
+        - name: volume-cleaner
+          image: scheduler
+          imagePullPolicy: Never
+          command: ["/volume-cleaner-scheduler"]
+          envFrom:
+            - configMapRef:
+                name: volume-cleaner-scheduler-config
+      restartPolicy: Never

@@ -41,7 +41,7 @@ func parseGracePeriod(value string) int {
 	if err != nil {
 		log.Fatalf("Error parsing grace period value: %v", err)
 	} else if days < 1 {
-		log.Fatal("For saftey reasons, grace period cannot be lower than one day.")
+		log.Fatal("For safety reasons, grace period cannot be lower than one day.")
 	}
 	return days
 }

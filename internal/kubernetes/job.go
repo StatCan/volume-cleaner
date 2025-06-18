@@ -1,10 +1,13 @@
 package kubernetes
 
 import (
+	"context"
 	"log"
 	"time"
 
 	structInternal "volume-cleaner/internal/structure"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/client-go/kubernetes"
 )
@@ -20,7 +23,11 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				if cfg.DryRun {
 					log.Printf("DRY RUN: delete pvc %s", pvc.Name)
 				} else {
-					log.Printf("Actually Delete")
+					err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
+					if err != nil {
+						log.Fatalf("Error deleting pvc %v: %v", pvc.Name, err)
+					}
+					log.Print("PVC successfully deleted.")
 				}
 			} else {
 				log.Print("Grace period not passed. Skipping.")

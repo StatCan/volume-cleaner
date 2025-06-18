@@ -72,7 +72,8 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 			log.Print("PVC labelled.")
 			SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		} else {
-			log.Print("PVC is attached. Skipping.")
+			log.Print("PVC already has label. Skipping.")
 		}
 	}
+	log.Print("Initial scan complete")
 }

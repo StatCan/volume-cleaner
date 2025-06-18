@@ -10,4 +10,3 @@ data:
   GRACE_PERIOD: "180"
   TIME_FORMAT: "2006-01-02_15-04-05Z"
   DRY_RUN: "true"
-
