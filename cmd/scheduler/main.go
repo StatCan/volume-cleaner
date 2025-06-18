@@ -1,12 +1,12 @@
 package main
 
 import (
-	// External Packages
-
+	// Standard Packages
 	"log"
 	"os"
 	"strconv"
 
+	// External Packages
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-
 	log.Print("Volume cleaner scheduler started.")
 
 	cfg := structInternal.SchedulerConfig{
@@ -29,22 +28,27 @@ func main() {
 
 	kubeClient, err := initKubeClient()
 	if err != nil {
-		log.Fatalf("Error creating kube client: %v", err)
+		log.Fatalf("Error creating kube client: %s", err)
 	}
 
 	kubeInternal.FindStale(kubeClient, cfg)
-
 }
 
+// read grace period value provided in the config and convert it to an int
+
 func parseGracePeriod(value string) int {
+	// Atoi means ASCII to Integer
+
 	days, err := strconv.Atoi(value)
 	if err != nil {
-		log.Fatalf("Error parsing grace period value: %v", err)
+		log.Fatalf("Error parsing grace period value: %s", err)
 	} else if days < 1 {
 		log.Fatal("For safety reasons, grace period cannot be lower than one day.")
 	}
 	return days
 }
+
+// go client used to interact with k8s clusters
 
 func initKubeClient() (*kubernetes.Clientset, error) {
 	// service runs inside cluster as a pod, therefore will use in-cluster config

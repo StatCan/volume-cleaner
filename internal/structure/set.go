@@ -1,5 +1,9 @@
 package structure
 
+// despite having generics now, Go still doesn't have sets
+// therefore, this was derived from https://stackoverflow.com/questions/34018908/golang-why-dont-we-have-a-set-datastructure
+// no external packages are needed for now, but that could change
+
 type Set struct {
 	list map[string]struct{}
 }
