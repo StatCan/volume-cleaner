@@ -4,7 +4,9 @@ import (
 	// Standard Packages
 	"log"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 
 	// External Packages
 	"k8s.io/client-go/kubernetes"
@@ -24,6 +26,7 @@ func main() {
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
 		GracePeriod: parseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
+		NotifTimes:  parseNotifTimes(os.Getenv("NOTIF_TIMES")),
 	}
 
 	kubeClient, err := initKubeClient()
@@ -32,6 +35,30 @@ func main() {
 	}
 
 	kubeInternal.FindStale(kubeClient, cfg)
+}
+
+func parseNotifTimes(str string) []int {
+	var intSlice []int
+
+	// use fields() and join() to get rid of all whitespace
+	// split by delimeter ,
+	// try to convert each value to an int, error out if failed
+	// sort final slice of ints
+
+	parsedString := strings.Split(strings.Join(strings.Fields(str), ""), ",")
+	for _, val := range parsedString {
+		converted, err := strconv.Atoi(val)
+		if err != nil {
+			log.Fatalf("Error parsing notification time: %s", err)
+		}
+		intSlice = append(intSlice, converted)
+	}
+
+	sort.Ints(intSlice)
+
+	log.Print(intSlice)
+
+	return intSlice
 }
 
 // read grace period value provided in the config and convert it to an int
