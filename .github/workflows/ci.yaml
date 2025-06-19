@@ -77,7 +77,7 @@ jobs:
         with:
           # Define filters for each image 
           filters: .github/configs/paths.yaml
-          base: 'test/82-anray-optimize-trivy-scans'
+          base: 'main'
 
   build-push:
     name: Push Docker Images 
