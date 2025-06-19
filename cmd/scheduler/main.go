@@ -23,7 +23,7 @@ func main() {
 		Label:       os.Getenv("LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
 		GracePeriod: parseGracePeriod(os.Getenv("GRACE_PERIOD")),
-		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1", //hi
+		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
 	}
 
 	kubeClient, err := initKubeClient()

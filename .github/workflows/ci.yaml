@@ -118,7 +118,7 @@ jobs:
   call-trivy-scan:
     name: Trivy Scans
     needs: filter
-    # if: ${{needs.filter.outputs.images != '[]'}}
+    if: ${{needs.filter.outputs.images != '[]'}}
     uses: ./.github/workflows/trivy-scan.yaml
     with:
       verticals: ${{needs.filter.outputs.images}}
