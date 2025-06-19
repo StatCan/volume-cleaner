@@ -63,7 +63,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 func IsStale(timestamp string, format string, gracePeriod int) bool {
 	timeObj, err := time.Parse(format, timestamp)
 	if err != nil {
-		log.Fatalf("Could not parse time: %s", err) //test comment
+		log.Fatalf("Could not parse time: %s", err)
 	}
 
 	// difference in days
