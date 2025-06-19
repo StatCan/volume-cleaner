@@ -35,7 +35,7 @@ func main() {
 	cfg := structInternal.ControllerConfig{
 		Namespace:  os.Getenv("NAMESPACE"),
 		Label:      os.Getenv("LABEL"),
-		TimeFormat: os.Getenv("TIME_FORMAT"),
+		TimeFormat: os.Getenv("TIME_FORMAT"), //hi
 	}
 
 	kubeClient, err := initKubeClient()
