@@ -3,7 +3,6 @@ module volume-cleaner
 go 1.24.3
 
 require (
-	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
 	k8s.io/api v0.33.1
 	k8s.io/apimachinery v0.33.1
