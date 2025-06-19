@@ -77,7 +77,7 @@ jobs:
         with:
           # Define filters for each image 
           filters: .github/configs/paths.yaml
-          base: 'main'
+          base: 'test/82-anray-optimize-trivy-scans'
 
   build-push:
     name: Push Docker Images 
@@ -117,8 +117,8 @@ jobs:
   # Calling Reusable Workflows for Trivy Docker Image Scans
   call-trivy-scan:
     name: Trivy Scans
-    needs: build-push
-    if: ${{needs.filter.outputs.images != '[]'}}
+    needs: filter
+    # if: ${{needs.filter.outputs.images != '[]'}}
     uses: ./.github/workflows/trivy-scan.yaml
     with:
       verticals: ${{needs.filter.outputs.images}}
