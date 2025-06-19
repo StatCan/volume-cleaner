@@ -4,6 +4,7 @@ import (
 	// standard packages
 	"context"
 	"log"
+	"math"
 	"time"
 
 	/* Unfortunate that a lof of the kubernetes packages require renaming because
@@ -51,6 +52,9 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				}
 			} else {
 				log.Print("Grace period not passed. Skipping.")
+
+				processEmails(timestamp, kube, cfg)
+
 			}
 		} else {
 			log.Print("Not labelled. Skipping.")
@@ -76,4 +80,25 @@ func IsStale(timestamp string, format string, gracePeriod int) bool {
 	log.Printf("int(diff) > cfg.GracePeriod: %v > %v == %v", int(diff), gracePeriod, stale)
 
 	return stale
+}
+
+func processEmails(timestamp string, kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
+	if err != nil {
+		log.Fatalf("Could not parse time: %s", err)
+	}
+	days_left := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
+
+	log.Printf("Days left until deletion: %d", days_left)
+
+	for _, time := range cfg.NotifTimes {
+		if days_left <= time {
+			if cfg.DryRun {
+				log.Print("DRY RUN: email user")
+			} else {
+				// actually send email
+			}
+			return
+		}
+	}
 }
