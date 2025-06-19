@@ -52,7 +52,7 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	return resp.StatusCode == 201
 }
 
-// NOTE: This is what you would do before you call the sendNotif function
+// NOTE: This is what you would do before you call the sendNotif function (DELETE THIS WHEN THIS FUNCTION IS INTEGRATED WITH THE SCHEDULER)
 // func example() {
 // 	// setup
 // 	email := "simulate-delivered@notification.canada.ca"
