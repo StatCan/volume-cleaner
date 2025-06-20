@@ -51,9 +51,15 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 				}
 			} else {
-				log.Print("Grace period not passed. Skipping.")
+				log.Print("Grace period not passed.")
 
-				processEmails(timestamp, kube, cfg)
+				if shouldSendMail(timestamp, kube, cfg) {
+					if cfg.DryRun {
+						log.Print("DRY RUN: email user")
+					} else {
+						// actually delete
+					}
+				}
 
 			}
 		} else {
@@ -82,7 +88,9 @@ func IsStale(timestamp string, format string, gracePeriod int) bool {
 	return stale
 }
 
-func processEmails(timestamp string, kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+func shouldSendMail(timestamp string, kube kubernetes.Interface, cfg structInternal.SchedulerConfig) bool {
+	log.Print("Checking email times....")
+
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
 		log.Fatalf("Could not parse time: %s", err)
@@ -93,12 +101,9 @@ func processEmails(timestamp string, kube kubernetes.Interface, cfg structIntern
 
 	for _, time := range cfg.NotifTimes {
 		if days_left <= time {
-			if cfg.DryRun {
-				log.Print("DRY RUN: email user")
-			} else {
-				// actually send email
-			}
-			return
+			return true
 		}
 	}
+
+	return false
 }
