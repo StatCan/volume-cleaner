@@ -1,3 +1,4 @@
+---
 # Determine which vertical (controller, scheduler) file changes trigger which workflows
 controller:
   - 'cmd/controller/**'
@@ -13,4 +14,3 @@ scheduler:
   - 'manifests/scheduler/**'
   - 'manifests/*.yaml'
   - 'scripts/**'
-
