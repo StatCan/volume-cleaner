@@ -4,7 +4,9 @@ import (
 	// Standard Packages
 	"log"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 
 	// External Packages
 	"k8s.io/client-go/kubernetes"
@@ -18,12 +20,22 @@ import (
 func main() {
 	log.Print("Volume cleaner scheduler started.")
 
+	// Initialize an EmailConfig struct
+	emailCfg := structInternal.EmailConfig{
+		BaseURL:         os.Getenv("BASE_URL"),
+		Endpoint:        os.Getenv("ENDPOINT"),
+		EmailTemplateID: os.Getenv("EMAIL_TEMPLATE_ID"),
+		APIKey:          os.Getenv("API_KEY"),
+	}
+
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		Label:       os.Getenv("LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
-		GracePeriod: parseGracePeriod(os.Getenv("GRACE_PERIOD")),
+		GracePeriod: ParseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
+		NotifTimes:  ParseNotifTimes(os.Getenv("NOTIF_TIMES")),
+		EmailCfg:    emailCfg,
 	}
 
 	kubeClient, err := initKubeClient()
@@ -34,9 +46,33 @@ func main() {
 	kubeInternal.FindStale(kubeClient, cfg)
 }
 
+func ParseNotifTimes(str string) []int {
+	var intSlice []int
+
+	// use fields() and join() to get rid of all whitespace
+	// split by delimeter ,
+	// try to convert each value to an int, error out if failed
+	// sort final slice of ints
+
+	parsedString := strings.Split(strings.Join(strings.Fields(str), ""), ",")
+	for _, val := range parsedString {
+		converted, err := strconv.Atoi(val)
+		if err != nil {
+			log.Fatalf("Error parsing notification time: %s", err)
+		}
+		intSlice = append(intSlice, converted)
+	}
+
+	sort.Ints(intSlice)
+
+	log.Print(intSlice)
+
+	return intSlice
+}
+
 // read grace period value provided in the config and convert it to an int
 
-func parseGracePeriod(value string) int {
+func ParseGracePeriod(value string) int {
 	// Atoi means ASCII to Integer
 
 	days, err := strconv.Atoi(value)
