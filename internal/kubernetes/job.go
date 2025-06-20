@@ -5,9 +5,10 @@ import (
 	"context"
 	"log"
 	"math"
+	"net/http"
 	"time"
 
-	/* Unfortunate that a lof of the kubernetes packages require renaming because
+	/* Unfortunate that a lot of the kubernetes packages require renaming because
 	they do not abide by good package name conventions as per https://go.dev/blog/package-names
 	*/
 
@@ -18,11 +19,15 @@ import (
 
 	// internal packages
 	structInternal "volume-cleaner/internal/structure"
+	utilsInternal "volume-cleaner/internal/utils"
 )
 
 // will write unit test for this when whole function is done
 
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+	// One http client is created for emailing users
+	client := &http.Client{Timeout: 10 * time.Second}
+
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
 
@@ -58,10 +63,22 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
 					} else {
-						log.Print("actually delete")
+						email := "simulate-delivered@notication.canada.ca"
+						personal := structInternal.Personalisation{
+							Name:         "",
+							VolumeName:   "",
+							VolumeID:     "",
+							GracePeriod:  "",
+							DeletionDate: "",
+						}
+
+						err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
+
+						if err {
+							log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
+						}
 					}
 				}
-
 			}
 		} else {
 			log.Print("Not labelled. Skipping.")

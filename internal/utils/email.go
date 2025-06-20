@@ -11,7 +11,7 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
-func sendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) bool {
+func SendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) bool {
 
 	url := conf.BaseURL + conf.Endpoint
 
@@ -49,10 +49,10 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	defer resp.Body.Close()
 
-	return resp.StatusCode == 201
+	return resp.StatusCode != 201 // return err boolean
 }
 
-// NOTE: This is what you would do before you call the sendNotif function (DELETE THIS WHEN THIS FUNCTION IS INTEGRATED WITH THE SCHEDULER)
+// NOTE: This is what you would do before you call the SendNotif function (DELETE THIS WHEN THIS FUNCTION IS INTEGRATED WITH THE SCHEDULER)
 // func example() {
 // 	// setup
 // 	email := "simulate-delivered@notification.canada.ca"
@@ -75,7 +75,7 @@ func sendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 // 	client := &http.Client{Timeout: 10 * time.Second}
 //
 // 	// sending email!
-// 	code := sendNotif(client, config, email, personal)
+// 	code := SendNotif(client, config, email, personal)
 //
 // 	log.Printf("Status: %t", code)
 // }

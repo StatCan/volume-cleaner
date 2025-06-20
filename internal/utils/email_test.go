@@ -35,11 +35,11 @@ func TestSendingNotif(t *testing.T) {
 	}
 
 	// sending email!
-	fail := sendNotif(client, configInvalid, email, personal)
+	err := SendNotif(client, configInvalid, email, personal)
 
-	log.Printf("Status: %t", fail)
+	log.Printf("Status: %t", err)
 
 	t.Run("sending an unauthorized api email request", func(t *testing.T) {
-		assert.Equal(t, fail, false)
+		assert.Equal(t, err, true)
 	})
 }

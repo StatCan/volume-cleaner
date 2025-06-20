@@ -57,6 +57,12 @@ func TestShouldSendMail(t *testing.T) {
 			TimeFormat:  "2006-01-02_15-04-05Z",
 			DryRun:      true,
 			NotifTimes:  []int{1, 2, 3, 30},
+			EmailCfg: structInternal.EmailConfig{
+				BaseURL:         "https://api.notification.canada.ca",
+				Endpoint:        "/v2/notifications/email",
+				EmailTemplateID: "Random Template",
+				APIKey:          "Random APIKEY",
+			},
 		}
 
 		assert.Equal(t, ShouldSendMail(time.Now().Format(cfg.TimeFormat), *pvc, cfg), false)

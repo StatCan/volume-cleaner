@@ -20,6 +20,14 @@ import (
 func main() {
 	log.Print("Volume cleaner scheduler started.")
 
+	// Initialize an EmailConfig struct
+	emailCfg := structInternal.EmailConfig{
+		BaseURL:         os.Getenv("BASE_URL"),
+		Endpoint:        os.Getenv("ENDPOINT"),
+		EmailTemplateID: os.Getenv("EMAIL_TEMPLATE_ID"),
+		APIKey:          os.Getenv("API_KEY"),
+	}
+
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		Label:       os.Getenv("LABEL"),
@@ -27,6 +35,7 @@ func main() {
 		GracePeriod: ParseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
 		NotifTimes:  ParseNotifTimes(os.Getenv("NOTIF_TIMES")),
+		EmailCfg:    emailCfg,
 	}
 
 	kubeClient, err := initKubeClient()

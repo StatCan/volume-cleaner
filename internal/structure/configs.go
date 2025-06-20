@@ -17,6 +17,11 @@ GRACE_PERIOD: "180"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
 DRY_RUN: "true"
 NOTIF_TIMES: "1, 2, 3, 4, 7, 30"
+
+BASE_URL: "https://api.notification.canada.ca",
+ENDPOINT: "/v2/notifications/email",
+EMAIL_TEMPLATE_ID: "Random Template",
+API_KEY: "Random APIKEY",
 */
 
 type ControllerConfig struct {
@@ -32,6 +37,7 @@ type SchedulerConfig struct {
 	GracePeriod int
 	DryRun      bool
 	NotifTimes  []int
+	EmailCfg    EmailConfig
 }
 
 type EmailConfig struct {
