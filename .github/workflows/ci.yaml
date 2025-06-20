@@ -23,7 +23,7 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           MULTI_STATUS: ${{ env.ACT && 'false' || 'true' }}
-          VALIDATE_ALL_CODEBASE: false 
+          VALIDATE_ALL_CODEBASE: false
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_GITHUB_ACTIONS: true
           VALIDATE_GO_MODULES: true
@@ -41,7 +41,7 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
-        with: 
+        with:
           go-version-file: 'go.mod'
           cache: true
 
@@ -51,7 +51,7 @@ jobs:
       - name: Download Go modules
         run: go mod download
 
-      - name: Run Go vet 
+      - name: Run Go vet
         run: go vet -v ./...
 
       - name: Run Go tests
@@ -68,20 +68,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Used for determining which vertical has been changed
+          fetch-depth: 0  # Used for determining which vertical has been changed
 
       # Determine which images need to be built
       - name: Check for image-specific file changes
-        id: filter 
+        id: filter
         uses: dorny/paths-filter@v3
         with:
-          # Define filters for each image 
+          # Define filters for each image
           filters: .github/configs/paths.yaml
           base: 'main'
 
   build-push:
-    name: Push Docker Images 
-    needs: filter # Depends on the job that figures out what to build
+    name: Push Docker Images
+    needs: filter  # Depends on the job that figures out what to build
     if: ${{needs.filter.outputs.images != '[]'}}
     runs-on: ubuntu-latest
 
@@ -112,7 +112,7 @@ jobs:
           context: .
           file: ./docker/${{ matrix.image }}/Dockerfile
           tags: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
-          push: ${{ env.ACT && 'false' || 'true' }} 
+          push: ${{ env.ACT && 'false' || 'true' }}
 
   # Calling Reusable Workflows for Trivy Docker Image Scans
   call-trivy-scan:

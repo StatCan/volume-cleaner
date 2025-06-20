@@ -1,5 +1,5 @@
 ---
-name: CI Trivy Scans 
+name: CI Trivy Scans
 
 on:
   workflow_call:
@@ -41,4 +41,4 @@ jobs:
           image-ref: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
           severity: "CRITICAL"
           ignore-unfixed: true
-          exit-code: 1 # Fail the job if critical unfixed vulnerabilities are found
+          exit-code: 1  # Fail the job if critical unfixed vulnerabilities are found
