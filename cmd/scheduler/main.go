@@ -24,9 +24,9 @@ func main() {
 		Namespace:   os.Getenv("NAMESPACE"),
 		Label:       os.Getenv("LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
-		GracePeriod: parseGracePeriod(os.Getenv("GRACE_PERIOD")),
+		GracePeriod: ParseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
-		NotifTimes:  parseNotifTimes(os.Getenv("NOTIF_TIMES")),
+		NotifTimes:  ParseNotifTimes(os.Getenv("NOTIF_TIMES")),
 	}
 
 	kubeClient, err := initKubeClient()
@@ -37,7 +37,7 @@ func main() {
 	kubeInternal.FindStale(kubeClient, cfg)
 }
 
-func parseNotifTimes(str string) []int {
+func ParseNotifTimes(str string) []int {
 	var intSlice []int
 
 	// use fields() and join() to get rid of all whitespace
@@ -63,7 +63,7 @@ func parseNotifTimes(str string) []int {
 
 // read grace period value provided in the config and convert it to an int
 
-func parseGracePeriod(value string) int {
+func ParseGracePeriod(value string) int {
 	// Atoi means ASCII to Integer
 
 	days, err := strconv.Atoi(value)

@@ -12,6 +12,7 @@ import (
 	*/
 
 	// external packages
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -53,7 +54,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			} else {
 				log.Print("Grace period not passed.")
 
-				if shouldSendMail(timestamp, kube, cfg) {
+				if ShouldSendMail(timestamp, pvc, cfg) {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
 					} else {
@@ -88,7 +89,7 @@ func IsStale(timestamp string, format string, gracePeriod int) bool {
 	return stale
 }
 
-func shouldSendMail(timestamp string, kube kubernetes.Interface, cfg structInternal.SchedulerConfig) bool {
+func ShouldSendMail(timestamp string, pvc corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) bool {
 	log.Print("Checking email times....")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
@@ -100,7 +101,7 @@ func shouldSendMail(timestamp string, kube kubernetes.Interface, cfg structInter
 	log.Printf("Days left until deletion: %d", days_left)
 
 	for _, time := range cfg.NotifTimes {
-		if days_left <= time {
+		if days_left == time {
 			return true
 		}
 	}
