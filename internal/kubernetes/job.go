@@ -58,7 +58,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
 					} else {
-						// actually delete
+						log.Print("actually delete")
 					}
 				}
 
@@ -89,19 +89,19 @@ func IsStale(timestamp string, format string, gracePeriod int) bool {
 	return stale
 }
 
-func ShouldSendMail(timestamp string, pvc corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) bool {
+func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) bool {
 	log.Print("Checking email times....")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
 		log.Fatalf("Could not parse time: %s", err)
 	}
-	days_left := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
+	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
 
-	log.Printf("Days left until deletion: %d", days_left)
+	log.Printf("Days left until deletion: %d", daysLeft)
 
 	for _, time := range cfg.NotifTimes {
-		if days_left == time {
+		if daysLeft == time {
 			return true
 		}
 	}
