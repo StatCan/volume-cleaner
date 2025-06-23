@@ -19,6 +19,8 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
+// given a collection of configs, this function makes a post request to an third party email service and sends an email to a user
+
 func SendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) bool {
 
 	url := conf.BaseURL + conf.Endpoint
