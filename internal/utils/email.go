@@ -48,7 +48,6 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	// Send Request
 	response, err := client.Do(request)
-	defer response.Body.Close()
 
 	if err != nil {
 		log.Printf("Error making HTTP POST request: %v", err)
@@ -56,6 +55,9 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		// sending the email failed, but don't stop the program
 		return false
 	}
+
+	defer response.Body.Close()
+
 	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
 
 	return response.StatusCode != 201 // return err boolean
