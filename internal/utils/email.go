@@ -91,7 +91,7 @@ func nsEmail(kube kubernetes.Interface, name string) string {
 		log.Printf("Error getting namespace %s: %v", name, err)
 	}
 
-	email, ok := ns.ObjectMeta.Annotations["owner"]
+	email, ok := ns.Annotations["owner"]
 	if !ok {
 		return ""
 	}
