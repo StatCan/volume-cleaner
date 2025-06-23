@@ -63,6 +63,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
 					} else {
+						// personal consists of details passed into the email template as variables while email is the email address that is consistent regardless of the template
 						email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
 
 						err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)

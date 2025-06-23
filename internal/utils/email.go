@@ -38,16 +38,17 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	}
 
 	// Create the request and add the required headers
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
-	req.Header.Add("Authorization", "ApiKey-v1 "+conf.APIKey)
-	req.Header.Add("Content-Type", "application/json")
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	request.Header.Add("Authorization", "ApiKey-v1 "+conf.APIKey)
+	request.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
 		log.Fatalf("Error creating request: %v", err)
 	}
 
 	// Send Request
-	resp, err := client.Do(req)
+	response, err := client.Do(request)
+	defer response.Body.Close()
 
 	if err != nil {
 		log.Printf("Error making HTTP POST request: %v", err)
@@ -55,11 +56,9 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		// sending the email failed, but don't stop the program
 		return false
 	}
-	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, resp.Status)
+	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
 
-	defer resp.Body.Close()
-
-	return resp.StatusCode != 201 // return err boolean
+	return response.StatusCode != 201 // return err boolean
 }
 
 // given a pvc, this function will aquire the details related to the pvc such as the owner of the pvc, their email, the bounded volume name and ID, and details about its deletion
