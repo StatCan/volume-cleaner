@@ -3,9 +3,17 @@ package utils
 import (
 	// standard packages
 	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
+
+	// external packages
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 
 	// internal packages
 	structInternal "volume-cleaner/internal/structure"
@@ -52,30 +60,40 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	return resp.StatusCode != 201 // return err boolean
 }
 
-// NOTE: This is what you would do before you call the SendNotif function (DELETE THIS WHEN THIS FUNCTION IS INTEGRATED WITH THE SCHEDULER)
-// func example() {
-// 	// setup
-// 	email := "simulate-delivered@notification.canada.ca"
-//
-// 	personal := structInternal.Personalisation{
-// 		Name:         "John Doe",
-// 		VolumeName:   "Volume",
-// 		VolumeID:     "Volume ID",
-// 		GracePeriod:  "180", // in days
-// 		DeletionDate: "June 17, 2025",
-// 	}
-//
-// 	config := structInternal.EmailConfig{
-// 		BaseURL:         "https://api.notification.canada.ca",
-// 		Endpoint:        "/v2/notifications/email",
-// 		EmailTemplateID: "Random Template",
-// 		APIKey:          "Random APIKEY",
-// 	}
-//
-// 	client := &http.Client{Timeout: 10 * time.Second}
-//
-// 	// sending email!
-// 	code := SendNotif(client, config, email, personal)
-//
-// 	log.Printf("Status: %t", code)
-// }
+// given a pvc, this function will aquire the details related to the pvc such as the owner of the pvc, their email, the bounded volume name and ID, and details about its deletion
+
+func EmailDetails(kube kubernetes.Interface, pvc corev1.PersistentVolumeClaim, gracePeriod int) (string, structInternal.Personalisation) {
+	ns := pvc.Namespace
+	vol := pvc.Spec.VolumeName
+
+	// Acquire User Email
+	email := nsEmail(kube, ns)
+
+	// Calculate DeletionDate
+	now := time.Now()
+	futureTime := now.Add(time.Duration(gracePeriod) * 24 * time.Hour)
+
+	personal := structInternal.Personalisation{
+		Name:         ns,
+		VolumeName:   vol,
+		GracePeriod:  fmt.Sprintf("%d", gracePeriod),
+		DeletionDate: futureTime.Format(time.UnixDate),
+	}
+
+	return email, personal
+}
+
+// returns the email associated with a namespace
+
+func nsEmail(kube kubernetes.Interface, name string) string {
+	ns, err := kube.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting namespace %s: %v", name, err)
+	}
+
+	email, ok := ns.ObjectMeta.Annotations["owner"]
+	if !ok {
+		return ""
+	}
+	return email
+}

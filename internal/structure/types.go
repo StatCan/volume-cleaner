@@ -11,7 +11,6 @@ type RequestBody struct {
 type Personalisation struct {
 	Name         string `json:"name"`
 	VolumeName   string `json:"volume_name"`
-	VolumeID     string `json:"volume_id"`
 	GracePeriod  string `json:"grace_period"`
 	DeletionDate string `json:"deletion_date"`
 }

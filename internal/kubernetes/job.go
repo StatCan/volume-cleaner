@@ -63,14 +63,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
 					} else {
-						email := "simulate-delivered@notication.canada.ca"
-						personal := structInternal.Personalisation{
-							Name:         "",
-							VolumeName:   "",
-							VolumeID:     "",
-							GracePeriod:  "",
-							DeletionDate: "",
-						}
+						email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
 
 						err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
 
