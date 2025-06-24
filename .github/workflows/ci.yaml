@@ -26,7 +26,7 @@ jobs:
 
       - run: |
           docker build --progress=plain --no-cache -t localhost:5050/controller:test -f docker/controller/Dockerfile ..
-          # docker build --progress=plain --no-cache -t localhost:5050/scheduler:test -f docker/scheduler/Dockerfile ..
+          docker build --progress=plain --no-cache -t localhost:5050/scheduler:test -f docker/scheduler/Dockerfile ..
           docker push localhost:5050/controller:test
 
       - run: |
@@ -41,5 +41,8 @@ jobs:
             -f manifests/controller/controller_config.yaml
           kubectl apply -f testing/controller_deployment.yaml
           sleep 10
+          kubectl apply -f testing/scheduler_job.yaml
+          sleep 10
           kubectl get pod -l app=volume-cleaner-controller -o yaml -n das
           kubectl logs -l app=volume-cleaner-controller -n das
+          kubectl logs -l app=volume-cleaner-scheduler -n das
