@@ -22,6 +22,8 @@ jobs:
           registry: true
           registry_port: 5050
 
+      - run: kind create cluster
+
       - run: |
           docker build --progress=plain --no-cache -t localhost:5050/controller:test -f docker/controller/Dockerfile ..
           # docker build --progress=plain --no-cache -t localhost:5050/scheduler:test -f docker/scheduler/Dockerfile ..
