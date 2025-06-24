@@ -2,6 +2,7 @@ package utils
 
 import (
 	// standard packages
+	"errors"
 	"log"
 	"net/http"
 	"testing"
@@ -42,7 +43,7 @@ func TestSendingNotif(t *testing.T) {
 	log.Printf("Status: %t", err)
 
 	t.Run("sending an unauthorized api email request", func(t *testing.T) {
-		assert.Equal(t, err, true)
+		assert.Equal(t, err, errors.New("403 Forbidden"))
 	})
 }
 

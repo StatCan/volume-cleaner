@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -21,7 +22,7 @@ import (
 
 // given a collection of configs, this function makes a post request to an third party email service and sends an email to a user
 
-func SendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) bool {
+func SendNotif(client *http.Client, conf structInternal.EmailConfig, email string, personal structInternal.Personalisation) error {
 
 	url := conf.BaseURL + conf.Endpoint
 
@@ -53,14 +54,17 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		log.Printf("Error making HTTP POST request: %v", err)
 
 		// sending the email failed, but don't stop the program
-		return false
+		return errors.New(response.Status)
 	}
 
 	defer response.Body.Close()
 
 	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
 
-	return response.StatusCode != 201 // return err boolean
+	if response.StatusCode == 201 {
+		return nil
+	}
+	return errors.New(response.Status)
 }
 
 // given a pvc, this function will aquire the details related to the pvc such as the owner of the pvc, their email, the bounded volume name and ID, and details about its deletion
@@ -91,12 +95,12 @@ func EmailDetails(kube kubernetes.Interface, pvc corev1.PersistentVolumeClaim, g
 func nsEmail(kube kubernetes.Interface, name string) string {
 	ns, err := kube.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
-		log.Printf("Error getting namespace %s: %v", name, err)
+		log.Printf("Error: Can't get namespace %s: %v", name, err)
 	}
 
-	email, ok := ns.Annotations["owner"]
-	if !ok {
-		return ""
+	email := ns.Annotations["owner"]
+	if email == "" {
+		log.Printf("Error: Annotation 'owner' for namespace %s is empty", name)
 	}
 	return email
 }
