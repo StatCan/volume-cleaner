@@ -17,8 +17,8 @@ spec:
       serviceAccountName: volume-cleaner
       containers:
         - name: volume-cleaner
-          image: controller
-          imagePullPolicy: Never
+          image: localhost:5050/controller:test
+          # imagePullPolicy: Never
           command: ["/volume-cleaner-controller"]
           envFrom:
             - configMapRef:

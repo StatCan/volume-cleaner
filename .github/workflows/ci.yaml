@@ -18,10 +18,26 @@ jobs:
 
       - name: Create k8s Kind Cluster
         uses: helm/kind-action@v1
+        with: 
+          registry: true
+          registry_port: 5050
+
+      - run: |
+          docker build --progress=plain --no-cache -t localhost:5050/controller:test -f docker/controller/Dockerfile ..
+          # docker build --progress=plain --no-cache -t localhost:5050/scheduler:test -f docker/scheduler/Dockerfile ..
+          docker push localhost:5050/controller:test
+
+      - run: |
+          kind load docker-image localhost:5050/controller:test
+          # kind load docker-image localhost:5050/scheduler:test
 
       - run: |
           kubectl apply -f testing/manifests.yaml
-          make run_controller
+          kubectl apply -f manifests/rbac.yaml \
+            -f manifests/serviceaccount.yaml \
+            -f manifests/netpol.yaml \
+            -f manifests/controller/controller_config.yaml
+          kubectl apply -f testing/controller_deployment.yaml
           sleep 10
-          kubectl get pod -n das
-  
+          kubectl get pod -l app=volume-cleaner-controller -o yaml -n das
+          kubectl logs -l app=volume-cleaner-controller -n das
