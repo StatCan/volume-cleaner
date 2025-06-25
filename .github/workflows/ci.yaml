@@ -50,7 +50,7 @@ jobs:
         run: |
           kubectl apply -f manifests/controller/controller_config.yaml \
             -f manifests/scheduler/scheduler_config.yaml \
-            -f manifests/scheduler/scheduler_secret.yaml\
+            # -f manifests/scheduler/scheduler_secret.yaml\
 
       - name: Apply controller
         run: |
