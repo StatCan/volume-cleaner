@@ -71,7 +71,7 @@ jobs:
           else 
               echo "Test passed."
               OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
-              if [[ "${OUTPUT}" = "volume-cleaner/unattached-time:"* ]]; then
+              if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
               else
                   echo "${OUTPUT}"
