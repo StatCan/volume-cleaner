@@ -79,8 +79,8 @@ jobs:
               fi
           fi
 
-      - name: list pvcs
-        run: kubectl get pvc -n anray-liu
+      - name: test error here
+        run: kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels
 
       - name: Test label not applied
         run: |
