@@ -71,7 +71,8 @@ jobs:
           kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels:
 
           echo here
-          kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels:
+          kubectl get pvc -n anray-liu
+          kubectl get pvc pvc2 -n anray-liu -o yaml
           echo here2
           kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels >> $TEST
           echo here3
