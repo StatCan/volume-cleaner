@@ -62,6 +62,22 @@ jobs:
           kubectl apply -f testing/scheduler/scheduler_job.yaml
           sleep 5
 
+      - name: Test labels applied
+        run: |
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu | grep labels)"
+          if [ "${OUTPUT}" = "" ]; then
+              echo "No labels found. Test failed."
+              exit 1
+          else 
+              OUTPUT="${kubectl get pvc pvc1 -n anray-liu | grep labels -A 1}"
+              if [[ "${OUTPUT}" = "volume-cleaner/unattached-time:"* ]]; then
+                  echo "Test passed."
+              else
+                  echo "Wrong label found. Test failed."
+                  exit 1
+              fi
+          fi
+
       - name: Print logs
         run: |
           kubectl get pod -l app=volume-cleaner-controller -o yaml -n das
@@ -70,16 +86,4 @@ jobs:
 
           kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels:
 
-          echo here
-          kubectl get pvc pvc2 -n anray-liu -o yaml
-          echo here2
-          TEST="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
-          echo here3
-          echo "TEST is: ${TEST}"
-
-          if [ "${TEST}" = "hello" ]; then
-              echo "Match"
-          else
-              echo "No match"
-          fi
 
