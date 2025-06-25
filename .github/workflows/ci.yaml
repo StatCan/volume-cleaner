@@ -74,6 +74,7 @@ jobs:
               if [[ "${OUTPUT}" = "volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
               else
+                  eco "${OUPUT}"
                   echo "Wrong label found. Test failed."
                   exit 2
               fi
