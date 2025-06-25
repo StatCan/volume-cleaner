@@ -75,6 +75,11 @@ jobs:
           echo here2
           TEST="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
           echo here3
-          echo "${TEST}"
-          [ "${TEST}" == hello ]; echo "$?" 
+          echo "TEST is: ${TEST}"
+
+          if [ "${TEST}" = "hello" ]; then
+              echo "Match"
+          else
+              echo "No match"
+          fi
 
