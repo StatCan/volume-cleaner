@@ -69,9 +69,12 @@ jobs:
           kubectl logs -l app=volume-cleaner-scheduler -n das
 
           kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels:
-          kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels:
-          kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels >> $TEST
 
+          echo here
+          kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels:
+          echo here2
+          kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels >> $TEST
+          echo here3
           echo $TEST
 
           [ "$TEST" == hello ]; echo "$?" 
