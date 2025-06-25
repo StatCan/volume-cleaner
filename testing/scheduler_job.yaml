@@ -14,7 +14,7 @@ spec:
       serviceAccountName: volume-cleaner
       containers:
         - name: volume-cleaner
-          image: localhost:5050/scheduler
+          image: localhost:5050/scheduler:test
           command: ["/volume-cleaner-scheduler"]
           envFrom:
             - configMapRef:
