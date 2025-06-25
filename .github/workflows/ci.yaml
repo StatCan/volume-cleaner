@@ -76,5 +76,5 @@ jobs:
           TEST="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
           echo here3
           echo "${TEST}"
-          [ "$TEST" == hello ]; echo "$?" 
+          [ "${TEST}" == hello ]; echo "$?" 
 
