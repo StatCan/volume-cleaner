@@ -16,34 +16,54 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create k8s Kind Cluster
+      - name: Install Kind
         uses: helm/kind-action@v1
         with: 
           registry: true
           registry_port: 5050
 
-      - run: kind create cluster
+      - name: Create Kind cluster
+        run: kind create cluster
 
-      - run: |
+      - name: Build docker files
+        run: |
           docker build --progress=plain --no-cache -t localhost:5050/controller:test -f docker/controller/Dockerfile ..
           docker build --progress=plain --no-cache -t localhost:5050/scheduler:test -f docker/scheduler/Dockerfile ..
+
+      - name: Push docker files to Kind cluster
+        run: |
           docker push localhost:5050/controller:test
           docker push localhost:5050/scheduler:test
-
-      - run: |
           kind load docker-image localhost:5050/controller:test
-          # kind load docker-image localhost:5050/scheduler:test
+          kind load docker-image localhost:5050/scheduler:test
 
-      - run: |
-          kubectl apply -f testing/manifests.yaml
+      - name: Apply cluster resources
+        run: kubectl apply -f testing/manifests/yaml
+
+      - name: Apply helper resources
+        run: |
           kubectl apply -f manifests/rbac.yaml \
             -f manifests/serviceaccount.yaml \
-            -f manifests/netpol.yaml \
-            -f manifests/controller/controller_config.yaml
+            -f manifests/netpol.yaml
+
+      - name: Apply configs
+        run: |
+          kubectl apply -f manifests/controller/controller_config.yaml \
+            -f manifests/scheduler/scheduler_config.yaml \
+            -f manifests/scheduler/scheduler_secret.yaml\
+
+      - name: Apply controller
+        run: |
           kubectl apply -f testing/controller_deployment.yaml
           sleep 10
+
+      - name: Apply scheduler
+        run: |
           kubectl apply -f testing/scheduler_job.yaml
           sleep 10
+
+      - name: Print logs
+        run: |
           kubectl get pod -l app=volume-cleaner-controller -o yaml -n das
           kubectl logs -l app=volume-cleaner-controller -n das
           kubectl logs -l app=volume-cleaner-scheduler -n das
