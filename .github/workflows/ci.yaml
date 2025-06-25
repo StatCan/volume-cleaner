@@ -70,12 +70,12 @@ jobs:
               exit 2
           else 
               echo "Test passed."
-              OUTPUT="${kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1}"
+              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
               if [[ "${OUTPUT}" = "volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
               else
                   echo "Wrong label found. Test failed."
-                  exit 1
+                  exit 2
               fi
           fi
 
