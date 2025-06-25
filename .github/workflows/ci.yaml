@@ -64,10 +64,10 @@ jobs:
 
       - name: Test labels applied
         run: |
-          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu | grep labels)"
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
           if [ "${OUTPUT}" = "" ]; then
               echo "No labels found. Test failed."
-              exit 1
+              exit 2
           else 
               echo "Test passed."
               # OUTPUT="${kubectl get pvc pvc1 -n anray-liu | grep labels -A 1}"
