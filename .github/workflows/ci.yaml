@@ -128,7 +128,18 @@ jobs:
 
       - name: Test scheduler processing
         run: |
-          kubectl logs -l app=volume-cleaner-scheduler -n das | xargs -L1 echo | cut -d ' ' -f 3-
+          LOGS="$(kubectl logs -l app=volume-cleaner-scheduler -n das | xargs -L1 echo | cut -d ' ' -f 3-)"
+          if ! "${LOGS}" | grep "Found pvc pvc1 from namespace anray-liu"; then
+              echo "Scheduler didn't find pvc1. Test failed."
+              exit 2
+          else
+              if ! ${LOGS} | grep "Found pvc pvc1 from namespace anray-liu" -A 3 | grep "Grace Period not passed. Skipping"; then
+                  echo "Scheduler didn't skip pvc1. Test failed."
+                  exit 2
+              else
+                  echo "Test passed."
+              fi
+          fi
 
       - name: Print logs
         run: |
