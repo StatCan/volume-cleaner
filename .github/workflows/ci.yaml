@@ -57,15 +57,9 @@ jobs:
           kubectl apply -f testing/controller/controller_deployment.yaml
           sleep 5
 
-      - name: Apply scheduler
-        run: |
-          kubectl apply -f testing/scheduler/scheduler_job.yaml
-          sleep 5
-
       - name: Test label applied
         run: |
-          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
-          if [ "${OUTPUT}" = "" ]; then
+          if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
           else 
@@ -73,7 +67,7 @@ jobs:
               if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
               else
-                  echo "${OUTPUT}"
+                  echo "Output: ${OUTPUT}"
                   echo "Wrong label found. Test failed."
                   exit 2
               fi
@@ -85,7 +79,7 @@ jobs:
               echo "Test passed."
           else
               OUTPUT="$(kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels)"
-              echo "${OUTPUT}"
+              echo "Output: ${OUTPUT}"
               echo "Labels found. Test failed."
               exit 2
           fi
@@ -101,7 +95,7 @@ jobs:
               echo "Test passed."
           else
               OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
-              echo "${OUTPUT}"
+              echo "Output: ${OUTPUT}"
               echo "Labels found. Test failed."
               exit 2
           fi
@@ -114,19 +108,27 @@ jobs:
       - name: Test label applied again
         run: |
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
-              echo "Test failed."
+              echo "No labels found. Test failed."
               exit 2
           else
               OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
               if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
               else
-                  echo "${OUTPUT}"
+                  echo "Output: ${OUTPUT}"
                   echo "Wrong label found. Test failed."
                   exit 2
               fi
           fi
 
+      - name: Apply scheduler
+        run: |
+          kubectl apply -f testing/scheduler/scheduler_job.yaml
+          sleep 5
+
+      - name: Test scheduler processing
+        run: |
+          kubectl logs -l app=volume-cleaner-scheduler -n das | xargs -L1 echo | cut -d ' ' -f 3-
 
       - name: Print logs
         run: |
