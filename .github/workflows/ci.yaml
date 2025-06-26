@@ -97,10 +97,10 @@ jobs:
 
       - name: Test label removed
         run: |
-          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
-          if [ "${OUTPUT}" = "" ]; then
+          if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "Test passed."
-          else 
+          else
+              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
               echo "${OUTPUT}"
               echo "Labels found. Test failed."
               exit 2
@@ -113,11 +113,10 @@ jobs:
 
       - name: Test label applied again
         run: |
-          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels)"
-          if [ "${OUTPUT}" = "" ]; then
-              echo "No labels found. Test failed."
+          if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
+              echo "Test failed."
               exit 2
-          else 
+          else
               OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
               if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
@@ -127,7 +126,6 @@ jobs:
                   exit 2
               fi
           fi
-
 
 
       - name: Print logs
