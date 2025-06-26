@@ -135,7 +135,7 @@ jobs:
 
       - name: Install Kind
         uses: helm/kind-action@v1
-        with: 
+        with:
           registry: true
           registry_port: 5050
 
@@ -179,7 +179,7 @@ jobs:
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
-          else 
+          else
               OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
               if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
                   echo "Test passed."
