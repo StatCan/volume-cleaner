@@ -79,15 +79,12 @@ jobs:
               fi
           fi
 
-      - name: test error here
-        run: kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels
-
       - name: Test label not applied
         run: |
-          OUTPUT="$(kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels)"
-          if [ "${OUTPUT}" = "" ]; then
+          if ! kubectl get pvc pvc2 -n anray-liu -o yaml | grep -q labels; then
               echo "Test passed."
-          else 
+          else
+              OUTPUT="$(kubectl get pvc pvc2 -n anray-liu -o yaml | grep labels)"
               echo "${OUTPUT}"
               echo "Labels found. Test failed."
               exit 2
