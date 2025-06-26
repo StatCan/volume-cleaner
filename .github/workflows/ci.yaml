@@ -7,7 +7,124 @@ env:
   REGISTRY: k8scc01covidacr.azurecr.io
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs full git history to get the list of files that changed across commits
+          fetch-depth: 0
 
+      - name: Super linter
+        uses: super-linter/super-linter@v7
+        env:
+          DEFAULT_BRANCH: main
+          MULTI_STATUS: ${{ env.ACT && 'false' || 'true' }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_DOCKERFILE_HADOLINT: true
+          VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_GO_MODULES: true
+          VALIDATE_GITLEAKS: true
+          VALIDATE_YAML: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: Golang Tests
+    runs-on: ubuntu-latest
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Go mod tidy (ensure dependencies are clean)
+        run: go mod tidy -v
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run Go vet
+        run: go vet -v ./...
+
+      - name: Run Go tests
+        run: go test -v -race ./...
+
+  filter:
+    name: Filter Images to Build
+    runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.filter.outputs.changes }}
+
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Used for determining which vertical has been changed
+
+      # Determine which images need to be built
+      - name: Check for image-specific file changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          # Define filters for each image
+          filters: .github/configs/paths.yaml
+          base: 'main'
+
+  build-push:
+    name: Push Docker Images
+    needs: filter  # Depends on the job that figures out what to build
+    if: ${{needs.filter.outputs.images != '[]'}}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        # The list of images to scan
+        image: ${{ fromJson(needs.filter.outputs.images) }}
+
+    steps:
+      # allows workflow to access the repo
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to ACR
+        if: ${{ !env.ACT }}
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push Image ${{ matrix.image }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/${{ matrix.image }}/Dockerfile
+          tags: ${{ env.REGISTRY }}/volume-cleaner-${{ matrix.image }}:latest
+          push: ${{ env.ACT && 'false' || 'true' }}
+
+  # Calling Reusable Workflows for Trivy Docker Image Scans
+  call-trivy-scan:
+    name: Trivy Scans
+    needs: filter
+    if: ${{needs.filter.outputs.images != '[]'}}
+    uses: ./.github/workflows/trivy-scan.yaml
+    with:
+      verticals: ${{needs.filter.outputs.images}}
+    secrets: inherit
+
+  # creates a local cluster and tests for correct behaviour
   integration-test:
     name: Integration Test
     runs-on: ubuntu-latest
@@ -154,12 +271,8 @@ jobs:
               fi
           fi
 
+      # extra information
       - name: Print logs
         run: |
-          kubectl get pod -l app=volume-cleaner-controller -o yaml -n das
           kubectl logs -l app=volume-cleaner-controller -n das
           kubectl logs -l app=volume-cleaner-scheduler -n das
-
-          kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels:
-
-
