@@ -132,6 +132,7 @@ jobs:
               echo "Scheduler didn't find pvc1. Test failed."
               exit 2
           else
+              echo "kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc1 from namespace anray-liu" -A 3"
               if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc1 from namespace anray-liu" -A 3 | grep "Grace Period not passed. Skipping"; then
                   echo "Scheduler didn't skip pvc1. Test failed."
                   exit 2
