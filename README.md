@@ -1,16 +1,23 @@
 # Kubernetes Volume Cleaner
 
+([Français](#volume-cleaner-kubernetes))
+
 <p align="center">
     <img src="./assets/volume_cleaner.jpg" alt="Volume Cleaner Logo" width="400"/>
 </p>
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/StatCan/volume-cleaner)
-
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+<p align="center">
+  <a href="https://deepwiki.com/StatCan/volume-cleaner">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"/>
+  </a>
+  <a href="https://www.gnu.org/licenses/agpl-3.0">
+    <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"/>
+  </a>
+</p>
 
 A Kubernetes CronJob that automatically identifies and cleans up stale Persistent Volume Claims and Persistent Volumes (K8S) linked to an associated Azure disk.
 
-# Contents
+## Contents
 
 - [Introduction](#introduction)
 - [Requirements](#requirements)
@@ -21,7 +28,7 @@ A Kubernetes CronJob that automatically identifies and cleans up stale Persisten
 - [License](#license)
 
 
-# Introduction 
+## Introduction 
 
 This project was designed to integrate with Statistic Canada’s [The Zone](https://zone.pages.cloud.statcan.ca/docs/en/) platform. In The Zone, users can create individual workspaces with Kubeflow Notebooks. To persist their work, users can attach volumes to their notebooks. These volumes are not automatically deleted when a notebook is deleted. Users are free to move them or to reuse them. As a result, over time, users tend to amass several unused volumes. These volumes sit on the cloud and result in unnecessary costs. The purpose of this project is to design an automatic system that detects these unused volumes and safely removes them, reducing unnecessary expenditure. 
 
@@ -29,7 +36,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 ### Architectural Structure
 
-# Requirements
+## Requirements
 
 - Golang 1.24.3 
 
@@ -41,7 +48,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 - Testify's Testing Framework 
 
-# Features 
+## Features 
 
 - **Automatic PVC Discovery** : Scans Kubeflow namespaces to identify unattached Persistent Volume Claims that are no longer associated with StatefulSets
 
@@ -61,17 +68,17 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 The system operates through two main components: a controller that runs continuously to monitor StatefulSet events and label PVCs, and a scheduler that runs periodically (via CronJob) to perform cleanup operations and send notifications. The project integrates with GC Notify for email services and supports Azure disk cleanup in Kubernetes environments.
 
-# Quick Start
+## Quick Start
 
-# How to Contribute
+## How to Contribute
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
-# Code of Conduct
+## Code of Conduct
 
 See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
-# License
+## License
 
 Volume Cleaner is distributed under [AGPL-3.0.only](LICENSE.md).
 
@@ -85,27 +92,32 @@ Volume Cleaner is distributed under [AGPL-3.0.only](LICENSE.md).
 
 ______________________
 
-# Kubernetes Volume Cleaner
+# Volume Cleaner Kubernetes
 
 <p align="center">
     <img src="./assets/volume_cleaner.jpg" alt="Volume Cleaner Logo" width="400"/>
 </p>
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/StatCan/volume-cleaner)
-
-[![Licence : AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+<p align="center">
+  <a href="https://deepwiki.com/StatCan/volume-cleaner">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"/>
+  </a>
+  <a href="https://www.gnu.org/licenses/agpl-3.0">
+    <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"/>
+  </a>
+</p>
 
 Un CronJob Kubernetes qui identifie automatiquement et nettoie les Persistent Volume Claims et Persistent Volumes (K8S) obsolètes liés à un disque Azure associé.
 
 ## Contenu
 
-* [Introduction](#introduction)
-* [Prérequis](#prérequis)
-* [Fonctionnalités](#fonctionnalités)
-* [Démarrage rapide](#démarrage-rapide)
-* [Comment contribuer](#comment-contribuer)
-* [Code de conduite](#code-de-conduite)
-* [Licence](#licence)
+- [Introduction](#introduction)
+- [Prérequis](#prérequis)
+- [Fonctionnalités](#fonctionnalités)
+- [Démarrage rapide](#démarrage-rapide)
+- [Comment contribuer](#comment-contribuer)
+- [Code de conduite](#code-de-conduite)
+- [Licence](#licence)
 
 ## Introduction
 
@@ -165,6 +177,6 @@ Volume Cleaner est distribué sous [AGPL-3.0.only](LICENSE.md).
 
 ### Open Source au sein du Gouvernement du Canada
 
-* [Utilisation de logiciels Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-pour-lutilisation-de-logiciels-libres.html)
-* [Publication de code Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-pour-la-publication-du-code-source-libre.html)
-* [Contribution aux logiciels Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-de-contribution-aux-logiciels-libres.html)
+- [Utilisation de logiciels Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-pour-lutilisation-de-logiciels-libres.html)
+- [Publication de code Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-pour-la-publication-du-code-source-libre.html)
+- [Contribution aux logiciels Open Source](https://www.canada.ca/fr/gouvernement/systeme/gouvernement-numerique/innovations-gouvernementales-numeriques/logiciels-libres/guide-de-contribution-aux-logiciels-libres.html)

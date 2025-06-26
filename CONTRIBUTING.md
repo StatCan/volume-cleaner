@@ -51,13 +51,11 @@ volume-cleaner/
 This project does not use a test folder, `_test.go` files are keep in their package folders, unit testing and integration testing is performed using Golang's standard testing library along with the popular testing toolkit [Testify](https://github.com/stretchr/testify). End-to-End testing is performed in Github actions workflows defined within the `.github/workflows/` directory. Testing can be performed locally using the following:
 
 ```
-
 // Unit and Integration Testing
 go test -v -race ./...
 
 // End-to-End Testing
 act --rm
-
 ```
 
 ### Practices 
