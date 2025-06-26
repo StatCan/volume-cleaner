@@ -8,4 +8,4 @@ ______________________
 
 ## Sécurité
 
-**Ne publiez aucun problème de sécurité sur le dépôt publique!** Les vulnérabilités de sécurité doivent être signalées par courriel à `statcan.cybersecurity-cybersecurite.statcan@statcan.gc.ca`
+**Ne publiez aucun problème de sécurité sur le dépôt public!** Les vulnérabilités de sécurité doivent être signalées par courriel à `statcan.cybersecurity-cybersecurite.statcan@statcan.gc.ca`
