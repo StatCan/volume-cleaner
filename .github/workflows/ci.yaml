@@ -128,7 +128,7 @@ jobs:
 
       - name: Test scheduler processing
         run: |
-          LOGS="$(kubectl logs -l app=volume-cleaner-scheduler -n das | cut -d ' ' -f 3-)"
+          LOGS="$(kubectl logs -l app=volume-cleaner-scheduler -n das | awk '{ $1=""; $2=""; sub(/^  */, ""); print }')"
           echo "hi"
           echo ${LOGS}
           echo "bye"
