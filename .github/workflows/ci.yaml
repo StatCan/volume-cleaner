@@ -129,7 +129,7 @@ jobs:
       - name: Test scheduler processing
         run: |
           LOGS="$(kubectl logs -l app=volume-cleaner-scheduler -n das | xargs -L1 echo | cut -d ' ' -f 3-)"
-          if ! "${LOGS}" | grep "Found pvc pvc1 from namespace anray-liu"; then
+          if ! ${LOGS} | grep "Found pvc pvc1 from namespace anray-liu"; then
               echo "Scheduler didn't find pvc1. Test failed."
               exit 2
           else
