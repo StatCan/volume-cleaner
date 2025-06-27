@@ -35,7 +35,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		})
 
 	if err != nil {
-		log.Fatalf("Error creating request body: %v", err)
+		log.Printf("Error creating request body: %v", err)
 	}
 
 	// Create the request and add the required headers
@@ -44,7 +44,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	request.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
-		log.Fatalf("Error creating request: %v", err)
+		log.Printf("Error creating request: %v", err)
 	}
 
 	// Send Request
