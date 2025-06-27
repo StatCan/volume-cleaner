@@ -27,7 +27,7 @@ import (
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
-	errors := 0
+	errCount := 0
 
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
@@ -46,7 +46,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 			if staleError != nil {
 				log.Printf("Could not parse time: %s", staleError)
-				errors++
+				errCount++
 				continue
 			}
 
@@ -61,7 +61,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
 				if err != nil {
 					log.Printf("Error deleting pvc %s: %s", pvc.Name, err)
-					errors++
+					errCount++
 				}
 				log.Print("PVC successfully deleted.")
 
@@ -72,7 +72,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 				if mailError != nil {
 					log.Printf("Could not parse time: %s", mailError)
-					errors++
+					errCount++
 					continue
 				}
 
@@ -89,7 +89,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 					if err != nil {
 						log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
-						errors++
+						errCount++
 					}
 
 				}
@@ -99,7 +99,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		}
 	}
 
-	log.Printf("Job errors %d", errors)
+	log.Printf("Job errors %d", errCount)
 }
 
 // determines if the grace period is greater than a given timestamp
