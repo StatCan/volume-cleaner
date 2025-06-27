@@ -7,7 +7,7 @@ metadata:
 data:
   NAMESPACE: "anray-liu"
   LABEL: "volume-cleaner/unattached-time"
-  GRACE_PERIOD: "180"
+  GRACE_PERIOD: "7"
   TIME_FORMAT: "2006-01-02_15-04-05Z"
   DRY_RUN: "true"
-  NOTIF_TIMES: "1, 2, 3, 7, 14, 90"
+  NOTIF_TIMES: "1, 2, 3, 4"
