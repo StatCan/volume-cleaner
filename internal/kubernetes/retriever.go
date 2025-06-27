@@ -22,6 +22,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
 	})
 	if err != nil {
+		// nothing can be done without namespaces so crash the program
 		log.Fatalf("Error listing namespaces: %s", err)
 	}
 
@@ -33,7 +34,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("Error listing volume claims: %s", err)
+		log.Printf("Error listing volume claims: %s", err)
 	}
 	return pvcs.Items
 }
@@ -43,7 +44,7 @@ func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeCl
 func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	sts, err := kube.AppsV1().StatefulSets(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("Error listing stateful sets: %s", err)
+		log.Printf("Error listing stateful sets: %s", err)
 	}
 	return sts.Items
 }
