@@ -48,7 +48,7 @@ volume-cleaner/
 
 ### Testing
 
-This project does not use a test folder, `_test.go` files are kept in their package folders, unit testing and integration testing is performed using Golang's standard testing library along with the popular testing toolkit [Testify](https://github.com/stretchr/testify). End-to-End testing is performed in Github actions workflows defined within the `.github/workflows/` directory. Testing can be performed locally using the following:
+This project does not use a test folder, `_test.go` files are kept in their package folders, unit testing is performed using Golang's standard testing library along with the popular testing toolkit [Testify](https://github.com/stretchr/testify). Integration testing is performed in Github actions workflows defined within the `.github/workflows/` directory. Testing can be performed locally using the following:
 
 ```
 // Unit and Integration Testing
@@ -143,7 +143,7 @@ volume-cleaner/
 
 ### Tests
 
-Ce projet n'utilise pas de dossier de test ; les fichiers `_test.go` restent dans leur dossier de package. Les tests unitaires et d'intégration sont réalisés avec la bibliothèque de tests standard de Golang ainsi que le populaire toolkit [Testify](https://github.com/stretchr/testify). Les tests End-to-End sont exécutés via les workflows GitHub Actions définis dans le répertoire `.github/workflows/`. Les tests peuvent être lancés localement avec :
+Ce projet n'utilise pas de dossier de test ; les fichiers `_test.go` restent dans leur dossier de package. Les tests unitaires sont réalisés avec la bibliothèque de tests standard de Golang ainsi que le populaire toolkit [Testify](https://github.com/stretchr/testify). Les tests d'intégration sont exécutés via les workflows GitHub Actions définis dans le répertoire `.github/workflows/`. Les tests peuvent être lancés localement avec :
 
 ```
 
