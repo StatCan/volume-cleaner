@@ -1,16 +1,17 @@
 package kubernetes
 
 import (
+	// standard packages
 	"context"
 	"testing"
 	"time"
 
+	// external packages
 	"github.com/stretchr/testify/assert"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/fake"
 
+	// internal packages
 	structInternal "volume-cleaner/internal/structure"
+	testInternal "volume-cleaner/internal/testing"
 )
 
 func TestIsStale(t *testing.T) {
@@ -91,17 +92,14 @@ func TestShouldSendMail(t *testing.T) {
 
 	t.Run("test successful determination of email sending", func(t *testing.T) {
 		// create fake client
-		client := fake.NewClientset()
+		kube := testInternal.NewFakeClient()
 
-		ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: "test",
-			Labels: map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}}}
-		_, namespaceErr := client.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
-		if namespaceErr != nil {
+		labels := map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}
+		if namespaceErr := kube.CreateNamespace(context.TODO(), "test", labels); namespaceErr != nil {
 			t.Fatalf("Error injecting namespace add: %v", namespaceErr)
 		}
 
-		pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: "pvc", Namespace: "test"}}
-		_, pvcErr := client.CoreV1().PersistentVolumeClaims("test").Create(context.TODO(), pvc, metav1.CreateOptions{})
+		pvc, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), "pvc", "test")
 		if pvcErr != nil {
 			t.Fatalf("Error injecting pvc add: %v", pvcErr)
 		}

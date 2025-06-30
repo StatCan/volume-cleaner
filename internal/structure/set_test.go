@@ -1,9 +1,10 @@
 package structure
 
 import (
-	// External Imports
+	// standard packages
 	"testing"
 
+	// external packages
 	"github.com/stretchr/testify/assert"
 )
 
