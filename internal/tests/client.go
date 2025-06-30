@@ -1,4 +1,4 @@
-package testing
+package tests
 
 // Abstract out a Fake Kubernetes Client to be used for testing
 

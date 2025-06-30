@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	// internal packages
-	testInternal "volume-cleaner/internal/testing"
+	testInternal "volume-cleaner/internal/tests"
 )
 
 func TestLabelFunctions(t *testing.T) {
