@@ -72,7 +72,6 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	for _, pvc := range FindUnattachedPVCs(kube) {
 		_, ok := pvc.Labels[cfg.Label]
 		if !ok {
-			log.Print("PVC labelled.")
 			SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		} else {
 			log.Print("PVC already has label. Skipping.")

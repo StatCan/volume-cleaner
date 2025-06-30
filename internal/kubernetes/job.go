@@ -27,6 +27,7 @@ import (
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
+	errCount := 0
 
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
@@ -42,50 +43,71 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 		timestamp, ok := pvc.Labels[cfg.Label]
 		if ok {
-			if IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod) {
+			stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
+			if staleError != nil {
+				log.Printf("Could not parse time: %s", staleError)
+				errCount++
+				continue
+			}
+
+			if stale {
 				if cfg.DryRun {
 
 					log.Printf("DRY RUN: delete pvc %s", pvc.Name)
-
-				} else {
-
-					err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
-					if err != nil {
-						log.Fatalf("Error deleting pvc %s: %s", pvc.Name, err)
-					}
-					log.Print("PVC successfully deleted.")
+					continue
 
 				}
+
+				err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
+				if err != nil {
+					log.Printf("Error deleting pvc %s: %s", pvc.Name, err)
+					errCount++
+				}
+				log.Print("PVC successfully deleted.")
+
 			} else {
 				log.Print("Grace period not passed.")
 
-				if ShouldSendMail(timestamp, pvc, cfg) {
+				shouldSend, mailError := ShouldSendMail(timestamp, pvc, cfg)
+
+				if mailError != nil {
+					log.Printf("Could not parse time: %s", mailError)
+					errCount++
+					continue
+				}
+
+				if shouldSend {
 					if cfg.DryRun {
 						log.Print("DRY RUN: email user")
-					} else {
-						// personal consists of details passed into the email template as variables while email is the email address that is consistent regardless of the template
-						email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
-
-						err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
-
-						if err != nil {
-							log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
-						}
+						continue
 					}
+
+					// personal consists of details passed into the email template as variables while email is the email address that is consistent regardless of the template
+					email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
+
+					err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
+
+					if err != nil {
+						log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
+						errCount++
+					}
+
 				}
 			}
 		} else {
 			log.Print("Not labelled. Skipping.")
 		}
 	}
+
+	log.Printf("Job errors %d", errCount)
 }
 
 // determines if the grace period is greater than a given timestamp
 
-func IsStale(timestamp string, format string, gracePeriod int) bool {
+func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 	timeObj, err := time.Parse(format, timestamp)
 	if err != nil {
-		log.Fatalf("Could not parse time: %s", err)
+		return false, err
 	}
 
 	// difference in days
@@ -97,15 +119,15 @@ func IsStale(timestamp string, format string, gracePeriod int) bool {
 
 	log.Printf("int(diff) > cfg.GracePeriod: %v > %v == %v", int(diff), gracePeriod, stale)
 
-	return stale
+	return stale, nil
 }
 
-func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) bool {
+func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) (bool, error) {
 	log.Print("Checking email times....")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
-		log.Fatalf("Could not parse time: %s", err)
+		return false, err
 	}
 	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
 
@@ -113,9 +135,9 @@ func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg struct
 
 	for _, time := range cfg.NotifTimes {
 		if daysLeft == time {
-			return true
+			return true, nil
 		}
 	}
 
-	return false
+	return false, nil
 }

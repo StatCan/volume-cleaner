@@ -24,7 +24,7 @@ func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 		metav1.PatchOptions{},
 	)
 	if err != nil {
-		log.Fatalf("Error patching PVC %s from namespace %s: %s", pvc, ns, err)
+		log.Printf("Error patching PVC %s from namespace %s: %s", pvc, ns, err)
 	}
 
 	log.Printf("Patch successfully applied to %s", pvc)
