@@ -24,28 +24,28 @@ func NewFakeClient() *FakeClient {
 }
 
 // creates a Kubernetes Namespace resource with the given name and labels.
-func (f FakeClient) CreateNamespace(ctx context.Context, name string, labels map[string]string) error {
+func (f *FakeClient) CreateNamespace(ctx context.Context, name string, labels map[string]string) error {
 	ns := &corev1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: name, Labels: labels}}
 	_, err := f.CoreV1().Namespaces().Create(ctx, ns, metav1.CreateOptions{})
 	return err
 }
 
 // creates a PersistentVolumeClaim in the specified namespace with the given name.
-func (f FakeClient) CreatePersistentVolumeClaim(ctx context.Context, name string, namespace string) (*corev1.PersistentVolumeClaim, error) {
+func (f *FakeClient) CreatePersistentVolumeClaim(ctx context.Context, name string, namespace string) (*corev1.PersistentVolumeClaim, error) {
 	pvc := &corev1.PersistentVolumeClaim{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace}}
 	_, err := f.CoreV1().PersistentVolumeClaims(namespace).Create(ctx, pvc, metav1.CreateOptions{})
 	return pvc, err
 }
 
 // creates a basic StatefulSet resource in the specified namespace with the given name.
-func (f FakeClient) CreateStatefulSet(ctx context.Context, name string, namespace string) error {
+func (f *FakeClient) CreateStatefulSet(ctx context.Context, name string, namespace string) error {
 	sts := &appv1.StatefulSet{ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace}}
 	_, err := f.AppsV1().StatefulSets(namespace).Create(ctx, sts, metav1.CreateOptions{})
 	return err
 }
 
 // creates a StatefulSet that references a PersistentVolumeClaim by name.
-func (f FakeClient) CreateStatefulSetWithPvc(ctx context.Context, stsName string, namespace string, pvcName string) error {
+func (f *FakeClient) CreateStatefulSetWithPvc(ctx context.Context, stsName string, namespace string, pvcName string) error {
 
 	sts := &appv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
