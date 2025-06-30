@@ -75,6 +75,6 @@ func (f FakeClient) CreateStatefulSetWithPvc(ctx context.Context, stsName string
 
 // deletes a StatefulSet by name from the specified namespace.
 func (f FakeClient) DeleteStatefulSet(ctx context.Context, name string, namespace string) error {
-	err := f.AppsV1().StatefulSets(namespace).Delete(context.TODO(), name, metav1.DeleteOptions{})
+	err := f.AppsV1().StatefulSets(namespace).Delete(ctx, name, metav1.DeleteOptions{})
 	return err
 }
