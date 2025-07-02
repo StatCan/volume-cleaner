@@ -1,6 +1,7 @@
 apply:
 	@minikube kubectl -- apply -f manifests.yaml
 	@minikube kubectl -- apply -f ../manifests/scheduler/scheduler_config.yaml \
+							-f  ../manifests/scheduler/scheduler_secret.yaml \
 							-f  ../manifests/controller/controller_config.yaml \
 							-f	  ../manifests/netpol.yaml \
 							-f	  ../manifests/rbac.yaml \
