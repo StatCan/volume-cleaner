@@ -1,4 +1,4 @@
-package main
+package kubernetes
 
 import (
 	// standard packages
@@ -13,7 +13,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	// internal packages
-	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
 )
 
@@ -52,7 +51,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
 					log.Printf("removing label")
 
-					kubeInternal.RemovePvcLabel(kube, cfg.Label, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					RemovePvcLabel(kube, cfg.Label, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			case watch.Deleted:
 				log.Printf("sts deleted: %s", sts.Name)
@@ -60,7 +59,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
 					log.Printf("adding label")
 
-					kubeInternal.SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			}
 		}
@@ -70,10 +69,10 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Checking for unattached PVCs...")
-	for _, pvc := range kubeInternal.FindUnattachedPVCs(kube) {
+	for _, pvc := range FindUnattachedPVCs(kube) {
 		_, ok := pvc.Labels[cfg.Label]
 		if !ok {
-			kubeInternal.SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+			SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		} else {
 			log.Print("PVC already has label. Skipping.")
 		}

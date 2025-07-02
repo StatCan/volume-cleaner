@@ -1,4 +1,4 @@
-package main
+package kubernetes
 
 import (
 	// standard packages
@@ -18,7 +18,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	// internal packages
-	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
 	utilsInternal "volume-cleaner/internal/utils"
 )
@@ -30,7 +29,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	errCount := 0
 
-	for _, pvc := range kubeInternal.PvcList(kube, cfg.Namespace) {
+	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
 
 		// check if label exists (meaning unattached)

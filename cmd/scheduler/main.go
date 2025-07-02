@@ -10,6 +10,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	// internal Packages
+	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
 	utilsInternal "volume-cleaner/internal/utils"
 )
@@ -43,7 +44,7 @@ func main() {
 		log.Fatalf("Error creating kube client: %s", err)
 	}
 
-	FindStale(kubeClient, cfg)
+	kubeInternal.FindStale(kubeClient, cfg)
 }
 
 // go client used to interact with k8s clusters
