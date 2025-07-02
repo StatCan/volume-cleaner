@@ -1,6 +1,7 @@
 apply:
 	@minikube kubectl -- apply -f manifests.yaml
 	@minikube kubectl -- apply -f ../manifests/scheduler/scheduler_config.yaml \
+							-f  ../manifests/scheduler/scheduler_secret.yaml \
 							-f  ../manifests/controller/controller_config.yaml \
 							-f	  ../manifests/netpol.yaml \
 							-f	  ../manifests/rbac.yaml \
@@ -23,16 +24,16 @@ pvc2_logs:
 	@minikube kubectl -- get -o yaml -n anray-liu pvc pvc2
 
 controller:
-	@minikube kubectl -- apply -f controller_deployment.yaml
+	@minikube kubectl -- apply -f controller/controller_deployment.yaml
 
 stop_controller:
-	@minikube kubectl -- delete -f controller_deployment.yaml
+	@minikube kubectl -- delete -f controller/controller_deployment.yaml
 
 controller_logs:
 	@minikube kubectl -- logs -l app=volume-cleaner-controller -n das --tail 500
 
 scheduler:
-	@minikube kubectl -- apply -f scheduler_job.yaml
+	@minikube kubectl -- apply -f scheduler/scheduler_job.yaml
 	@minikube kubectl -- -n das wait --for=condition=complete job volume-cleaner-scheduler --timeout=300s || \
 		(echo "Pod did not become ready"; exit 1)
 	@make scheduler_logs

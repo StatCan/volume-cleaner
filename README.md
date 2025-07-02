@@ -46,7 +46,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 - GC Notify Email Service (Email Template ID + API Key) (or some other 3rd party email service)
 
-- Testify's Testing Framework 
+- The Testify Testing Framework 
 
 ## Features 
 
