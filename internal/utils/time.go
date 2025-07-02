@@ -31,8 +31,6 @@ func ParseNotifTimes(str string) []int {
 
 	sort.Ints(intSlice)
 
-	log.Print(intSlice)
-
 	return intSlice
 }
 
