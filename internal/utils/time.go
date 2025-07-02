@@ -1,7 +1,7 @@
 package utils
 
 import (
-	// Standard Packages
+	// standard Packages
 	"log"
 	"sort"
 	"strconv"

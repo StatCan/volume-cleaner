@@ -1,15 +1,15 @@
 package main
 
 import (
-	// Standard Packages
+	// standard Packages
 	"log"
 	"os"
 
-	// External Packages
+	// external Packages
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	// Internal Packages
+	// internal Packages
 	structInternal "volume-cleaner/internal/structure"
 	utilsInternal "volume-cleaner/internal/utils"
 )

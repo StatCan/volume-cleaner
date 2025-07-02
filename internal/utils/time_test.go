@@ -1,8 +1,10 @@
 package utils
 
 import (
+	// standard packages
 	"testing"
 
+	// external packages
 	"github.com/stretchr/testify/assert"
 )
 
