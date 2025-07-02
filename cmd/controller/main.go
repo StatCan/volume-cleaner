@@ -14,7 +14,6 @@ import (
 
 	// Internal Packages
 
-	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
 )
 
@@ -46,10 +45,10 @@ func main() {
 	}
 
 	// scans pvcs to find already unattached ones
-	kubeInternal.InitialScan(kubeClient, cfg)
+	InitialScan(kubeClient, cfg)
 
 	// watches stateful sets to discover newly unattached pvcs
-	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
+	WatchSts(context.TODO(), kubeClient, cfg)
 }
 
 // go client used to interact with k8s clusters

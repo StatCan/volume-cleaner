@@ -1,0 +1,51 @@
+package utils
+
+import (
+	// Standard Packages
+	"log"
+	"sort"
+	"strconv"
+	"strings"
+)
+
+func ParseNotifTimes(str string) []int {
+	var intSlice []int
+
+	if str == "" {
+		return []int{}
+	}
+
+	// use fields() and join() to get rid of all whitespace
+	// split by delimeter ,
+	// try to convert each value to an int, error out if failed
+	// sort final slice of ints
+
+	parsedString := strings.Split(strings.Join(strings.Fields(str), ""), ",")
+	for _, val := range parsedString {
+		converted, err := strconv.Atoi(val)
+		if err != nil {
+			log.Fatalf("Error parsing notification time: %s", err)
+		}
+		intSlice = append(intSlice, converted)
+	}
+
+	sort.Ints(intSlice)
+
+	log.Print(intSlice)
+
+	return intSlice
+}
+
+// read grace period value provided in the config and convert it to an int
+
+func ParseGracePeriod(value string) int {
+	// Atoi means ASCII to Integer
+
+	days, err := strconv.Atoi(value)
+	if err != nil {
+		log.Fatalf("Error parsing grace period value: %s", err)
+	} else if days < 1 {
+		log.Fatal("For safety reasons, grace period cannot be lower than one day.")
+	}
+	return days
+}

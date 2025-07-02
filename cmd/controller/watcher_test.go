@@ -1,4 +1,4 @@
-package kubernetes
+package main
 
 import (
 	// standard packages
@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	// internal packages
+	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
 	testInternal "volume-cleaner/internal/tests"
 )
@@ -47,7 +48,7 @@ func TestWatcherLabelling(t *testing.T) {
 		time.Sleep(2 * time.Second)
 
 		// no pvc should have labels right now
-		pvcs := PvcList(kube, "test")
+		pvcs := kubeInternal.PvcList(kube, "test")
 
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
@@ -64,7 +65,7 @@ func TestWatcherLabelling(t *testing.T) {
 
 		// should be no change
 
-		pvcs = PvcList(kube, "test")
+		pvcs = kubeInternal.PvcList(kube, "test")
 
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
@@ -81,7 +82,7 @@ func TestWatcherLabelling(t *testing.T) {
 
 		// should have new labels
 
-		pvcs = PvcList(kube, "test")
+		pvcs = kubeInternal.PvcList(kube, "test")
 
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
@@ -115,7 +116,7 @@ func TestInitialScan(t *testing.T) {
 		}
 
 		// no pvc should have labels right now
-		pvcs := PvcList(kube, "test")
+		pvcs := kubeInternal.PvcList(kube, "test")
 
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
@@ -137,7 +138,7 @@ func TestInitialScan(t *testing.T) {
 
 		// should have new labels
 
-		pvcs = PvcList(kube, "test")
+		pvcs = kubeInternal.PvcList(kube, "test")
 
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
