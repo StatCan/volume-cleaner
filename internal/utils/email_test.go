@@ -18,6 +18,7 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
+// TestSendingNotif verifies that SendNotif returns the expected error when using invalid API credentials.
 func TestSendingNotif(t *testing.T) {
 	email := "simulate-delivered@notification.canada.ca"
 
@@ -47,6 +48,7 @@ func TestSendingNotif(t *testing.T) {
 	})
 }
 
+// TestEmailDetails covers multiple scenarios for retrieving email and personalisation data from Kubernetes objects.
 func TestEmailDetails(t *testing.T) {
 	tests := []struct {
 		name                    string
