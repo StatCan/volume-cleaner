@@ -20,4 +20,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: volume-cleaner-scheduler-config
+            - secretRef:
+                name: volume-cleaner-scheduler-secret
       restartPolicy: Never
