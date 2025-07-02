@@ -11,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	// Internal packages
+	// internal packages
 	structInternal "volume-cleaner/internal/structure"
 )
 
