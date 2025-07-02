@@ -98,8 +98,8 @@ func TestCreateStatefulSetWithPvc(t *testing.T) {
 	vols := got.Spec.Template.Spec.Volumes
 	assert.Len(t, vols, 1)
 	assert.Equal(t, pvcName, vols[0].Name)
-	assert.NotNil(t, vols[0].VolumeSource.PersistentVolumeClaim)
-	assert.Equal(t, pvcName, vols[0].VolumeSource.PersistentVolumeClaim.ClaimName)
+	assert.NotNil(t, vols[0].PersistentVolumeClaim)
+	assert.Equal(t, pvcName, vols[0].PersistentVolumeClaim.ClaimName)
 }
 
 // TestDeleteStatefulSet verifies the deletion of a statefulset within a namespace
