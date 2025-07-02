@@ -32,7 +32,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
-    name: Golang Tests
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       # allows workflow to access the repo
@@ -126,7 +126,7 @@ jobs:
 
   # creates a local cluster and tests for correct behaviour
   integration-test:
-    name: Integration Test
+    name: Integration Tests
     runs-on: ubuntu-latest
     steps:
       # allows workflow to access the repo
