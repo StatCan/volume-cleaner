@@ -52,7 +52,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		// mock a stateful set attached to a pvc1
@@ -69,7 +75,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		// delete sts
@@ -86,7 +98,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		ctx.Done()
@@ -120,7 +138,13 @@ func TestInitialScan(t *testing.T) {
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		ctx := context.Background()
@@ -142,7 +166,13 @@ func TestInitialScan(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, true)
 
 		ctx.Done()

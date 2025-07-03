@@ -52,6 +52,8 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 					log.Printf("removing label")
 
 					RemovePvcLabel(kube, cfg.Label, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					// TODO: abstract label name out into config
+					RemovePvcLabel(kube, "volume-cleaner/notification-count", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			case watch.Deleted:
 				log.Printf("sts deleted: %s", sts.Name)
@@ -60,6 +62,8 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 					log.Printf("adding label")
 
 					SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					// TODO: abstract label name out into config
+					SetPvcLabel(kube, "volume-cleaner/notification-count", "0", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 				}
 			}
 		}
@@ -73,6 +77,9 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 		_, ok := pvc.Labels[cfg.Label]
 		if !ok {
 			SetPvcLabel(kube, cfg.Label, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+
+			// TODO: abstract label name out into config
+			SetPvcLabel(kube, "volume-cleaner/notification-count", "0", pvc.Namespace, pvc.Name)
 		} else {
 			log.Print("PVC already has label. Skipping.")
 		}
