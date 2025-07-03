@@ -1,0 +1,144 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,
+  paperheight=36in,   % increase the paper height
+margin=1in]{geometry}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\pagenumbering{gobble}
+
+\begin{document}
+
+\section*{Phase 1: Volume Controller - Watch \& Label}
+\subsection*{Controller Pattern - Deployment Kind}
+
+\begin{figure}[H]
+  \makebox[\linewidth]{
+    \begin{minipage}{\dimexpr\linewidth+5em}
+      \begin{algorithm}[H]
+        \caption{Control Loop}
+        \begin{algorithmic}[1]
+          \STATE \textbf{Procedure} \textsc{ControlLoop}()
+          \STATE client $\gets$ kubernetesConfig
+          \STATE \textsc{StartUp}(client)
+          \medskip
+          \STATE watcher $\gets$ client.watchSts()
+          \FOR{event \textbf{in} watcher.events}
+          \STATE sts $\gets$ event.getSts()
+          \IF{sts.isAdded $\OR$ sts.isDeleted}
+          \STATE pvcList $\gets$ \textsc{GetPvcs}(sts)
+          \FOR{pvc \textbf{in} pvcList}
+            \STATE timePatch $\gets$ \{``volume-cleaner/unattached-time":
+          currentTime\}
+          \STATE notifPatch $\gets$ \{``volume-cleaner/notificationCount": 0\} \\
+          \textsc{ApplyPatches}(timePatch, notifPatch, pvc) $\hfill$\
+          \ENDFOR
+          \ENDIF
+          \ENDFOR
+          \STATE \textbf{End Procedure}
+        \end{algorithmic}
+      \end{algorithm}
+    \end{minipage}
+  }
+\end{figure}
+
+
+\begin{figure}[H]
+  \makebox[\linewidth]{
+    \begin{minipage}{\dimexpr\linewidth+5em}
+      \begin{algorithm}[H]
+        \caption{Reconciliation process to catch untracked volumes}
+        \begin{algorithmic}[1]
+          \STATE \textbf{Procedure} \textsc{StartUp}($client$)
+          \STATE pvcList $\gets$ \textsc{ListAllPvcs()}
+          \STATE stsList $\gets$
+          client.listStatefulSets()$\hfill$\Comment{//
+          listStatefulSets is an arbitrary client-go func}
+
+          \STATE unattachedPvcs $\gets$ setIntersection(pvcList,
+          stsList)$\hfill$\Comment{// setIntersection is a custom function}
+          \FOR{each pvc \textbf{in} unattachedPvcs}
+          \IF{pvc is not labeled}
+          \STATE \textsc{LabelPvc($pvc$)}
+          \ENDIF
+          \ENDFOR
+          \STATE \textbf{End Procedure}
+        \end{algorithmic}
+      \end{algorithm}
+    \end{minipage}
+  }
+\end{figure}
+
+\bigskip
+
+\section*{Phase 2: Volume Cleaner - Notify \& Delete}
+\subsection*{Scheduler Pattern - Cronjob Kind}
+
+\begin{figure}[H]
+  \makebox[\linewidth]{
+    \begin{minipage}{\dimexpr\linewidth+5em}
+      \begin{algorithm}[H]
+        \caption{Cronjob Scheduler – Main Script}
+        \begin{algorithmic}[1]
+          \STATE \textbf{Procedure} \textsc{Main}()
+          \medskip
+          \STATE \textsc{ControllerPulse}()
+
+          \STATE deleteCount $\gets$ 0
+          \STATE emailCount $\gets$ 0
+          \medskip
+          \STATE notifTime $\gets [\,60,\,30\,]$ $\hfill$\Comment{//
+          The non-negative integers are denoted in days}
+          \STATE gracePeriod $\gets 90$
+
+          \medskip
+          \STATE notifTime \gets$ notifTime.sort(descending)
+          $\hfill$\Comment{// Sort the notifTime list in descending order}
+          \medskip
+          \STATE pvcList $\gets \textsc{ListAllPvcs}()$
+          $\hfill$\Comment{// Get all Namespaces and concat their PVCs}
+
+          \FOR{each pvc \textbf{in} pvcList}
+          \STATE last $\gets$
+          pvc.getLabel(``volume-cleaner/unattached-time")
+          \STATE timeDelta $\gets$ now() $-$ last $\hfill$\Comment{// Use
+          time library}
+          \medskip
+          \IF{timeDelta $<$ gracePeriod}
+          \STATE timeLeft $\gets$ gracePeriod $-$ timeDelta
+          \STATE currNotif $\gets$
+          pvc.getLabel(``volume-cleaner/notificationCount")
+          \IF{currNotif $<$ len(notifTime) \AND notifTime[currNotif]
+          $\ge$ timeLeft}
+          \STATE
+          err $\gets$
+          \textsc{NotifyUser}($pvc.name,\,pvc.email,\,timeLeft$)
+          $\hfill$\Comment{//
+          err is a bool}
+          \IF{err}
+          \STATE \textsc{Log}(``Error: Unable to email \%s", pvc.email)
+          \ELSE
+          \STATE pvc.setLabel(``volume-cleaner/notificationCount",
+          currNotif + 1)
+          \STATE emailCount $\gets$ emailCount + 1
+          \ENDIF
+          \ENDIF
+          \ELSE
+          \STATE err $\gets$ \textsc{DeletePvc}($pvc$) $\hfill$\Comment{//
+          err is a bool}
+          \IF{err}
+          \STATE \textsc{Log}(``Error: Could not delete PVC " + pvc.name)
+          \ELSE
+          \STATE deleteCount $\gets$ deleteCount $+$ 1
+          \ENDIF
+          \ENDIF
+          \ENDFOR
+          \medskip
+          \STATE \textbf{End Procedure}
+        \end{algorithmic}
+      \end{algorithm}
+    \end{minipage}
+  }
+\end{figure}
+
+\end{document}
