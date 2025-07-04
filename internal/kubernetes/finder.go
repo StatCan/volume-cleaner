@@ -86,7 +86,8 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				currNotif, err := strconv.Atoi(notifCount)
 
 				if err != nil {
-					log.Printf("Error converting string label to int: %s", notifCount)
+					log.Printf("Error converting notification-count '%s': %v", notifCount, err)
+					continue
 				}
 
 				shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
