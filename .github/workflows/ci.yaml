@@ -241,6 +241,12 @@ jobs:
           kubectl apply -f testing/scheduler/scheduler_job.yaml
           sleep 10
 
+      # extra information
+      - name: Print logs
+        run: |
+          kubectl logs -l app=volume-cleaner-controller -n das
+          kubectl logs -l app=volume-cleaner-scheduler -n das
+
       - name: Test scheduler for pvc1
         run: |
           if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc1 from namespace anray-liu"; then
@@ -268,9 +274,3 @@ jobs:
                   echo "Test passed."
               fi
           fi
-
-      # extra information
-      - name: Print logs
-        run: |
-          kubectl logs -l app=volume-cleaner-controller -n das
-          kubectl logs -l app=volume-cleaner-scheduler -n das
