@@ -83,10 +83,10 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					log.Printf("Error reading label: %s", cfg.NotifLabel)
 					continue
 				}
-				currNotif, errCount := strconv.Atoi(notifCount)
+				currNotif, countErr := strconv.Atoi(notifCount)
 
-				if errCount != nil {
-					log.Printf("Error converting notification-count '%s': %v", notifCount, errCount)
+				if countErr != nil {
+					log.Printf("Error converting notification-count '%s': %v", notifCount, countErr)
 					continue
 				}
 
