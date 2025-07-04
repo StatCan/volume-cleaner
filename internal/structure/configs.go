@@ -6,13 +6,15 @@ Example configs
 controller:
 
 NAMESPACE: "anray-liu"
-LABEL: "volume-cleaner/unattached-time"
+TIME_LABEL: "volume-cleaner/unattached-time"
+NOTIF_LABEL: "volume-cleaner/notification-count"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
 
 scheduler:
 
 NAMESPACE: "anray-liu"
-LABEL: "volume-cleaner/unattached-time"
+TIME_LABEL: "volume-cleaner/unattached-time"
+NOTIF_LABEL: "volume-cleaner/notification-count"
 GRACE_PERIOD: "180"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
 DRY_RUN: "true"
@@ -26,13 +28,15 @@ API_KEY: "Random APIKEY",
 
 type ControllerConfig struct {
 	Namespace  string
-	Label      string
+	TimeLabel  string
+	NotifLabel string
 	TimeFormat string
 }
 
 type SchedulerConfig struct {
 	Namespace   string
-	Label       string
+	TimeLabel   string
+	NotifLabel  string
 	TimeFormat  string
 	GracePeriod int
 	DryRun      bool

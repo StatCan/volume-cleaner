@@ -3,6 +3,7 @@ package kubernetes
 import (
 	// standard packages
 	"context"
+	"sort"
 	"testing"
 	"time"
 
@@ -99,14 +100,10 @@ func TestShouldSendMail(t *testing.T) {
 			t.Fatalf("Error injecting namespace add: %v", namespaceErr)
 		}
 
-		pvc, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), "pvc", "test")
-		if pvcErr != nil {
-			t.Fatalf("Error injecting pvc add: %v", pvcErr)
-		}
-
 		cfg := structInternal.SchedulerConfig{
 			Namespace:   "test",
-			Label:       "volume-cleaner/unattached-time",
+			TimeLabel:   "volume-cleaner/unattached-time",
+			NotifLabel:  "volume-cleaner/notification-count",
 			GracePeriod: 180,
 			TimeFormat:  "2006-01-02_15-04-05Z",
 			DryRun:      true,
@@ -119,9 +116,14 @@ func TestShouldSendMail(t *testing.T) {
 			},
 		}
 
+		sort.Slice(cfg.NotifTimes, func(i, j int) bool {
+			return cfg.NotifTimes[i] > cfg.NotifTimes[j] // Descending
+		})
+
 		type testCase struct {
 			timestamp     string
 			expectedValue bool
+			currNotif     int
 		}
 
 		now := time.Now()
@@ -130,39 +132,207 @@ func TestShouldSendMail(t *testing.T) {
 			{
 				timestamp:     now.Format(cfg.TimeFormat),
 				expectedValue: false,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour * 24 * 150).Format(cfg.TimeFormat),
 				expectedValue: true,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 150).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 150).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 150).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 150).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour*24*150 - time.Hour).Format(cfg.TimeFormat),
 				expectedValue: true,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23).Format(cfg.TimeFormat),
 				expectedValue: true,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(cfg.TimeFormat),
 				expectedValue: true,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour*24*150 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 151).Format(cfg.TimeFormat),
+				expectedValue: true,
+				currNotif:     0,
 			},
 			{
 				timestamp:     now.Add(-time.Hour * 24 * 151).Format(cfg.TimeFormat),
 				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 151).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 151).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 151).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour * 24 * 149).Format(cfg.TimeFormat),
 				expectedValue: false,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 149).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 149).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 149).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 149).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 			{
 				timestamp:     now.Add(-time.Hour * 24 * 177).Format(cfg.TimeFormat),
 				expectedValue: true,
+				currNotif:     0,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 177).Format(cfg.TimeFormat),
+				expectedValue: true,
+				currNotif:     1,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 177).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     2,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 177).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     3,
+			},
+			{
+				timestamp:     now.Add(-time.Hour * 24 * 177).Format(cfg.TimeFormat),
+				expectedValue: false,
+				currNotif:     4,
 			},
 		}
 
 		for _, test := range testCases {
-			v, err := ShouldSendMail(test.timestamp, *pvc, cfg)
+			v, err := ShouldSendMail(test.timestamp, test.currNotif, cfg)
 			if err != nil {
 				t.Fatal("ShouldSendMail failed.")
 			}

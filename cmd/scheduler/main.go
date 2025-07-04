@@ -31,7 +31,8 @@ func main() {
 
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
-		Label:       os.Getenv("LABEL"),
+		TimeLabel:   os.Getenv("TIME_LABEL"),
+		NotifLabel:  os.Getenv("NOTIF_LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
 		GracePeriod: gracePeriod,
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",

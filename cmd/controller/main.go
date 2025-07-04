@@ -32,7 +32,8 @@ func main() {
 
 	cfg := structInternal.ControllerConfig{
 		Namespace:  os.Getenv("NAMESPACE"),
-		Label:      os.Getenv("LABEL"),
+		TimeLabel:  os.Getenv("TIME_LABEL"),
+		NotifLabel: os.Getenv("NOTIF_LABEL"),
 		TimeFormat: os.Getenv("TIME_FORMAT"),
 	}
 

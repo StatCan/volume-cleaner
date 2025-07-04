@@ -38,7 +38,8 @@ func TestWatcherLabelling(t *testing.T) {
 
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
-			Label:      "volume-cleaner/unattached-time",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
 			TimeFormat: "2006-01-02_15-04-05Z",
 		}
 
@@ -52,7 +53,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		// mock a stateful set attached to a pvc1
@@ -69,7 +76,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		// delete sts
@@ -86,7 +99,13 @@ func TestWatcherLabelling(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		ctx.Done()
@@ -120,14 +139,21 @@ func TestInitialScan(t *testing.T) {
 		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
 		ctx := context.Background()
 
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
-			Label:      "volume-cleaner/unattached-time",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
 			TimeFormat: "2006-01-02_15-04-05Z",
 		}
 
@@ -142,7 +168,13 @@ func TestInitialScan(t *testing.T) {
 		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, true)
 
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, true)
 
 		ctx.Done()

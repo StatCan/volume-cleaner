@@ -6,6 +6,8 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"sort"
+	"strconv"
 	"time"
 
 	/* Unfortunate that a lot of the kubernetes packages require renaming because
@@ -13,7 +15,6 @@ import (
 	*/
 
 	// external packages
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -29,6 +30,14 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	client := &http.Client{Timeout: 10 * time.Second}
 	errCount := 0
 
+	deleteCount := 0
+	emailCount := 0
+
+	// Sort in descending order
+	sort.Slice(cfg.NotifTimes, func(i, j int) bool {
+		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
+	})
+
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
 
@@ -41,7 +50,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			I wanted to keep the logic here as straightfoward as possible
 		*/
 
-		timestamp, ok := pvc.Labels[cfg.Label]
+		timestamp, ok := pvc.Labels[cfg.TimeLabel]
 		if ok {
 			stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 			if staleError != nil {
@@ -64,11 +73,24 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					errCount++
 				}
 				log.Print("PVC successfully deleted.")
+				deleteCount++
 
 			} else {
 				log.Print("Grace period not passed.")
 
-				shouldSend, mailError := ShouldSendMail(timestamp, pvc, cfg)
+				notifCount, ok := pvc.Labels[cfg.NotifLabel]
+				if !ok {
+					log.Printf("Error reading label: %s", cfg.NotifLabel)
+					continue
+				}
+				currNotif, countErr := strconv.Atoi(notifCount)
+
+				if countErr != nil {
+					log.Printf("Error converting notification-count '%s': %v", notifCount, countErr)
+					continue
+				}
+
+				shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
 
 				if mailError != nil {
 					log.Printf("Could not parse time: %s", mailError)
@@ -90,6 +112,13 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 					if err != nil {
 						log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
 						errCount++
+					} else {
+						// Update Email Count
+						emailCount++
+
+						// Increment notification count by 1
+						newNotifCount := strconv.Itoa(currNotif + 1)
+						SetPvcLabel(kube, cfg.NotifLabel, newNotifCount, pvc.Namespace, pvc.Name)
 					}
 
 				}
@@ -100,6 +129,8 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	}
 
 	log.Printf("Job errors %d", errCount)
+	log.Printf("Emails sent: %d", emailCount)
+	log.Printf("Pvcs deleted: %d", deleteCount)
 }
 
 // determines if the grace period is greater than a given timestamp
@@ -122,7 +153,7 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 	return stale, nil
 }
 
-func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg structInternal.SchedulerConfig) (bool, error) {
+func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
 	log.Print("Checking email times....")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
@@ -133,10 +164,8 @@ func ShouldSendMail(timestamp string, _ corev1.PersistentVolumeClaim, cfg struct
 
 	log.Printf("Days left until deletion: %d", daysLeft)
 
-	for _, time := range cfg.NotifTimes {
-		if daysLeft == time {
-			return true, nil
-		}
+	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
+		return true, nil
 	}
 
 	return false, nil

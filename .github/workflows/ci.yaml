@@ -179,15 +179,14 @@ jobs:
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
+          fi
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
+          if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
+              echo "Both labels found. Test passed."
           else
-              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
-              if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
-                  echo "Test passed."
-              else
-                  echo "Output: ${OUTPUT}"
-                  echo "Wrong label found. Test failed."
-                  exit 2
-              fi
+              echo "Output: ${OUTPUT}"
+              echo "Expected both labels, but one or both are missing. Test failed."
+              exit 2
           fi
 
       - name: Test label not applied
@@ -227,29 +226,36 @@ jobs:
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
+          fi
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
+          if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
+              echo "Both labels found again. Test passed."
           else
-              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
-              if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
-                  echo "Test passed."
-              else
-                  echo "Output: ${OUTPUT}"
-                  echo "Wrong label found. Test failed."
-                  exit 2
-              fi
+              echo "Output: ${OUTPUT}"
+              echo "Expected both labels, but one or both are missing. Test failed."
+              exit 2
           fi
 
       - name: Apply scheduler
         run: |
           kubectl apply -f testing/scheduler/scheduler_job.yaml
-          sleep 5
+          sleep 10
+
+      # extra information
+      - name: Print logs
+        run: |
+          echo "----------controller----------"
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500
+          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
+          echo "----------scheduler----------"
 
       - name: Test scheduler for pvc1
         run: |
-          if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc1 from namespace anray-liu"; then
+          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc1 from namespace anray-liu"; then
               echo "Scheduler didn't find pvc1. Test failed."
               exit 2
           else
-              if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc1 from namespace anray-liu" -A 3 | grep "Grace period not passed."; then
+              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc1 from namespace anray-liu" -A 3 | grep "Grace period not passed."; then
                   echo "Scheduler didn't skip pvc1. Test failed."
                   exit 2
               else
@@ -259,20 +265,14 @@ jobs:
 
       - name: Test scheduler for pvc2
         run: |
-          if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc2 from namespace anray-liu"; then
+          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc2 from namespace anray-liu"; then
               echo "Scheduler didn't find pvc2. Test failed."
               exit 2
           else
-              if ! kubectl logs -l app=volume-cleaner-scheduler -n das | grep "Found pvc pvc2 from namespace anray-liu" -A 1 | grep "Not labelled. Skipping."; then
+              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc2 from namespace anray-liu" -A 1 | grep "Not labelled. Skipping."; then
                   echo "Scheduler didn't skip pvc2. Test failed."
                   exit 2
               else
                   echo "Test passed."
               fi
           fi
-
-      # extra information
-      - name: Print logs
-        run: |
-          kubectl logs -l app=volume-cleaner-controller -n das
-          kubectl logs -l app=volume-cleaner-scheduler -n das
