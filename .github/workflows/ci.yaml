@@ -182,11 +182,11 @@ jobs:
           fi
           OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
           if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
-            echo "Both labels found. Test passed."
+              echo "Both labels found. Test passed."
           else
-            echo "Output: ${OUTPUT}"
-            echo "Expected both labels, but one or both are missing. Test failed."
-            exit 2
+              echo "Output: ${OUTPUT}"
+              echo "Expected both labels, but one or both are missing. Test failed."
+              exit 2
           fi
 
       - name: Test label not applied
@@ -229,11 +229,11 @@ jobs:
           fi
           OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
           if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
-            echo "Both labels found again. Test passed."
+              echo "Both labels found again. Test passed."
           else
-            echo "Output: ${OUTPUT}"
-            echo "Expected both labels, but one or both are missing. Test failed."
-            exit 2
+              echo "Output: ${OUTPUT}"
+              echo "Expected both labels, but one or both are missing. Test failed."
+              exit 2
           fi
 
       - name: Apply scheduler
