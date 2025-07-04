@@ -32,6 +32,7 @@ volume-cleaner/
 ├─ docker/
 │  ├─ controller/
 │  ├─ scheduler/
+├─ docs/
 ├─ internal/
 │  ├─ kubernetes/
 │  ├─ structure/
