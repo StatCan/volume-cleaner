@@ -239,7 +239,7 @@ jobs:
       - name: Apply scheduler
         run: |
           kubectl apply -f testing/scheduler/scheduler_job.yaml
-          sleep 5
+          sleep 10
 
       - name: Test scheduler for pvc1
         run: |
