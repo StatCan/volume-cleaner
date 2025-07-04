@@ -26,13 +26,15 @@ API_KEY: "Random APIKEY",
 
 type ControllerConfig struct {
 	Namespace  string
-	Label      string
+	TimeLabel  string
+	NotifLabel string
 	TimeFormat string
 }
 
 type SchedulerConfig struct {
 	Namespace   string
-	Label       string
+	TimeLabel   string
+	NotifLabel  string
 	TimeFormat  string
 	GracePeriod int
 	DryRun      bool

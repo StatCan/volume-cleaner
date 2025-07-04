@@ -38,7 +38,8 @@ func TestWatcherLabelling(t *testing.T) {
 
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
-			Label:      "volume-cleaner/unattached-time",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
 			TimeFormat: "2006-01-02_15-04-05Z",
 		}
 
@@ -151,7 +152,8 @@ func TestInitialScan(t *testing.T) {
 
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
-			Label:      "volume-cleaner/unattached-time",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
 			TimeFormat: "2006-01-02_15-04-05Z",
 		}
 

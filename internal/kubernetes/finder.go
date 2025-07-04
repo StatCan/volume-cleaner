@@ -35,7 +35,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 	// Sort in descending order
 	sort.Slice(cfg.NotifTimes, func(i, j int) bool {
-		return cfg.NotifTimes[i] > cfg.NotifTimes[j] // Descending
+		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
 	})
 
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
@@ -50,7 +50,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			I wanted to keep the logic here as straightfoward as possible
 		*/
 
-		timestamp, ok := pvc.Labels[cfg.Label]
+		timestamp, ok := pvc.Labels[cfg.TimeLabel]
 		if ok {
 			stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 			if staleError != nil {
@@ -78,10 +78,9 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			} else {
 				log.Print("Grace period not passed.")
 
-				notifCount, ok := pvc.Labels["volume-cleaner/notification-count"]
+				notifCount, ok := pvc.Labels[cfg.NotifLabel]
 				if !ok {
-					// TODO: replace this with variable, abstracted out label
-					log.Print("Error reading label: volume-cleaner/notification-count")
+					log.Printf("Error reading label: %s", cfg.NotifLabel)
 					continue
 				}
 				currNotif, err := strconv.Atoi(notifCount)
@@ -118,7 +117,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 						// Increment notification count by 1
 						newNotifCount := strconv.Itoa(currNotif + 1)
-						SetPvcLabel(kube, "volume-cleaner/notification-count", newNotifCount, pvc.Namespace, pvc.Name)
+						SetPvcLabel(kube, cfg.NotifLabel, newNotifCount, pvc.Namespace, pvc.Name)
 					}
 
 				}

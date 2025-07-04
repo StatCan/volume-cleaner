@@ -179,15 +179,14 @@ jobs:
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
+          fi
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
+          if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
+            echo "Both labels found. Test passed."
           else
-              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
-              if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
-                  echo "Test passed."
-              else
-                  echo "Output: ${OUTPUT}"
-                  echo "Wrong label found. Test failed."
-                  exit 2
-              fi
+            echo "Output: ${OUTPUT}"
+            echo "Expected both labels, but one or both are missing. Test failed."
+            exit 2
           fi
 
       - name: Test label not applied
@@ -227,15 +226,14 @@ jobs:
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
+          fi
+          OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep -A 2 "labels:")"
+          if [[ "${OUTPUT}" == *"volume-cleaner/unattached-time:"* ]] && [[ "${OUTPUT}" == *"volume-cleaner/notification-count:"* ]]; then
+            echo "Both labels found again. Test passed."
           else
-              OUTPUT="$(kubectl get pvc pvc1 -n anray-liu -o yaml | grep labels -A 1)"
-              if [[ "${OUTPUT}" = *"volume-cleaner/unattached-time:"* ]]; then
-                  echo "Test passed."
-              else
-                  echo "Output: ${OUTPUT}"
-                  echo "Wrong label found. Test failed."
-                  exit 2
-              fi
+            echo "Output: ${OUTPUT}"
+            echo "Expected both labels, but one or both are missing. Test failed."
+            exit 2
           fi
 
       - name: Apply scheduler

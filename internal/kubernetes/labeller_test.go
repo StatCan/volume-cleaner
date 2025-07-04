@@ -43,5 +43,12 @@ func TestLabelFunctions(t *testing.T) {
 		_, ok := PvcList(kube, "test")[0].Labels["volume-cleaner/unattached-time"]
 
 		assert.Equal(t, ok, false)
+
+		// test 2 new label
+		SetPvcLabel(kube, "volume-cleaner/unattached-time", "foo", "test", "pvc1")
+		SetPvcLabel(kube, "volume-cleaner/notification-count", "0", "test", "pvc1")
+
+		assert.Equal(t, PvcList(kube, "test")[0].Labels["volume-cleaner/unattached-time"], "foo")
+		assert.Equal(t, PvcList(kube, "test")[0].Labels["volume-cleaner/notification-count"], "0")
 	})
 }

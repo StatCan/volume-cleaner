@@ -102,7 +102,8 @@ func TestShouldSendMail(t *testing.T) {
 
 		cfg := structInternal.SchedulerConfig{
 			Namespace:   "test",
-			Label:       "volume-cleaner/unattached-time",
+			TimeLabel:   "volume-cleaner/unattached-time",
+			NotifLabel:  "volume-cleaner/notification-count",
 			GracePeriod: 180,
 			TimeFormat:  "2006-01-02_15-04-05Z",
 			DryRun:      true,

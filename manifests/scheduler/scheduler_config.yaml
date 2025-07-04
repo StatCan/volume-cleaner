@@ -6,7 +6,8 @@ metadata:
   namespace: das
 data:
   NAMESPACE: "anray-liu"
-  LABEL: "volume-cleaner/unattached-time"
+  TIME_LABEL: "volume-cleaner/unattached-time"
+  NOTIF_LABEL: "volume-cleaner/notification-count"
   GRACE_PERIOD: "7"
   TIME_FORMAT: "2006-01-02_15-04-05Z"
   DRY_RUN: "true"
