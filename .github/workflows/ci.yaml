@@ -244,8 +244,8 @@ jobs:
       # extra information
       - name: Print logs
         run: |
-          kubectl logs -l app=volume-cleaner-controller -n das
-          kubectl logs -l app=volume-cleaner-scheduler -n das
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500
+          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
 
       - name: Test scheduler for pvc1
         run: |
