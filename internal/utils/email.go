@@ -64,7 +64,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 			return errors.New(response.Status)
 		}
 
-		return errors.New("Error returning an HTTP response")
+		return errors.New("error returning an HTTP response")
 	}
 
 	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
