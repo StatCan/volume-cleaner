@@ -60,7 +60,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		log.Printf("Error making HTTP POST request: %v", err)
 
 		// sending the email failed, but don't stop the program
-		return errors.New("Error response is invalid")
+		return errors.New("error response is invalid")
 	}
 
 	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
