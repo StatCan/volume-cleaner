@@ -7,6 +7,10 @@ run_controller:
 run_scheduler:
 	@make -C scripts/scheduler run_scheduler
 
+run_job:
+	@kubectl delete job volume-cleaner-scheduler -n das > /dev/null 2>&1 || true
+	@kubectl create job --from=cronjob/volume-cleaner-scheduler volume-cleaner-scheduler -n das
+
 clean:
 	@echo "🧼 Cleaning up leftover resources..."
 	@kubectl delete -f manifests/ --ignore-not-found > /dev/null 2>&1 || true
