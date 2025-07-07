@@ -47,8 +47,16 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		log.Printf("Error creating request: %v", err)
 	}
 
+	log.Print(err)
+	log.Print(request)
+
+	log.Print(1)
 	// Send Request
 	response, err := client.Do(request)
+	log.Print(2)
+
+	log.Print(err)
+	log.Print(response)
 
 	if err != nil {
 		log.Printf("Error making HTTP POST request: %v", err)
