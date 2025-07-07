@@ -26,6 +26,11 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	url := conf.BaseURL + conf.Endpoint
 
+	_, err := http.Get("https://www.google.com/")
+	if err != nil {
+		log.Print(err)
+	}
+
 	// Request Body
 	reqBody, err := json.Marshal(
 		structInternal.RequestBody{
