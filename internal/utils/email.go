@@ -26,7 +26,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	url := conf.BaseURL + conf.Endpoint
 
-	_, err := http.Get("https://www.google.com/")
+	_, err := http.Get("https://graph.microsoft.com/")
 	if err != nil {
 		log.Print(err)
 	}
