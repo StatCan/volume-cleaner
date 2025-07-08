@@ -45,19 +45,23 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 
 	if err != nil {
 		log.Printf("Error creating request: %v", err)
+	} else {
+		log.Printf("Successfully created HTTP request")
 	}
 
 	// Send Request
 	response, err := client.Do(request)
 
+	if response != nil {
+		defer response.Body.Close()
+	}
+
 	if err != nil {
 		log.Printf("Error making HTTP POST request: %v", err)
 
 		// sending the email failed, but don't stop the program
-		return errors.New(response.Status)
+		return errors.New("error response is invalid")
 	}
-
-	defer response.Body.Close()
 
 	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
 
@@ -101,6 +105,9 @@ func nsEmail(kube kubernetes.Interface, name string) string {
 	email := ns.Annotations["owner"]
 	if email == "" {
 		log.Printf("Error: Annotation 'owner' for namespace %s is empty", name)
+	} else {
+		log.Printf("Successfully acquired owner email %s", email)
 	}
+
 	return email
 }
