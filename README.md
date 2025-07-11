@@ -255,29 +255,29 @@ Le volume-cleaner est composé de 2 composants principaux :
 
 2. Personnalisez le comportement du Contrôleur dans `manifests/controller/controller_config.yaml` :
 
-   * **metadata.namespace** : Espace de noms cible pour déployer le contrôleur
-   * **data.NAMESPACE** : Espace de noms à surveiller (par ex. les namespaces “kubeflow-profile”); laissez cette valeur vide pour scanner tous les namespaces
-   * **data.TIME_LABEL** : Clé du label pour stocker l’horodatage des PVC non attachés (par défaut : `volume-cleaner/unattached-time`)
-   * **data.NOTIF_LABEL** : Clé du label pour le suivi du nombre de notifications (par défaut : `volume-cleaner/notification-count`)
-   * **data.TIME_FORMAT** : Format de l’horodatage pour les labels (par défaut : `2006-01-02_15-04-05Z`)
+   * `metadata.namespace` : Espace de noms cible pour déployer le contrôleur
+   * `data.NAMESPACE` : Espace de noms à surveiller (par ex. les namespaces “kubeflow-profile”); laissez cette valeur vide pour scanner tous les namespaces
+   * `data.TIME_LABEL` : Clé du label pour stocker l’horodatage des PVC non attachés (par défaut : `volume-cleaner/unattached-time`)
+   * `data.NOTIF_LABEL` : Clé du label pour le suivi du nombre de notifications (par défaut : `volume-cleaner/notification-count`)
+   * `data.TIME_FORMAT` : Format de l’horodatage pour les labels (par défaut : `2006-01-02_15-04-05Z`)
 
 3. Personnalisez le comportement du Planificateur dans `manifests/scheduler/scheduler_config.yaml` :
 
-   * **metadata.namespace** : Espace de noms cible pour déployer le planificateur
-   * **data.NAMESPACE** : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les namespaces
-   * **data.TIME_LABEL** : Doit correspondre au `TIME_LABEL` du contrôleur
-   * **data.NOTIF_LABEL** : Doit correspondre au `NOTIF_LABEL` du contrôleur
-   * **data.GRACE_PERIOD** : Nombre de jours avant suppression du PVC (par ex. `"180"`)
-   * **data.TIME_FORMAT** : Doit correspondre au `TIME_FORMAT` du contrôleur
-   * **data.DRY_RUN** : À `"true"` pour tester sans suppression réelle
-   * **data.NOTIF_TIMES** : Jours avant suppression pour envoyer des notifications (par ex. `"1,2,3,4,7,30"`)
-   * **data.BASE_URL** : URL de base de l’API GC Notify
-   * **data.ENDPOINT** : Point de terminaison pour l’envoi des e‑mails
+   * `metadata.namespace` : Espace de noms cible pour déployer le planificateur
+   * `data.NAMESPACE` : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les namespaces
+   * `data.TIME_LABEL` : Doit correspondre au `TIME_LABEL` du contrôleur
+   * `data.NOTIF_LABEL` : Doit correspondre au `NOTIF_LABEL` du contrôleur
+   * `data.GRACE_PERIOD` : Nombre de jours avant suppression du PVC (par ex. `"180"`)
+   * `data.TIME_FORMAT` : Doit correspondre au `TIME_FORMAT` du contrôleur
+   * `data.DRY_RUN` : À `"true"` pour tester sans suppression réelle
+   * `data.NOTIF_TIMES` : Jours avant suppression pour envoyer des notifications (par ex. `"1,2,3,4,7,30"`)
+   * `data.BASE_URL` : URL de base de l’API GC Notify
+   * `data.ENDPOINT` : Point de terminaison pour l’envoi des e‑mails
 
 4. Définissez les Secrets dans `manifests/scheduler/scheduler_secret.yaml` :
 
-   * **EMAIL_TEMPLATE_ID** : ID du modèle d’e‑mail GC Notify
-   * **API_KEY** : Clé d’authentification GC Notify
+   * `EMAIL_TEMPLATE_ID` : ID du modèle d’e‑mail GC Notify
+   * `API_KEY` : Clé d’authentification GC Notify
 
 5. Lancez le Contrôleur et le Planificateur avec Make :
 
