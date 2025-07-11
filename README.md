@@ -196,7 +196,7 @@ Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valoris
 
 ### Structure architecturale
 
-<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
+<img width="845" height="722" alt="Schéma d'architecture du volume-cleaner" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
 
 ## Prérequis
 
