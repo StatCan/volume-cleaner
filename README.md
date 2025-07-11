@@ -100,29 +100,29 @@ cd volume-cleaner
 
 2. Customize the behavior of the Controller in `manifests/controller/controller_config.yaml`
 
-- `metadata.namespace`: Target namespace to deploy the controller
-- `data.NAMESPACE`: Target namespace to monitor (e.g., "kubeflow-profile" namespaces), leave this value as an empty string to scan all namespaces 
-- `data.TIME_LABEL`: Label key for storing unattached timestamp (default: "volume-cleaner/unattached-time") 
-- `data.NOTIF_LABEL`: Label key for notification count tracking (default: "volume-cleaner/notification-count")
-- `data.TIME_FORMAT`: Timestamp format for labels (default: "2006-01-02_15-04-05Z")
+   * `metadata.namespace`: Target namespace to deploy the controller
+   * `data.NAMESPACE`: Target namespace to monitor (e.g., "kubeflow-profile" namespaces), leave this value as an empty string to scan all namespaces 
+   * `data.TIME_LABEL`: Label key for storing unattached timestamp (default: "volume-cleaner/unattached-time") 
+   * `data.NOTIF_LABEL`: Label key for notification count tracking (default: "volume-cleaner/notification-count")
+   * `data.TIME_FORMAT`: Timestamp format for labels (default: "2006-01-02_15-04-05Z")
 
 3. Customize the behavior of the Scheduler in `manifests/scheduler/scheduler_config.yaml` 
 
-- `metadata.namespace`: Target namespace to deploy the scheduler
-- `data.NAMESPACE`: Target namespace to scan for stale PVCs, leave this value as an empty string to scan all namespaces 
-- `data.TIME_LABEL`: Must match controller's time label
-- `data.NOTIF_LABEL`: Must match controller's notification label
-- `data.GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
-- `data.TIME_FORMAT`: Must match controller's time format
-- `data.DRY_RUN`: Set to "true" for testing without actual deletion 
-- `data.NOTIF_TIMES`: Comma-separated days before deletion to send notifications (e.g., "1, 2, 3, 4, 7, 30")
-- `data.BASE_URL`: GC Notify API base URL 
-- `data.ENDPOINT`: Email notification endpoint 
+   * `metadata.namespace`: Target namespace to deploy the scheduler
+   * `data.NAMESPACE`: Target namespace to scan for stale PVCs, leave this value as an empty string to scan all namespaces 
+   * `data.TIME_LABEL`: Must match controller's time label
+   * `data.NOTIF_LABEL`: Must match controller's notification label
+   * `data.GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
+   * `data.TIME_FORMAT`: Must match controller's time format
+   * `data.DRY_RUN`: Set to "true" for testing without actual deletion 
+   * `data.NOTIF_TIMES`: Comma-separated days before deletion to send notifications (e.g., "1, 2, 3, 4, 7, 30")
+   * `data.BASE_URL`: GC Notify API base URL 
+   * `data.ENDPOINT`: Email notification endpoint 
 
 4. Set Secrets in `manifests/scheduler/scheduler_secret.yaml` 
 
-- `EMAIL_TEMPLATE_ID`: GC notify email template ID 
-- `API_KEY`: GC Notify API authentication key 
+   * `EMAIL_TEMPLATE_ID`: GC notify email template ID 
+   * `API_KEY`: GC Notify API authentication key 
 
 5. Run the controller & scheduler using the Make command
 
