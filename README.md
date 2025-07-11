@@ -36,7 +36,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 ### Architectural Structure
 
-<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
+<img width="845" height="722" alt="Volume Cleaner Architectural Diagram" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
 
 ## Requirements
 
