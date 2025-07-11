@@ -36,6 +36,8 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 ### Architectural Structure
 
+<img width="845" height="722" alt="Volume Cleaner Architectural Diagram" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
+
 ## Requirements
 
 - Golang 1.24.3 
@@ -69,6 +71,73 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 The system operates through two main components: a controller that runs continuously to monitor StatefulSet events and label PVCs, and a scheduler that runs periodically (via CronJob) to perform cleanup operations and send notifications. The project integrates with GC Notify for email services and supports Azure disk cleanup in Kubernetes environments.
 
 ## Quick Start
+
+### Prerequisites
+
+Set your Kubernetes context to the target cluster:
+
+```bash
+
+kubectl config use-context <your-cluster-context>
+
+```
+
+### Architecture Overview
+
+The volume-cleaner is split into 2 main components:
+
+- **Controller:** Continuously monitors StatefulSet events and labels unattached PVCs with timestamps
+- **Scheduler:** Runs periodically to find PVCs past their stale date, sends email notifications, and deletes expired volumes
+
+### Installation
+
+1. Clone this repository:
+
+```bash
+
+git clone https://github.com/StatCan/volume-cleaner.git  
+cd volume-cleaner
+
+```
+
+2. Customize the behavior of the Controller in `manifests/controller/controller_config.yaml`
+
+   * `metadata.namespace`: Target namespace to deploy the controller
+   * `data.NAMESPACE`: Target namespace to monitor (e.g., "kubeflow-profile" namespaces), leave this value as an empty string to scan all namespaces 
+   * `data.TIME_LABEL`: Label key for storing unattached timestamp (default: "volume-cleaner/unattached-time") 
+   * `data.NOTIF_LABEL`: Label key for notification count tracking (default: "volume-cleaner/notification-count")
+   * `data.TIME_FORMAT`: Timestamp format for labels (default: "2006-01-02_15-04-05Z")
+
+3. Customize the behavior of the Scheduler in `manifests/scheduler/scheduler_config.yaml` 
+
+   * `metadata.namespace`: Target namespace to deploy the scheduler
+   * `data.NAMESPACE`: Target namespace to scan for stale PVCs, leave this value as an empty string to scan all namespaces 
+   * `data.TIME_LABEL`: Must match controller's time label
+   * `data.NOTIF_LABEL`: Must match controller's notification label
+   * `data.GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
+   * `data.TIME_FORMAT`: Must match controller's time format
+   * `data.DRY_RUN`: Set to "true" for testing without actual deletion 
+   * `data.NOTIF_TIMES`: Comma-separated days before deletion to send notifications (e.g., "1, 2, 3, 4, 7, 30")
+   * `data.BASE_URL`: GC Notify API base URL 
+   * `data.ENDPOINT`: Email notification endpoint 
+
+4. Set Secrets in `manifests/scheduler/scheduler_secret.yaml` 
+
+   * `EMAIL_TEMPLATE_ID`: GC notify email template ID 
+   * `API_KEY`: GC Notify API authentication key, do not push API keys to this repository
+
+5. Run the controller & scheduler using the Make command
+
+```bash
+make run_controller
+make run_scheduler
+```
+
+6. Remove the scheduler and controller (optional)
+
+```bash
+make clean 
+```
 
 ## How to Contribute
 
@@ -127,6 +196,7 @@ Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valoris
 
 ### Structure architecturale
 
+<img width="845" height="722" alt="Schéma d'architecture du volume-cleaner" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
 
 ## Prérequis
 
@@ -162,6 +232,68 @@ Le système fonctionne via deux composants principaux : un contrôleur qui s'ex
 
 ## Démarrage rapide
 
+### Prérequis
+
+Placez votre contexte Kubernetes sur le cluster cible :
+
+```bash
+kubectl config use-context <votre-cluster-context>
+````
+
+### Vue d’ensemble de l’architecture
+
+Le volume-cleaner est composé de 2 composants principaux :
+
+* **Contrôleur :** Surveille en continu les événements de StatefulSet et étiquette les PVC non attachés avec un horodatage
+* **Planificateur :** S’exécute périodiquement pour repérer les PVC dépassant leur date de péremption, envoyer des notifications par e‑mail et supprimer les volumes expirés
+
+### Installation
+
+1. Clonez ce dépôt :
+
+   ```bash
+   git clone https://github.com/StatCan/volume-cleaner.git  
+   cd volume-cleaner
+   ```
+
+2. Personnalisez le comportement du Contrôleur dans `manifests/controller/controller_config.yaml` :
+
+   * `metadata.namespace` : Espace de noms cible pour déployer le contrôleur
+   * `data.NAMESPACE` : Espace de noms à surveiller (par ex. les namespaces “kubeflow-profile”); laissez cette valeur vide pour scanner tous les namespaces
+   * `data.TIME_LABEL` : Clé du label pour stocker l’horodatage des PVC non attachés (par défaut : `volume-cleaner/unattached-time`)
+   * `data.NOTIF_LABEL` : Clé du label pour le suivi du nombre de notifications (par défaut : `volume-cleaner/notification-count`)
+   * `data.TIME_FORMAT` : Format de l’horodatage pour les labels (par défaut : `2006-01-02_15-04-05Z`)
+
+3. Personnalisez le comportement du Planificateur dans `manifests/scheduler/scheduler_config.yaml` :
+
+   * `metadata.namespace` : Espace de noms cible pour déployer le planificateur
+   * `data.NAMESPACE` : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les namespaces
+   * `data.TIME_LABEL` : Doit correspondre au `TIME_LABEL` du contrôleur
+   * `data.NOTIF_LABEL` : Doit correspondre au `NOTIF_LABEL` du contrôleur
+   * `data.GRACE_PERIOD` : Nombre de jours avant suppression du PVC (par ex. `"180"`)
+   * `data.TIME_FORMAT` : Doit correspondre au `TIME_FORMAT` du contrôleur
+   * `data.DRY_RUN` : À `"true"` pour tester sans suppression réelle
+   * `data.NOTIF_TIMES` : Jours avant suppression pour envoyer des notifications (par ex. `"1,2,3,4,7,30"`)
+   * `data.BASE_URL` : URL de base de l’API GC Notify
+   * `data.ENDPOINT` : Point de terminaison pour l’envoi des e‑mails
+
+4. Définissez les Secrets dans `manifests/scheduler/scheduler_secret.yaml` :
+
+   * `EMAIL_TEMPLATE_ID` : ID du modèle d’e‑mail GC Notify
+   * `API_KEY` : Clé d’authentification GC Notify, ne pas pousser les clés API dans ce dépôt
+
+5. Lancez le Contrôleur et le Planificateur avec Make :
+
+   ```bash
+   make run_controller
+   make run_scheduler
+   ```
+
+6. Supprimez le planificateur et le contrôleur (optionnel) :
+
+   ```bash
+   make clean
+   ```
 
 ## Comment contribuer
 
