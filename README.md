@@ -36,7 +36,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 ### Architectural Structure
 
-<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
+<img width="845" height="722" alt="Volume Cleaner Architectural Diagram" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
 
 ## Requirements
 
@@ -72,7 +72,7 @@ The system operates through two main components: a controller that runs continuo
 
 ## Quick Start
 
-### Prerequisties
+### Prerequisites
 
 Set your Kubernetes context to the target cluster:
 
@@ -196,7 +196,7 @@ Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valoris
 
 ### Structure architecturale
 
-<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
+<img width="845" height="722" alt="Schéma d'architecture du volume-cleaner" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
 
 ## Prérequis
 
