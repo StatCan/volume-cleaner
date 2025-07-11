@@ -72,7 +72,7 @@ The system operates through two main components: a controller that runs continuo
 
 ## Quick Start
 
-### Prerequisties
+### Prerequisites
 
 Set your Kubernetes context to the target cluster:
 
