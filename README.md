@@ -124,7 +124,7 @@ cd volume-cleaner
 4. Set Secrets in `manifests/scheduler/scheduler_secret.yaml` 
 
    * `EMAIL_TEMPLATE_ID`: GC notify email template ID 
-   * `API_KEY`: GC Notify API authentication key 
+   * `API_KEY`: GC Notify API authentication key, do not push API keys to this repository
 
 5. Run the controller & scheduler using the Make command
 
@@ -280,7 +280,7 @@ Le volume-cleaner est composé de 2 composants principaux :
 4. Définissez les Secrets dans `manifests/scheduler/scheduler_secret.yaml` :
 
    * `EMAIL_TEMPLATE_ID` : ID du modèle d’e‑mail GC Notify
-   * `API_KEY` : Clé d’authentification GC Notify
+   * `API_KEY` : Clé d’authentification GC Notify, ne pas pousser les clés API dans ce dépôt
 
 5. Lancez le Contrôleur et le Planificateur avec Make :
 
