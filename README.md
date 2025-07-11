@@ -36,6 +36,8 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 
 ### Architectural Structure
 
+<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/2ec877ac-cb72-4337-914d-115e0172405f" />
+
 ## Requirements
 
 - Golang 1.24.3 
@@ -194,6 +196,7 @@ Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valoris
 
 ### Structure architecturale
 
+<img width="845" height="722" alt="image" src="https://github.com/user-attachments/assets/22da4862-704d-49e4-b757-29eff1c29db4" />
 
 ## Prérequis
 
