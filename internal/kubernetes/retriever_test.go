@@ -138,5 +138,13 @@ func TestFindUnattachedPVCs(t *testing.T) {
 
 		assert.Equal(t, len(FindUnattachedPVCs(kube)), 1)
 
+		// mock a sts with no vols
+		if err := kube.CreateStatefulSet(context.TODO(), "sts-no-volumes", "test"); err != nil {
+			t.Fatalf("error creating sts: %v", err)
+		}
+
+		// no new attachements, expected unattached should still be 1
+		assert.Equal(t, len(FindUnattachedPVCs(kube)), 1)
+
 	})
 }

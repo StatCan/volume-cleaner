@@ -91,14 +91,18 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 		for _, statefulset := range StsList(kube, namespace.Name) {
 			log.Printf("Found stateful set: %s", statefulset.Name)
 
-			// Spec.Volumes will find all the attached pvcs, not pvs
+			// Spec.Volumes will find all the attached PVCs, not PVs
 
-			for _, claim := range statefulset.Spec.Template.Spec.Volumes {
-				log.Printf("pvc attached to sts: %s", claim.PersistentVolumeClaim.ClaimName)
+			for _, volumes := range statefulset.Spec.Template.Spec.Volumes {
+				if volumes.PersistentVolumeClaim == nil {
+					continue
+				}
+				claim := volumes.PersistentVolumeClaim.ClaimName
 
-				attachedPVCs.Add(claim.PersistentVolumeClaim.ClaimName)
+				log.Printf("pvc attached to sts: %s", claim)
+
+				attachedPVCs.Add(claim)
 			}
-
 		}
 
 		/*
