@@ -9,7 +9,7 @@ on:
         type: string
 
 env:
-  REGISTRY: k8scc01covidacr.azurecr.io
+  REGISTRY: docker.io
 
 jobs:
   # Deep Docker Image Vulnerability Scanning
