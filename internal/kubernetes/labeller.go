@@ -25,6 +25,7 @@ func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 	)
 	if err != nil {
 		log.Printf("Error patching PVC %s from namespace %s: %s", pvc, ns, err)
+		return
 	}
 
 	log.Printf("Patch successfully applied to %s", pvc)
@@ -37,5 +38,15 @@ func SetPvcLabel(kube kubernetes.Interface, label string, value string, ns strin
 
 // setting label to null (not "null") will remove it
 func RemovePvcLabel(kube kubernetes.Interface, label string, ns string, pvc string) {
+	pvcObj, err := kube.CoreV1().PersistentVolumeClaims(ns).Get(context.TODO(), pvc, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting PVC to patch: %s", err)
+		return
+	}
+	_, ok := pvcObj.Labels[label]
+	if !ok {
+		log.Printf("Error removing label %s because label does not exist", label)
+		return
+	}
 	patchPvcLabel(kube, label, "null", ns, pvc)
 }
