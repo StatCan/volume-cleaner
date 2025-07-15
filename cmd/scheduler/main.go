@@ -15,6 +15,9 @@ import (
 	utilsInternal "volume-cleaner/internal/utils"
 )
 
+// test comment to trigger build
+// if you see this, feel free to remove this in the next commit
+
 func main() {
 	log.Print("Volume cleaner scheduler started.")
 
