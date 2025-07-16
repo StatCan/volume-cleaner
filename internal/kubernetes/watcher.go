@@ -49,6 +49,10 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				log.Printf("sts added: %s", sts.Name)
 
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
+					if vol.PersistentVolumeClaim == nil {
+						continue
+					}
+
 					log.Printf("removing label")
 
 					RemovePvcLabel(kube, cfg.TimeLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
@@ -58,6 +62,10 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				log.Printf("sts deleted: %s", sts.Name)
 
 				for _, vol := range sts.Spec.Template.Spec.Volumes {
+					if vol.PersistentVolumeClaim == nil {
+						continue
+					}
+
 					log.Printf("adding label")
 
 					SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
@@ -75,6 +83,11 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 		_, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
+		} else {
+			log.Print("PVC already has label. Skipping.")
+		}
+		_, ok = pvc.Labels[cfg.NotifLabel]
+		if !ok {
 			SetPvcLabel(kube, cfg.NotifLabel, "0", pvc.Namespace, pvc.Name)
 		} else {
 			log.Print("PVC already has label. Skipping.")

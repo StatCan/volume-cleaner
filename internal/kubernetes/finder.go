@@ -28,8 +28,8 @@ import (
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
-	errCount := 0
 
+	errCount := 0
 	deleteCount := 0
 	emailCount := 0
 
@@ -165,6 +165,7 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	log.Printf("Days left until deletion: %d", daysLeft)
 
 	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
+		log.Printf("Email time: %v", cfg.NotifTimes[currNotif])
 		return true, nil
 	}
 

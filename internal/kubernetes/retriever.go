@@ -25,6 +25,9 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 		// nothing can be done without namespaces so crash the program
 		log.Fatalf("Error listing namespaces: %s", err)
 	}
+	if ns == nil {
+		return make([]corev1.Namespace, 0)
+	}
 
 	return ns.Items
 }
@@ -36,6 +39,9 @@ func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeCl
 	if err != nil {
 		log.Printf("Error listing volume claims: %s", err)
 	}
+	if pvcs == nil {
+		return make([]corev1.PersistentVolumeClaim, 0)
+	}
 	return pvcs.Items
 }
 
@@ -45,6 +51,9 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	sts, err := kube.AppsV1().StatefulSets(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		log.Printf("Error listing stateful sets: %s", err)
+	}
+	if sts == nil {
+		return make([]appv1.StatefulSet, 0)
 	}
 	return sts.Items
 }
