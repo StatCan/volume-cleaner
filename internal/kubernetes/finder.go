@@ -165,6 +165,7 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	log.Printf("Days left until deletion: %d", daysLeft)
 
 	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
+		log.Printf("Email time: %v", cfg.NotifTimes[currNotif])
 		return true, nil
 	}
 
