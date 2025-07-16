@@ -16,7 +16,7 @@ spec:
           serviceAccountName: volume-cleaner
           containers:
             - name: cleaner
-              image: artifactory.cloud.statcan.ca/das-aaw-docker/volume-cleaner-scheduler:latest
+              image: docker.io/statcan/volume-cleaner-scheduler:latest
               command: ["/volume-cleaner-scheduler"]
               envFrom:
                 - configMapRef:

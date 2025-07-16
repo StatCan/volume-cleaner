@@ -16,6 +16,9 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
+// test comment to trigger build //
+// if you see this, feel free to remove this in the next commit
+
 func main() {
 	/*
 		It took me a while to figure this out because there wasn't much documentation about this
