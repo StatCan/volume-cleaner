@@ -53,10 +53,23 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 						continue
 					}
 
-					log.Printf("removing label")
+					pvcObj, err := kube.CoreV1().PersistentVolumeClaims(sts.Namespace).Get(context.TODO(), vol.PersistentVolumeClaim.ClaimName, metav1.GetOptions{})
+					if err != nil {
+						log.Printf("Error finding PVC: %s", err)
+						continue
+					}
+					_, ok := pvcObj.Labels[cfg.TimeLabel]
+					if ok {
+						log.Printf("removing label")
+						RemovePvcLabel(kube, cfg.TimeLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					}
 
-					RemovePvcLabel(kube, cfg.TimeLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
-					RemovePvcLabel(kube, cfg.NotifLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					_, ok = pvcObj.Labels[cfg.NotifLabel]
+					if ok {
+						log.Printf("removing label")
+						RemovePvcLabel(kube, cfg.NotifLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
+					}
+
 				}
 			case watch.Deleted:
 				log.Printf("sts deleted: %s", sts.Name)
