@@ -16,14 +16,11 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
-// test comment to trigger build //
-// if you see this, feel free to remove this in the next commit
-
 func main() {
 	/*
 		It took me a while to figure this out because there wasn't much documentation about this
 
-		log.Println and log.Print can be *practically* used for the purpose
+		log.Println and log.Print can be *practically* used for the same purpose
 
 		Both functions actually make calls to log.Output. The only difference lies in how the string
 		is formatted before printing. log.Println uses fmt.Appendln and log.Print uses fmt.Append. The
