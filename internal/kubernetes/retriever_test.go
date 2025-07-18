@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	// internal packages
-	testInternal "volume-cleaner/internal/tests"
+	testInternal "volume-cleaner/internal/utils"
 )
 
 func TestNsList(t *testing.T) {
