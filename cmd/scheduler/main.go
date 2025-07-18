@@ -5,10 +5,6 @@ import (
 	"log"
 	"os"
 
-	// external Packages
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-
 	// internal Packages
 	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
@@ -37,23 +33,10 @@ func main() {
 		EmailCfg:    emailCfg,
 	}
 
-	kubeClient, err := initKubeClient()
+	kubeClient, err := kubeInternal.InitKubeClient()
 	if err != nil {
 		log.Fatalf("Error creating kube client: %s", err)
 	}
 
 	kubeInternal.FindStale(kubeClient, cfg)
-}
-
-// go client used to interact with k8s clusters
-
-func initKubeClient() (*kubernetes.Clientset, error) {
-	// service runs inside cluster as a pod, therefore will use in-cluster config
-	// to connect with kubernetes API
-
-	cfg, err := rest.InClusterConfig()
-	if err == nil {
-		return kubernetes.NewForConfig(cfg)
-	}
-	return nil, err
 }
