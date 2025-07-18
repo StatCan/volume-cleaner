@@ -22,6 +22,7 @@ func main() {
 		APIKey:          os.Getenv("API_KEY"),
 	}
 
+	// Scheduler struct which composes an EmailConfig
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		TimeLabel:   os.Getenv("TIME_LABEL"),
