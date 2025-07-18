@@ -28,7 +28,7 @@ func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 		return
 	}
 
-	log.Printf("Patch successfully applied to %s", pvc)
+	log.Printf("Patch successfully applied to PVC %s from STS %s", pvc, ns)
 }
 
 // setting label will add it if doesn't exist

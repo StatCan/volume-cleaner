@@ -100,10 +100,12 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	for _, pvc := range FindUnattachedPVCs(kube) {
 		_, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
+			log.Printf("adding missing label %s", cfg.TimeLabel)
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		}
 		_, ok = pvc.Labels[cfg.NotifLabel]
 		if !ok {
+			log.Printf("adding missing label %s", cfg.TimeLabel)
 			SetPvcLabel(kube, cfg.NotifLabel, "0", pvc.Namespace, pvc.Name)
 		}
 	}
