@@ -16,7 +16,7 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
-// Watches for when statefulsets are created or deleted across all namespaces
+// Watches for when statefulsets are created or deleted
 
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{})
@@ -32,6 +32,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 		select {
 
 		// context used to kill loop
+		// used during unit tests
 		case <-ctx.Done():
 			return
 
@@ -41,6 +42,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 			// Skip this event if it can't be parsed into a sts
 			if !ok {
+				log.Printf("%s could not be parsed into a STS", event)
 				continue
 			}
 
@@ -55,18 +57,19 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 					pvcObj, err := kube.CoreV1().PersistentVolumeClaims(sts.Namespace).Get(context.TODO(), vol.PersistentVolumeClaim.ClaimName, metav1.GetOptions{})
 					if err != nil {
-						log.Printf("Error finding PVC: %s", err)
+						log.Printf("Error finding PVC object: %s", err)
 						continue
 					}
+
 					_, ok := pvcObj.Labels[cfg.TimeLabel]
 					if ok {
-						log.Printf("removing label")
+						log.Printf("removing label %s", cfg.TimeLabel)
 						RemovePvcLabel(kube, cfg.TimeLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 					}
 
 					_, ok = pvcObj.Labels[cfg.NotifLabel]
 					if ok {
-						log.Printf("removing label")
+						log.Printf("removing label %s", cfg.NotifLabel)
 						RemovePvcLabel(kube, cfg.NotifLabel, sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 					}
 
@@ -79,7 +82,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 						continue
 					}
 
-					log.Printf("adding label")
+					log.Printf("adding labels")
 
 					SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 					SetPvcLabel(kube, cfg.NotifLabel, "0", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
@@ -92,19 +95,18 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Checking for unattached PVCs...")
+
+	// scan and repair labels for all unattached pvcs
 	for _, pvc := range FindUnattachedPVCs(kube) {
 		_, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
-		} else {
-			log.Print("PVC already has label. Skipping.")
 		}
 		_, ok = pvc.Labels[cfg.NotifLabel]
 		if !ok {
 			SetPvcLabel(kube, cfg.NotifLabel, "0", pvc.Namespace, pvc.Name)
-		} else {
-			log.Print("PVC already has label. Skipping.")
 		}
 	}
+
 	log.Print("Initial scan complete")
 }
