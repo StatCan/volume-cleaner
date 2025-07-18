@@ -26,17 +26,14 @@ func main() {
 		APIKey:          os.Getenv("API_KEY"),
 	}
 
-	gracePeriod := utilsInternal.ParseGracePeriod(os.Getenv("GRACE_PERIOD"))
-	notifTimes := utilsInternal.ParseNotifTimes(os.Getenv("NOTIF_TIMES"))
-
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		TimeLabel:   os.Getenv("TIME_LABEL"),
 		NotifLabel:  os.Getenv("NOTIF_LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
-		GracePeriod: gracePeriod,
+		GracePeriod: utilsInternal.ParseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
-		NotifTimes:  notifTimes,
+		NotifTimes:  utilsInternal.ParseNotifTimes(os.Getenv("NOTIF_TIMES")),
 		EmailCfg:    emailCfg,
 	}
 
