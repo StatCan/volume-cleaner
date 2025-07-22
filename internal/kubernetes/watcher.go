@@ -42,7 +42,6 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 			// Skip this event if it can't be parsed into a sts
 			if !ok {
-				log.Printf("%s could not be parsed into a STS", event)
 				continue
 			}
 
