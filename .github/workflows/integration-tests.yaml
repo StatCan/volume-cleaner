@@ -54,6 +54,14 @@ jobs:
           kubectl apply -f testing/controller/controller_deployment.yaml
           sleep 5
 
+      # extra information
+      - name: Print logs
+        run: |
+          echo "----------controller----------"
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500
+          echo "----------scheduler----------"
+          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
+
       - name: Test label applied
         run: |
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
@@ -120,14 +128,6 @@ jobs:
         run: |
           kubectl apply -f testing/scheduler/scheduler_job.yaml
           sleep 10
-
-      # extra information
-      - name: Print logs
-        run: |
-          echo "----------controller----------"
-          kubectl logs -l app=volume-cleaner-controller -n das --tail 500
-          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
-          echo "----------scheduler----------"
 
       - name: Test scheduler for pvc1
         run: |
