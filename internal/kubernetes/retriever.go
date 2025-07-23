@@ -83,6 +83,11 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		// on first pass, add all pvcs to a set
 
 		for _, claim := range PvcList(kube, namespace.Name) {
+			log.Print(claim.Spec.StorageClassName)
+			if claim.Spec.StorageClassName != nil {
+				log.Print(*claim.Spec.StorageClassName)
+			}
+
 			if claim.Spec.StorageClassName == nil {
 				if cfg.StorageClass != "" {
 					continue
