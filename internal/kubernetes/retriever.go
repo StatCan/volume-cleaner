@@ -94,6 +94,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			} else if *claim.Spec.StorageClassName != cfg.StorageClass {
 				log.Print("**skip**")
 				log.Print(claim.Spec.StorageClassName)
+				log.Print(*claim.Spec.StorageClassName)
 				log.Print(cfg.StorageClass)
 				log.Print("****")
 				continue
