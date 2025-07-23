@@ -56,8 +56,6 @@ jobs:
 
       - name: Test label applied
         run: |
-          echo $(kubectl get pvc pvc1 -n anray-liu -o yaml)
-          
           if ! kubectl get pvc pvc1 -n anray-liu -o yaml | grep -q labels; then
               echo "No labels found. Test failed."
               exit 2
