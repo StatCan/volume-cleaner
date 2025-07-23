@@ -85,13 +85,21 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		for _, claim := range PvcList(kube, namespace.Name) {
 			if claim.Spec.StorageClassName == nil {
 				if cfg.StorageClass != "" {
+					log.Print("**skip empty**")
+					log.Print(claim.Spec.StorageClassName)
+					log.Print(cfg.StorageClass)
+					log.Print("****")
 					continue
 				}
 			} else if *claim.Spec.StorageClassName != cfg.StorageClass {
+				log.Print("**skip**")
+				log.Print(claim.Spec.StorageClassName)
+				log.Print(cfg.StorageClass)
+				log.Print("****")
 				continue
 			}
 
-			log.Print("**debug**")
+			log.Print("**didn't skip**")
 			log.Print(claim.Spec.StorageClassName)
 			log.Print(cfg.StorageClass)
 			log.Print("****")
