@@ -128,3 +128,4 @@ jobs:
   run-integration:
     name: Integration Tests
     uses: ./.github/workflows/integration-tests.yaml
+    secrets: inherit
