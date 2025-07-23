@@ -92,7 +92,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Checking for unattached PVCs...")
-	for _, pvc := range FindUnattachedPVCs(kube) {
+	for _, pvc := range FindUnattachedPVCs(kube, cfg) {
 		_, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)

@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	// internal packages
+	"volume-cleaner/internal/structure"
 	testInternal "volume-cleaner/internal/tests"
 )
 
@@ -129,14 +130,14 @@ func TestFindUnattachedPVCs(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, len(FindUnattachedPVCs(kube)), 2)
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{})), 2)
 
 		// mock a stateful set attached to a pvc1
 		if stsErr := kube.CreateStatefulSetWithPvc(context.TODO(), "sts1", "test", "pvc1"); stsErr != nil {
 			t.Fatalf("Error injecting sts add: %v", stsErr)
 		}
 
-		assert.Equal(t, len(FindUnattachedPVCs(kube)), 1)
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{})), 1)
 
 		// mock a sts with no vols
 		if err := kube.CreateStatefulSet(context.TODO(), "sts-no-volumes", "test"); err != nil {
@@ -144,7 +145,7 @@ func TestFindUnattachedPVCs(t *testing.T) {
 		}
 
 		// no new attachements, expected unattached should still be 1
-		assert.Equal(t, len(FindUnattachedPVCs(kube)), 1)
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{})), 1)
 
 	})
 }

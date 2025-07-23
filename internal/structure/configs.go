@@ -27,10 +27,11 @@ API_KEY: "Random APIKEY",
 */
 
 type ControllerConfig struct {
-	Namespace  string
-	TimeLabel  string
-	NotifLabel string
-	TimeFormat string
+	Namespace    string
+	TimeLabel    string
+	NotifLabel   string
+	TimeFormat   string
+	StorageClass string
 }
 
 type SchedulerConfig struct {
