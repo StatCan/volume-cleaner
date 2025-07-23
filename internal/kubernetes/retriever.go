@@ -83,9 +83,18 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		// on first pass, add all pvcs to a set
 
 		for _, claim := range PvcList(kube, namespace.Name) {
-			// if claim.Spec.StorageClassName != nil && *claim.Spec.StorageClassName != cfg.StorageClass {
-			// 	continue
-			// }
+			if claim.Spec.StorageClassName == nil {
+				if cfg.StorageClass != "" {
+					continue
+				}
+			} else if *claim.Spec.StorageClassName != cfg.StorageClass {
+				continue
+			}
+
+			log.Print("**debug**")
+			log.Print(claim.Spec.StorageClassName)
+			log.Print(cfg.StorageClass)
+			log.Print("****")
 
 			log.Print(claim.Spec.StorageClassName)
 			// azure disk will have the same name as the volume
