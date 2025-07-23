@@ -74,9 +74,6 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 	log.Print("Scanning namespaces...")
 
 	for _, namespace := range NsList(kube) {
-		log.Printf("Found namespace: %s", namespace.Name)
-		log.Print("Scanning persistent volume claims...")
-
 		allPVCs := structInternal.NewSet()
 		attachedPVCs := structInternal.NewSet()
 
@@ -96,7 +93,6 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 				continue
 			}
 
-			log.Print(claim.Spec.StorageClassName)
 			// azure disk will have the same name as the volume
 			// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
 
