@@ -39,6 +39,7 @@ func main() {
 		NotifLabel:   os.Getenv("NOTIF_LABEL"),
 		TimeFormat:   os.Getenv("TIME_FORMAT"),
 		StorageClass: os.Getenv("STORAGE_CLASS"),
+		ResetRun:     os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
 	}
 
 	kubeClient, err := initKubeClient()
@@ -48,11 +49,15 @@ func main() {
 		log.Fatalf("Error creating kube client: %s", err)
 	}
 
-	// scans pvcs to find already unattached ones
-	kubeInternal.InitialScan(kubeClient, cfg)
+	if cfg.ResetRun {
+		kubeInternal.ResetLabels(kubeClient, cfg)
+	} else {
+		// scans pvcs to find already unattached ones
+		kubeInternal.InitialScan(kubeClient, cfg)
 
-	// watches stateful sets to discover newly unattached pvcs
-	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
+		// watches stateful sets to discover newly unattached pvcs
+		kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
+	}
 }
 
 // go client used to interact with k8s clusters

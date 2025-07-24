@@ -108,3 +108,23 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	}
 	log.Print("Initial scan complete")
 }
+
+func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
+	log.Print("Resetting labels...")
+
+	for _, namespace := range NsList(kube) {
+		for _, pvc := range PvcList(kube, namespace.Name) {
+			_, ok := pvc.Labels[cfg.TimeLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.TimeLabel, namespace.Name, pvc.Name)
+				log.Printf("Label removed from PVC %s", pvc.Name)
+			}
+			_, ok = pvc.Labels[cfg.NotifLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.NotifLabel, namespace.Name, pvc.Name)
+				log.Printf("Label removed from PVC %s", pvc.Name)
+			}
+		}
+
+	}
+}
