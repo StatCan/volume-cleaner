@@ -74,6 +74,9 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 	log.Print("Scanning namespaces...")
 
 	for _, namespace := range NsList(kube) {
+		log.Printf("Found namespace: %s", namespace.Name)
+		log.Print("Scanning persistent volume claims...")
+
 		allPVCs := structInternal.NewSet()
 		attachedPVCs := structInternal.NewSet()
 
