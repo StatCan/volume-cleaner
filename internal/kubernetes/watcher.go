@@ -60,8 +60,6 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 						continue
 					}
 
-					log.Printf(*pvcObj.Spec.StorageClassName)
-
 					// ignore if incorrect storage class
 					if pvcObj.Spec.StorageClassName == nil {
 						if cfg.StorageClass != "" {
