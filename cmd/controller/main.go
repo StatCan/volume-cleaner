@@ -51,13 +51,13 @@ func main() {
 
 	if cfg.ResetRun {
 		kubeInternal.ResetLabels(kubeClient, cfg)
-	} else {
-		// scans pvcs to find already unattached ones
-		kubeInternal.InitialScan(kubeClient, cfg)
-
-		// watches stateful sets to discover newly unattached pvcs
-		kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
 	}
+
+	// scans pvcs to find already unattached ones
+	kubeInternal.InitialScan(kubeClient, cfg)
+
+	// watches stateful sets to discover newly unattached pvcs
+	kubeInternal.WatchSts(context.TODO(), kubeClient, cfg)
 }
 
 // go client used to interact with k8s clusters
