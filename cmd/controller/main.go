@@ -26,10 +26,11 @@ func main() {
 	log.Print("Volume cleaner controller started.")
 
 	cfg := structInternal.ControllerConfig{
-		Namespace:  os.Getenv("NAMESPACE"),
-		TimeLabel:  os.Getenv("TIME_LABEL"),
-		NotifLabel: os.Getenv("NOTIF_LABEL"),
-		TimeFormat: os.Getenv("TIME_FORMAT"),
+		Namespace:    os.Getenv("NAMESPACE"),
+		TimeLabel:    os.Getenv("TIME_LABEL"),
+		NotifLabel:   os.Getenv("NOTIF_LABEL"),
+		TimeFormat:   os.Getenv("TIME_FORMAT"),
+		StorageClass: os.Getenv("STORAGE_CLASS"),
 	}
 
 	kubeClient, err := kubeInternal.InitKubeClient()

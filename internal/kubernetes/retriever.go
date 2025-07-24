@@ -61,7 +61,7 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 // from all namespaces
 
-func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClaim {
+func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.ControllerConfig) []corev1.PersistentVolumeClaim {
 	/* map each pvc name to its pvc object
 	names are used to calculate set differences, but the actual returned
 	slice has the objects, so need to keep both
@@ -83,6 +83,14 @@ func FindUnattachedPVCs(kube kubernetes.Interface) []corev1.PersistentVolumeClai
 		// on first pass, add all pvcs to a set
 
 		for _, claim := range PvcList(kube, namespace.Name) {
+			if claim.Spec.StorageClassName == nil {
+				if cfg.StorageClass != "" {
+					continue
+				}
+			} else if *claim.Spec.StorageClassName != cfg.StorageClass {
+				continue
+			}
+
 			// azure disk will have the same name as the volume
 			// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
 
