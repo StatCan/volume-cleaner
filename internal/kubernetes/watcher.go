@@ -89,7 +89,11 @@ func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 				RemovePvcLabel(kube, cfg.NotifLabel, namespace.Name, pvc.Name)
 				log.Printf("Label removed from PVC %s", pvc.Name)
 			}
-			
+
+		}
+	}
+}
+
 func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig, sts *appsv1.StatefulSet) {
 	log.Printf("sts added: %s", sts.Name)
 
