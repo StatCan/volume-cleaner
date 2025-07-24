@@ -23,6 +23,8 @@ func main() {
 		new line character if it's not present
 	*/
 
+	// test comment to trigger build (please remove)
+
 	log.Print("Volume cleaner controller started.")
 
 	cfg := structInternal.ControllerConfig{

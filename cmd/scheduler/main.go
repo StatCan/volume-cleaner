@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+
+	// test comment to trigger build (please remove)
+
 	log.Print("Volume cleaner scheduler started.")
 
 	// Initialize an EmailConfig struct
