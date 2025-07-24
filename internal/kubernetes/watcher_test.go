@@ -11,7 +11,7 @@ import (
 
 	// internal packages
 	structInternal "volume-cleaner/internal/structure"
-	testInternal "volume-cleaner/internal/tests"
+	testInternal "volume-cleaner/internal/utils"
 )
 
 func TestWatcherLabelling(t *testing.T) {
