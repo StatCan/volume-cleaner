@@ -55,12 +55,9 @@ jobs:
           sleep 5
 
       # extra information
-      - name: Print logs
+      - name: Print controller logs
         run: |
-          echo "----------controller----------"
           kubectl logs -l app=volume-cleaner-controller -n das --tail 500
-          echo "----------scheduler----------"
-          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
 
       - name: Test label applied
         run: |
