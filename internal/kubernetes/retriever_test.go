@@ -10,7 +10,7 @@ import (
 
 	// internal packages
 	"volume-cleaner/internal/structure"
-	testInternal "volume-cleaner/internal/tests"
+	testInternal "volume-cleaner/internal/utils"
 )
 
 func TestNsList(t *testing.T) {
