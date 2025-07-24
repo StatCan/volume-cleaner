@@ -23,6 +23,7 @@ func main() {
 	}
 
 	// Scheduler struct which composes an EmailConfig
+	// there is also a config for the controller
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
 		TimeLabel:   os.Getenv("TIME_LABEL"),
@@ -34,10 +35,12 @@ func main() {
 		EmailCfg:    emailCfg,
 	}
 
+	// init client to interact with k8s cluster
 	kubeClient, err := kubeInternal.InitKubeClient()
 	if err != nil {
 		log.Fatalf("Error creating kube client: %s", err)
 	}
 
+	// run main scheduler logic
 	kubeInternal.FindStale(kubeClient, cfg)
 }
