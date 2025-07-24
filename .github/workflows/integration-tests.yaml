@@ -55,12 +55,18 @@ jobs:
           sleep 5
 
       # extra information
+<<<<<<< HEAD
       - name: Print logs
         run: |
           echo "----------controller----------"
           kubectl logs -l app=volume-cleaner-controller -n das --tail 500
           echo "----------scheduler----------"
           kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
+=======
+      - name: Print controller logs
+        run: |
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500
+>>>>>>> e7bb53cc9abece760989c3f4f9a72366167eab79
 
       - name: Test label applied
         run: |
@@ -149,7 +155,11 @@ jobs:
               echo "Scheduler didn't find pvc2. Test failed."
               exit 2
           else
+<<<<<<< HEAD
               if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc2 from namespace anray-liu" -A 1 | grep "Not labelled. Skipping."; then
+=======
+              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found pvc pvc2 from namespace anray-liu" -A 1 | grep "Label volume-cleaner/unattached-time not found on PVC pvc2. Skipping."; then
+>>>>>>> e7bb53cc9abece760989c3f4f9a72366167eab79
                   echo "Scheduler didn't skip pvc2. Test failed."
                   exit 2
               else
