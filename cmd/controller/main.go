@@ -25,6 +25,9 @@ func main() {
 
 	log.Print("Volume cleaner controller started.")
 
+	// controller config
+	// there is also a config for the scheduler
+
 	cfg := structInternal.ControllerConfig{
 		Namespace:    os.Getenv("NAMESPACE"),
 		TimeLabel:    os.Getenv("TIME_LABEL"),
@@ -33,6 +36,8 @@ func main() {
 		StorageClass: os.Getenv("STORAGE_CLASS"),
 	}
 
+	// init client to interact with k8s cluster
+
 	kubeClient, err := kubeInternal.InitKubeClient()
 	if err != nil {
 		// log.Fatalf will automatically call os.Exit
@@ -40,7 +45,7 @@ func main() {
 		log.Fatalf("Error creating kube client: %s", err)
 	}
 
-	// scans pvcs to find already unattached ones
+	// scans pvcs to find already unattached pvcs
 	kubeInternal.InitialScan(kubeClient, cfg)
 
 	// watches stateful sets to discover newly unattached pvcs

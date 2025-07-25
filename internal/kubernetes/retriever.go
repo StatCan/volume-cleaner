@@ -60,6 +60,7 @@ func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 
 // returns a slice of corev1.PersistentVolumeClaims that are all unattached (not associated with any statefulset)
 // from all namespaces
+// this function will probe and provide stats for each namespace at a time
 
 func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.ControllerConfig) []corev1.PersistentVolumeClaim {
 	/* map each pvc name to its pvc object
@@ -83,6 +84,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		// on first pass, add all pvcs to a set
 
 		for _, claim := range PvcList(kube, namespace.Name) {
+			// skip if storage class doesn't match config
 			if claim.Spec.StorageClassName == nil {
 				if cfg.StorageClass != "" {
 					continue
@@ -139,6 +141,8 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
 
 	}
+
+	// return final list of all unattached pvc objects
 
 	return fullList
 }

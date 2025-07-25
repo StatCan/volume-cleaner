@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+// read list of times provided in the config and convert to a list of ints
+// each values represented a number of days left
+
 func ParseNotifTimes(str string) []int {
 	var intSlice []int
 
