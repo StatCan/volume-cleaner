@@ -74,6 +74,25 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	log.Print("Initial scan complete")
 }
 
+// scans all pvcs and removes all volume-cleaner related labels
+func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
+	log.Print("Resetting labels...")
+
+	for _, namespace := range NsList(kube) {
+		for _, pvc := range PvcList(kube, namespace.Name) {
+			_, ok := pvc.Labels[cfg.TimeLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.TimeLabel, namespace.Name, pvc.Name)
+			}
+			_, ok = pvc.Labels[cfg.NotifLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.NotifLabel, namespace.Name, pvc.Name)
+			}
+
+		}
+	}
+}
+
 func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig, sts *appsv1.StatefulSet) {
 	log.Printf("sts added: %s", sts.Name)
 

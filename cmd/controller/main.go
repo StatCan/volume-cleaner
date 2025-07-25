@@ -31,6 +31,7 @@ func main() {
 		NotifLabel:   os.Getenv("NOTIF_LABEL"),
 		TimeFormat:   os.Getenv("TIME_FORMAT"),
 		StorageClass: os.Getenv("STORAGE_CLASS"),
+		ResetRun:     os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
 	}
 
 	kubeClient, err := kubeInternal.InitKubeClient()
@@ -38,6 +39,10 @@ func main() {
 		// log.Fatalf will automatically call os.Exit
 
 		log.Fatalf("Error creating kube client: %s", err)
+	}
+
+	if cfg.ResetRun {
+		kubeInternal.ResetLabels(kubeClient, cfg)
 	}
 
 	// scans pvcs to find already unattached ones
