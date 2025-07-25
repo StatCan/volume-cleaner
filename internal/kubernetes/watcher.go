@@ -140,7 +140,7 @@ func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfi
 			continue
 		}
 
-		log.Printf("[INFO] Adding labels")
+		log.Printf("[INFO] Adding labels.")
 		SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 		SetPvcLabel(kube, cfg.NotifLabel, "0", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 	}

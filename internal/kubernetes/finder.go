@@ -90,7 +90,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 			currNotif, countErr := strconv.Atoi(notifCount)
 			if countErr != nil {
-				log.Printf("[ERROR] Failed to parse notification count %s: %v", notifCount, countErr)
+				log.Printf("[ERROR] Failed to parse notification count: %v", countErr)
 				errCount++
 				continue
 			}
@@ -132,7 +132,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		}
 	}
 
-	log.Printf("[INFO] Job errors %d", errCount)
+	log.Printf("[INFO] Job errors: %d", errCount)
 	log.Printf("[INFO] Emails sent: %d", emailCount)
 	log.Printf("[INFO] Pvcs deleted: %d", deleteCount)
 }
@@ -156,7 +156,7 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 }
 
 func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
-	log.Print("[INFO] Checking email times....")
+	log.Print("[INFO] Checking email times...")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
@@ -165,7 +165,7 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
 
 	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
-		log.Printf("[INFO] Chosen email time %v", cfg.NotifTimes[currNotif])
+		log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
 		return true, nil
 	}
 

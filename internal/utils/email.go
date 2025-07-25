@@ -64,7 +64,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	}
 
 	if response.StatusCode == 201 {
-		log.Printf("[INFO] Sent Email Notif to %s: %s", personal.Name, response.Status)
+		log.Printf("[INFO] Successfully sent email notification to %s: %s", personal.Name, response.Status)
 
 		return nil
 	}

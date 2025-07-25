@@ -135,8 +135,8 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			fullList = append(fullList, pvcObjects[pvc])
 		}
 
-		log.Printf("[INFO] Found %d total volume claims.", allPVCs.Length())
-		log.Printf("[INFO] Found %d unattached volume claims.", unattachedPVCs.Length())
+		log.Printf("[INFO] Found %d total PVCs.", allPVCs.Length())
+		log.Printf("[INFO] Found %d unattached PVCs.", unattachedPVCs.Length())
 
 	}
 
