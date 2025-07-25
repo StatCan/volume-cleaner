@@ -23,7 +23,7 @@ func main() {
 		new line character if it's not present
 	*/
 
-	log.Print("Volume cleaner controller started.")
+	log.Print("[INFO] Volume cleaner controller started.")
 
 	cfg := structInternal.ControllerConfig{
 		Namespace:    os.Getenv("NAMESPACE"),
@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		// log.Fatalf will automatically call os.Exit
 
-		log.Fatalf("Error creating kube client: %s", err)
+		log.Fatalf("[ERROR] Failed to create kube client: %s", err)
 	}
 
 	// scans pvcs to find already unattached ones
