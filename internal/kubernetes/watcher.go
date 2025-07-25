@@ -74,6 +74,7 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	log.Print("Initial scan complete")
 }
 
+// scans all pvcs and removes all volume-cleaner related labels
 func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Resetting labels...")
 
