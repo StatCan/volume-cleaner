@@ -35,7 +35,7 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		})
 
 	if err != nil {
-		log.Printf("Error creating request body: %v", err)
+		log.Printf("[ERROR] Failed to create request body: %v", err)
 	}
 
 	// Create the request and add the required headers
@@ -44,9 +44,9 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	request.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
-		log.Printf("Error creating request: %v", err)
+		log.Printf("[ERROR] Failed to create request: %v", err)
 	} else {
-		log.Printf("Successfully created HTTP request")
+		log.Printf("[INFO] Successfully created HTTP request.")
 	}
 
 	// Send Request
@@ -57,15 +57,15 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 	}
 
 	if err != nil {
-		log.Printf("Error making HTTP POST request: %v", err)
+		log.Printf("[ERROR] Failed to create HTTP POST request: %v", err)
 
 		// sending the email failed, but don't stop the program
 		return errors.New("error response is invalid")
 	}
 
-	log.Printf("Successfully Sent Email Notif to %s: %s", personal.Name, response.Status)
-
 	if response.StatusCode == 201 {
+		log.Printf("[INFO] Sent Email Notif to %s: %s", personal.Name, response.Status)
+
 		return nil
 	}
 	return errors.New(response.Status)
@@ -99,14 +99,14 @@ func EmailDetails(kube kubernetes.Interface, pvc corev1.PersistentVolumeClaim, g
 func nsEmail(kube kubernetes.Interface, name string) string {
 	ns, err := kube.CoreV1().Namespaces().Get(context.TODO(), name, metav1.GetOptions{})
 	if err != nil {
-		log.Printf("Error: Can't get namespace %s: %v", name, err)
+		log.Printf("[ERROR] Failed to get namespace %s: %v", name, err)
 	}
 
 	email := ns.Annotations["owner"]
 	if email == "" {
-		log.Printf("Error: Annotation 'owner' for namespace %s is empty", name)
+		log.Printf("[ERROR] Annotation 'owner' for namespace %s is empty", name)
 	} else {
-		log.Printf("Successfully acquired owner email %s", email)
+		log.Printf("[INFO] Successfully acquired owner email %s", email)
 	}
 
 	return email

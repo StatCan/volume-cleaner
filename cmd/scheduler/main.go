@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	log.Print("Volume cleaner scheduler started.")
+	log.Print("[INFO] Volume cleaner scheduler started.")
 
 	// Initialize an EmailConfig struct
 	emailCfg := structInternal.EmailConfig{
@@ -36,7 +36,7 @@ func main() {
 
 	kubeClient, err := kubeInternal.InitKubeClient()
 	if err != nil {
-		log.Fatalf("Error creating kube client: %s", err)
+		log.Fatalf("[ERROR] Failed to create kube client: %s", err)
 	}
 
 	kubeInternal.FindStale(kubeClient, cfg)

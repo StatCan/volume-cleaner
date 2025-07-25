@@ -24,6 +24,7 @@ import (
 )
 
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
 
@@ -36,21 +37,23 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
 	})
 
+	log.Print("[INFO] Scanning for stale PVCS...")
+
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
-		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
+		log.Printf("[INFO] Found PVC %s from NS %s", pvc.Name, pvc.Namespace)
 
 		// check if label exists (meaning unattached)
 		// if pvc is attached to a sts, it would've had its label removed by the controller
 
 		timestamp, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
-			log.Printf("Label %s not found on PVC %s. Skipping.", cfg.TimeLabel, pvc.Name)
+			log.Printf("[INFO] Label %s not found. Skipping.", cfg.TimeLabel)
 			continue
 		}
 
 		stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 		if staleError != nil {
-			log.Printf("Could not parse time: %s", staleError)
+			log.Printf("[ERROR] Failed to parse timestamp: %s", staleError)
 			errCount++
 			continue
 		}
@@ -58,52 +61,50 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		// stale means grace period has passed, can be deleted
 		if stale {
 			if cfg.DryRun {
-
-				log.Printf("DRY RUN: delete pvc %s", pvc.Name)
+				log.Printf("[DRY RUN] Delete PVC %s", pvc.Name)
 				deleteCount++
 				continue
-
 			}
 
 			err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
 			if err != nil {
-				log.Printf("Error deleting pvc %s: %s", pvc.Name, err)
+				log.Printf("[ERROR] Failed to delete PVC %s: %s", pvc.Name, err)
 				errCount++
 				continue
 			}
 
-			log.Print("PVC successfully deleted.")
+			log.Print("[INFO] PVC successfully deleted.")
 			deleteCount++
 
 		} else {
 			// not stale yet, handle email logic here
 
-			log.Print("Grace period not passed.")
+			log.Print("[INFO] Grace period not passed.")
 
 			notifCount, ok := pvc.Labels[cfg.NotifLabel]
 			if !ok {
-				log.Printf("Label %s not found on PVC %s", cfg.NotifLabel, pvc.Name)
+				log.Printf("[INFO] Label %s not found. Skipping.", cfg.NotifLabel)
 				errCount++
 				continue
 			}
 
 			currNotif, countErr := strconv.Atoi(notifCount)
 			if countErr != nil {
-				log.Printf("Error converting notification-count %s: %v", notifCount, countErr)
+				log.Printf("[ERROR] Failed to parse notification count %s: %v", notifCount, countErr)
 				errCount++
 				continue
 			}
 
 			shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
 			if mailError != nil {
-				log.Printf("Could not parse time: %s", mailError)
+				log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
 				errCount++
 				continue
 			}
 
 			if shouldSend {
 				if cfg.DryRun {
-					log.Print("DRY RUN: email user")
+					log.Print("[DRY RUN] Email owner.")
 					emailCount++
 					continue
 				}
@@ -115,7 +116,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 
 				err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
 				if err != nil {
-					log.Printf("Error: Unable to send an email to %s at %s", personal.Name, email)
+					log.Printf("[Error] Unable to send an email to %s at %s", personal.Name, email)
 					errCount++
 					continue
 				}
@@ -131,9 +132,9 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		}
 	}
 
-	log.Printf("Job errors %d", errCount)
-	log.Printf("Emails sent: %d", emailCount)
-	log.Printf("Pvcs deleted: %d", deleteCount)
+	log.Printf("[INFO] Job errors %d", errCount)
+	log.Printf("[INFO] Emails sent: %d", emailCount)
+	log.Printf("[INFO] Pvcs deleted: %d", deleteCount)
 }
 
 // determines if the grace period is greater than a given timestamp
@@ -147,17 +148,15 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 	// difference in days
 	diff := time.Since(timeObj).Hours() / 24
 
-	log.Printf("Parsed timestamp: %f days.", diff)
+	log.Printf("[INFO] Parsed timestamp: %f days.", diff)
 
 	stale := int(diff) > gracePeriod
-
-	log.Printf("int(diff) > cfg.GracePeriod: %v > %v == %v", int(diff), gracePeriod, stale)
 
 	return stale, nil
 }
 
 func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
-	log.Print("Checking email times....")
+	log.Print("[INFO] Checking email times....")
 
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
@@ -165,10 +164,8 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	}
 	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
 
-	log.Printf("Days left until deletion: %d", daysLeft)
-
 	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
-		log.Printf("Email time: %v", cfg.NotifTimes[currNotif])
+		log.Printf("[INFO] Chosen email time %v", cfg.NotifTimes[currNotif])
 		return true, nil
 	}
 
