@@ -133,6 +133,7 @@ jobs:
 
       - name: Test scheduler for pvc1
         run: |
+          echo $(kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc1 from NS anray-liu" -A 3)
           if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc1 from NS anray-liu"; then
               echo "Scheduler didn't find pvc1. Test failed."
               exit 2
