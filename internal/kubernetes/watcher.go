@@ -74,7 +74,7 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		}
 
-		// add notification count label if not foudn
+		// add notification count label if not found
 		_, ok = pvc.Labels[cfg.NotifLabel]
 		if !ok {
 			log.Printf("adding missing label %s", cfg.TimeLabel)

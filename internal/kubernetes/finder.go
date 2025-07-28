@@ -51,7 +51,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			continue
 		}
 
-		// check if pvc shuold be deleted
+		// check if pvc should be deleted
 		stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 		if staleError != nil {
 			log.Printf("Could not parse time: %s", staleError)
