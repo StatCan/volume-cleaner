@@ -125,7 +125,11 @@ jobs:
         run: |
           kubectl apply -f testing/scheduler/scheduler_job.yaml
           sleep 10
-          echo $(kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500)
+
+      # extra information
+      - name: Print scheduler logs
+        run: |
+          kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500
 
       - name: Test scheduler for pvc1
         run: |
