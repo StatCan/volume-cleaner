@@ -23,6 +23,8 @@ import (
 	utilsInternal "volume-cleaner/internal/utils"
 )
 
+// main scheduler logic to find stale pvcs, send emails and delete them
+
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -36,10 +38,11 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
 	})
 
+	// iterate through all pvcs in configured namespace(s)
 	for _, pvc := range PvcList(kube, cfg.Namespace) {
 		log.Printf("Found pvc %s from namespace %s", pvc.Name, pvc.Namespace)
 
-		// check if label exists (meaning unattached)
+		// check if label exists (meaning pvc is unattached)
 		// if pvc is attached to a sts, it would've had its label removed by the controller
 
 		timestamp, ok := pvc.Labels[cfg.TimeLabel]
@@ -48,6 +51,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 			continue
 		}
 
+		// check if pvc should be deleted
 		stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 		if staleError != nil {
 			log.Printf("Could not parse time: %s", staleError)
@@ -58,11 +62,9 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 		// stale means grace period has passed, can be deleted
 		if stale {
 			if cfg.DryRun {
-
 				log.Printf("DRY RUN: delete pvc %s", pvc.Name)
 				deleteCount++
 				continue
-
 			}
 
 			err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
@@ -156,6 +158,8 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 	return stale, nil
 }
 
+// checks email times and determines if this pvc's owner should be emailed
+
 func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
 	log.Print("Checking email times....")
 
@@ -166,6 +170,9 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
 
 	log.Printf("Days left until deletion: %d", daysLeft)
+
+	// this logic ensures that emails are eventually sent even if the
+	// scheduler is down and misses a few days
 
 	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
 		log.Printf("Email time: %v", cfg.NotifTimes[currNotif])
