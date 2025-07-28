@@ -148,8 +148,6 @@ func TestInitialScan(t *testing.T) {
 		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
-		ctx := context.Background()
-
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
 			TimeLabel:  "volume-cleaner/unattached-time",
@@ -176,8 +174,6 @@ func TestInitialScan(t *testing.T) {
 
 		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, true)
-
-		ctx.Done()
 
 	})
 }
