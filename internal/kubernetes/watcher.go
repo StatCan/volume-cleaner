@@ -26,6 +26,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 	log.Print("Watching for statefulset events...")
 
+	// create a channel to capture sts events in the cluster
 	events := watcher.ResultChan()
 
 	for {
@@ -46,9 +47,12 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 			}
 
 			switch event.Type {
+
 			case watch.Added:
+				// sts added
 				handleAdded(kube, cfg, sts)
 			case watch.Deleted:
+				// sts deleted
 				handleDeleted(kube, cfg, sts)
 			}
 		}
@@ -56,14 +60,21 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 }
 
+// scan performed on controller startup to find unattached pvcs and assign labels to them
+
 func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Checking for unattached PVCs...")
+
 	for _, pvc := range FindUnattachedPVCs(kube, cfg) {
+
+		// add time stamp label if not found
 		_, ok := pvc.Labels[cfg.TimeLabel]
 		if !ok {
 			log.Printf("adding missing label %s", cfg.TimeLabel)
 			SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), pvc.Namespace, pvc.Name)
 		}
+
+		// add notification count label if not found
 		_, ok = pvc.Labels[cfg.NotifLabel]
 		if !ok {
 			log.Printf("adding missing label %s", cfg.TimeLabel)
@@ -74,6 +85,9 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	log.Print("Initial scan complete")
 }
 
+// triggered on sts creation event
+// will remove labels from all associated pvcs
+
 func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig, sts *appsv1.StatefulSet) {
 	log.Printf("sts added: %s", sts.Name)
 
@@ -82,6 +96,7 @@ func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig,
 			return
 		}
 
+		// get pvc object from name
 		pvcObj, err := kube.CoreV1().PersistentVolumeClaims(sts.Namespace).Get(context.TODO(), vol.PersistentVolumeClaim.ClaimName, metav1.GetOptions{})
 		if err != nil {
 			log.Printf("Error finding PVC object: %s", err)
@@ -97,6 +112,7 @@ func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig,
 			return
 		}
 
+		// remove labels if found
 		_, ok := pvcObj.Labels[cfg.TimeLabel]
 		if ok {
 			log.Printf("removing label %s", cfg.TimeLabel)
@@ -112,6 +128,9 @@ func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig,
 	}
 }
 
+// triggered on sts deletion event
+// will add labels to associated pvcs
+
 func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfig, sts *appsv1.StatefulSet) {
 	log.Printf("sts deleted: %s", sts.Name)
 
@@ -120,7 +139,7 @@ func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfi
 			continue
 		}
 
-		// get object to check storage class
+		// get pvc object to check storage class
 		pvcObj, err := kube.CoreV1().PersistentVolumeClaims(sts.Namespace).Get(context.TODO(), vol.PersistentVolumeClaim.ClaimName, metav1.GetOptions{})
 		if err != nil {
 			log.Printf("Error finding PVC object: %s", err)
