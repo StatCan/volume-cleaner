@@ -133,12 +133,12 @@ jobs:
 
       - name: Test scheduler for pvc1
         run: |
-          echo $(kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc1 from NS anray-liu" -A 3)
-          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc1 from NS anray-liu"; then
+          echo $(kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found PVC pvc1 from NS anray-liu" -A 3)
+          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found PVC pvc1 from NS anray-liu"; then
               echo "Scheduler didn't find pvc1. Test failed."
               exit 2
           else
-              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc1 from NS anray-liu" -A 3 | grep "[INFO] Grace period not passed."; then
+              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found PVC pvc1 from NS anray-liu" -A 3 | grep "Grace period not passed."; then
                   echo "Scheduler didn't skip pvc1. Test failed."
                   exit 2
               else
@@ -148,11 +148,11 @@ jobs:
 
       - name: Test scheduler for pvc2
         run: |
-          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc2 from NS anray-liu"; then
+          if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found PVC pvc2 from NS anray-liu"; then
               echo "Scheduler didn't find pvc2. Test failed."
               exit 2
           else
-              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "[INFO] Found PVC pvc2 from NS anray-liu" -A 1 | grep "[INFO] Label volume-cleaner/unattached-time not found. Skipping."; then
+              if ! kubectl logs -l app=volume-cleaner-scheduler -n das --tail 500 | grep "Found PVC pvc2 from NS anray-liu" -A 1 | grep "Label volume-cleaner/unattached-time not found. Skipping."; then
                   echo "Scheduler didn't skip pvc2. Test failed."
                   exit 2
               else
