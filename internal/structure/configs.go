@@ -9,6 +9,7 @@ NAMESPACE: "anray-liu"
 TIME_LABEL: "volume-cleaner/unattached-time"
 NOTIF_LABEL: "volume-cleaner/notification-count"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
+STORAGE_CLASS: "default"
 
 scheduler:
 
