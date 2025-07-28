@@ -75,6 +75,11 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 	log.Print("Scanning namespaces...")
 
 	for _, namespace := range NsList(kube) {
+		// skip if not in configured namespace
+		if namespace.Name != cfg.Namespace && cfg.Namespace != "" {
+			continue
+		}
+
 		log.Printf("Found namespace: %s", namespace.Name)
 		log.Print("Scanning persistent volume claims...")
 
