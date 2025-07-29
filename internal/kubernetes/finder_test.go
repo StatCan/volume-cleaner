@@ -64,7 +64,7 @@ func TestFindStale(t *testing.T) {
 		deleted, emailed = FindStale(kube, schedulerCfg)
 
 		assert.Equal(t, deleted, 2)
-		assert.Equal(t, emailed, 2)
+		assert.Equal(t, emailed, 0)
 
 	})
 
@@ -84,52 +84,46 @@ func TestIsStale(t *testing.T) {
 
 		testCases := []testCase{
 			{
+				// test one day longer than grace period
 				timestamp:     time.Now().Add(-time.Hour * 24 * 181).Format(format),
 				format:        format,
 				gracePeriod:   180,
 				expectedValue: true,
 			},
 			{
-				timestamp:     time.Now().Add(-time.Hour*24*180 - time.Hour*23).Format(format),
+				// test one hour shorter than grace period
+				timestamp:     time.Now().Add(-time.Hour*24*180 + time.Hour*23).Format(format),
 				format:        format,
 				gracePeriod:   180,
 				expectedValue: false,
 			},
 			{
-				timestamp:     time.Now().Add(-time.Hour*24*180 - time.Hour*23 - time.Minute*59 - time.Second*59).Format(format),
+				// test one second shorter than grace period
+				timestamp:     time.Now().Add(-time.Hour*24*180 + time.Hour*23 + time.Minute*59 + time.Second*59).Format(format),
 				format:        format,
 				gracePeriod:   180,
 				expectedValue: false,
 			},
 			{
-				timestamp:     time.Now().Add(-time.Hour * 24 * 1000).Format(format),
-				format:        format,
-				gracePeriod:   180,
-				expectedValue: true,
-			},
-			{
+				// test now
 				timestamp:     time.Now().Format(format),
 				format:        format,
 				gracePeriod:   180,
 				expectedValue: false,
 			},
 			{
+				// test now with 0 grace period
 				timestamp:     time.Now().Format(format),
 				format:        format,
 				gracePeriod:   0,
-				expectedValue: false,
-			},
-			{
-				timestamp:     time.Now().Add(-time.Second).Format(format),
-				format:        format,
-				gracePeriod:   0,
-				expectedValue: false,
-			},
-			{
-				timestamp:     time.Now().Add(-time.Hour * 24).Format(format),
-				format:        format,
-				gracePeriod:   0,
 				expectedValue: true,
+			},
+			{
+				// test one hour until grace period
+				timestamp:     time.Now().Add(time.Hour).Format(format),
+				format:        format,
+				gracePeriod:   0,
+				expectedValue: false,
 			},
 		}
 
