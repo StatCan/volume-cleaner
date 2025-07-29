@@ -15,6 +15,61 @@ import (
 	testInternal "volume-cleaner/internal/utils"
 )
 
+func TestFindStale(t *testing.T) {
+	t.Run("successful discovery of stale pvcs", func(t *testing.T) {
+		// create fake client
+		kube := testInternal.NewFakeClient()
+
+		labels := map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}
+		if namespaceErr := kube.CreateNamespace(context.TODO(), "test", labels); namespaceErr != nil {
+			t.Fatalf("Error injecting namespace add: %v", namespaceErr)
+		}
+
+		names := []string{"pvc1", "pvc2"}
+
+		// inject fake pvcs
+		for _, name := range names {
+			if _, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), name, "test"); pvcErr != nil {
+				t.Fatalf("Error injecting pvc add: %v", pvcErr)
+			}
+		}
+
+		schedulerCfg := structInternal.SchedulerConfig{
+			Namespace:   "test",
+			TimeLabel:   "volume-cleaner/unattached-time",
+			NotifLabel:  "volume-cleaner/notification-count",
+			GracePeriod: 0,
+			TimeFormat:  "2006-01-02_15-04-05Z",
+			DryRun:      true,
+			NotifTimes:  []int{0},
+		}
+
+		deleted, emailed := FindStale(kube, schedulerCfg)
+
+		// nothing was labelled, so nothing should be deleted
+		assert.Equal(t, deleted, 0)
+		assert.Equal(t, emailed, 0)
+
+		controllerCfg := structInternal.ControllerConfig{
+			Namespace:  "test",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
+			TimeFormat: "2006-01-02_15-04-05Z",
+		}
+
+		InitialScan(kube, controllerCfg)
+
+		time.Sleep(5 * time.Second)
+
+		deleted, emailed = FindStale(kube, schedulerCfg)
+
+		assert.Equal(t, deleted, 2)
+		assert.Equal(t, emailed, 2)
+
+	})
+
+}
+
 func TestIsStale(t *testing.T) {
 
 	t.Run("test successful determination of stale pvcs", func(t *testing.T) {
