@@ -92,6 +92,10 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 				continue
 			}
 
+			if len(cfg.NotifTimes) == 0 {
+				continue
+			}
+
 			shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
 			if mailError != nil {
 				log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
@@ -152,7 +156,7 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 
 	stale := diff > float64(gracePeriod)
 	if !stale {
-		log.Printf("[INFO] Days until deletion: %f", float64(gracePeriod)-diff)
+		log.Printf("[INFO] Time until deletion: %f days", float64(gracePeriod)-diff)
 	}
 
 	return stale, nil
@@ -161,8 +165,6 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 // checks email times and determines if this pvc's owner should be emailed
 
 func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
-	log.Print("[INFO] Checking email times...")
-
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
 		return false, err
@@ -173,9 +175,13 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	// scheduler is down and misses a few days
 	// logic has been triple checked, it's correct
 
-	if currNotif < len(cfg.NotifTimes) && float64(cfg.NotifTimes[currNotif]) >= daysLeft {
-		log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
-		return true, nil
+	if currNotif < len(cfg.NotifTimes) {
+		if float64(cfg.NotifTimes[currNotif]) >= daysLeft {
+			log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
+			return true, nil
+		} else {
+			log.Printf("[INFO] Time until next email: %v days", daysLeft-float64(cfg.NotifTimes[currNotif]))
+		}
 	}
 
 	return false, nil
