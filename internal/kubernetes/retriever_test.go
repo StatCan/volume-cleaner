@@ -147,5 +147,16 @@ func TestFindUnattachedPVCs(t *testing.T) {
 		// no new attachements, expected unattached should still be 1
 		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{})), 1)
 
+		// create new namespace to see if controller will mark PVCs in namespaces outside its configured namespace
+
+		if err := kube.CreateNamespace(context.TODO(), "test2", labels); err != nil {
+			t.Fatalf("Error injecting namespace add: %v", err)
+		}
+		// create unattached pvc for second namespace
+		if _, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), "pvc3", "test2"); pvcErr != nil {
+			t.Fatalf("Error injecting pvc add: %v", pvcErr)
+		}
+
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{Namespace: "test"})), 1)
 	})
 }
