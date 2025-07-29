@@ -174,8 +174,6 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 		return false, err
 	}
 	daysLeft := float64(cfg.GracePeriod) - time.Since(timeObj).Hours()/24
-	log.Println(daysLeft)
-	log.Println(cfg.NotifTimes[0])
 
 	// this logic ensures that emails are eventually sent even if the
 	// scheduler is down and misses a few days
