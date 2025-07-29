@@ -4,7 +4,6 @@ import (
 	// standard packages
 	"context"
 	"log"
-	"math"
 	"net/http"
 	"sort"
 	"strconv"
@@ -157,7 +156,10 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 
 	log.Printf("[INFO] Parsed timestamp: %f days.", diff)
 
-	stale := int(diff) > gracePeriod
+	stale := diff > float64(gracePeriod)
+	if !stale {
+		log.Printf("[INFO] Days until deletion: %f", float64(gracePeriod)-diff)
+	}
 
 	return stale, nil
 }
@@ -171,12 +173,15 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 	if err != nil {
 		return false, err
 	}
-	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
+	daysLeft := float64(cfg.GracePeriod) - time.Since(timeObj).Hours()/24
+	log.Println(daysLeft)
+	log.Println(cfg.NotifTimes[0])
 
 	// this logic ensures that emails are eventually sent even if the
 	// scheduler is down and misses a few days
+	// logic has been triple checked, it's correct
 
-	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
+	if currNotif < len(cfg.NotifTimes) && float64(cfg.NotifTimes[currNotif]) >= daysLeft {
 		log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
 		return true, nil
 	}
