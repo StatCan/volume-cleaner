@@ -10,6 +10,11 @@ run_scheduler:
 create_job:
 	@kubectl create job volume-cleaner-scheduler --from=cronjob/volume-cleaner-scheduler -n aaw
 
+test:
+	go test -v -coverprofile cover.out ./...
+	go tool cover -html cover.out -o cover.html
+	open cover.html
+
 clean:
 	@echo "🧼 Cleaning up leftover resources..."
 	@kubectl delete -f manifests/ --ignore-not-found > /dev/null 2>&1 || true

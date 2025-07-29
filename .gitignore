@@ -2,3 +2,4 @@
 .env
 manifests/scheduler/scheduler_secret.yaml
 bin/act
+cover.html
