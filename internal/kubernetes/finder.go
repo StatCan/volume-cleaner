@@ -25,7 +25,7 @@ import (
 
 // main scheduler logic to find stale pvcs, send emails and delete them
 
-func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
+func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (int, int) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
 
@@ -136,6 +136,8 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	log.Printf("Job errors %d", errCount)
 	log.Printf("Emails sent: %d", emailCount)
 	log.Printf("Pvcs deleted: %d", deleteCount)
+
+	return deleteCount, emailCount
 }
 
 // determines if the grace period is greater than a given timestamp
