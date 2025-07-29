@@ -3,7 +3,6 @@ package kubernetes
 import (
 	// standard packages
 	"context"
-	"sort"
 	"testing"
 	"time"
 
@@ -41,7 +40,7 @@ func TestFindStale(t *testing.T) {
 			GracePeriod: 0,
 			TimeFormat:  "2006-01-02_15-04-05Z",
 			DryRun:      true,
-			NotifTimes:  []int{0},
+			NotifTimes:  []int{10},
 		}
 
 		deleted, emailed := FindStale(kube, schedulerCfg)
@@ -65,6 +64,13 @@ func TestFindStale(t *testing.T) {
 
 		assert.Equal(t, deleted, 2)
 		assert.Equal(t, emailed, 0)
+
+		schedulerCfg.GracePeriod = 5
+
+		deleted, emailed = FindStale(kube, schedulerCfg)
+
+		assert.Equal(t, deleted, 0)
+		assert.Equal(t, emailed, 2)
 
 	})
 
@@ -156,7 +162,7 @@ func TestShouldSendMail(t *testing.T) {
 			GracePeriod: 180,
 			TimeFormat:  "2006-01-02_15-04-05Z",
 			DryRun:      true,
-			NotifTimes:  []int{1, 2, 3, 30},
+			NotifTimes:  []int{30, 3, 2, 1},
 			EmailCfg: structInternal.EmailConfig{
 				BaseURL:         "https://api.notification.canada.ca",
 				Endpoint:        "/v2/notifications/email",
@@ -164,10 +170,6 @@ func TestShouldSendMail(t *testing.T) {
 				APIKey:          "Random APIKEY",
 			},
 		}
-
-		sort.Slice(cfg.NotifTimes, func(i, j int) bool {
-			return cfg.NotifTimes[i] > cfg.NotifTimes[j] // Descending
-		})
 
 		type testCase struct {
 			timestamp     string
