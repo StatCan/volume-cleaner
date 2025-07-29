@@ -5,7 +5,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"sort"
 	"strconv"
 	"time"
 
@@ -31,11 +30,6 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 	errCount := 0
 	deleteCount := 0
 	emailCount := 0
-
-	// Sort in descending order
-	sort.Slice(cfg.NotifTimes, func(i, j int) bool {
-		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
-	})
 
 	log.Print("[INFO] Scanning for stale PVCS...")
 

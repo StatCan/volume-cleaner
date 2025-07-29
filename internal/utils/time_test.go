@@ -23,27 +23,27 @@ func TestParseNotifTimes(t *testing.T) {
 		{
 			name:     "multiple digits with space",
 			input:    "1, 2",
-			expected: []int{1, 2},
+			expected: []int{2, 1},
 		},
 		{
 			name:     "multiple digits without space",
 			input:    "1,2",
-			expected: []int{1, 2},
+			expected: []int{2, 1},
 		},
 		{
 			name:     "multiple digits",
 			input:    "1,2,3",
-			expected: []int{1, 2, 3},
+			expected: []int{3, 2, 1},
 		},
 		{
 			name:     "multiple digits with varied spacing",
 			input:    "	1,      2   , 3 ",
-			expected: []int{1, 2, 3},
+			expected: []int{3, 2, 1},
 		},
 		{
 			name:     "unsorted digits, should be sorted",
 			input:    "3, 2, 1",
-			expected: []int{1, 2, 3},
+			expected: []int{3, 2, 1},
 		},
 		{
 			name:     "empty string",
