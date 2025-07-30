@@ -121,8 +121,7 @@ jobs:
           run: docker pull ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Tag image
-          run: docker tag ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest \
-               ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
+          run: docker tag ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Login to ACR
           if: ${{ !env.ACT }}
