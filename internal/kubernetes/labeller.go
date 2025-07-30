@@ -24,11 +24,11 @@ func patchPvcLabel(kube kubernetes.Interface, label string, value string, ns str
 		metav1.PatchOptions{},
 	)
 	if err != nil {
-		log.Printf("[ERROR] Failed to patch PVC %s from NS %s: %s", pvc, ns, err)
+		log.Printf("Error patching PVC %s from namespace %s: %s", pvc, ns, err)
 		return
 	}
 
-	log.Printf("[INFO] Patch successfully applied to PVC %s from NS %s", pvc, ns)
+	log.Printf("Patch successfully applied to PVC %s from NS %s", pvc, ns)
 }
 
 // setting label will add it if doesn't exist

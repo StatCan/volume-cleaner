@@ -25,7 +25,7 @@ func main() {
 		new line character if it's not present
 	*/
 
-	log.Print("[INFO] Volume cleaner controller started.")
+	log.Print("Volume cleaner controller started.")
 
 	// controller config
 	// there is also a config for the scheduler
@@ -44,7 +44,7 @@ func main() {
 	if err != nil {
 		// log.Fatalf will automatically call os.Exit
 
-		log.Fatalf("[ERROR] Failed to create kube client: %s", err)
+		log.Fatalf("Error creating kube client: %s", err)
 	}
 
 	// scans pvcs to find already unattached pvcs

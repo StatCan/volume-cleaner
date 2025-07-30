@@ -27,7 +27,7 @@ func ParseNotifTimes(str string) []int {
 	for _, val := range parsedString {
 		converted, err := strconv.Atoi(val)
 		if err != nil {
-			log.Fatalf("[ERROR] Failed to parse notification time: %s", err)
+			log.Fatalf("Error parsing notification time: %s", err)
 		}
 		intSlice = append(intSlice, converted)
 	}
@@ -44,9 +44,9 @@ func ParseGracePeriod(value string) int {
 
 	days, err := strconv.Atoi(value)
 	if err != nil {
-		log.Fatalf("[ERROR] Failed to parse grace period value: %s", err)
+		log.Fatalf("Error parsing grace period value: %s", err)
 	} else if days < 1 {
-		log.Fatal("[ERROR] For safety reasons, grace period cannot be lower than one day.")
+		log.Fatal("For safety reasons, grace period cannot be lower than one day.")
 	}
 	return days
 }

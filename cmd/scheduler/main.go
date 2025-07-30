@@ -14,7 +14,7 @@ import (
 // temporary comment to trigger build, please remove
 
 func main() {
-	log.Print("[INFO] Volume cleaner scheduler started.")
+	log.Print("Volume cleaner scheduler started.")
 
 	// Initialize an EmailConfig struct
 	emailCfg := structInternal.EmailConfig{
@@ -40,7 +40,7 @@ func main() {
 	// init client to interact with k8s cluster
 	kubeClient, err := kubeInternal.InitKubeClient()
 	if err != nil {
-		log.Fatalf("[ERROR] Failed to create kube client: %s", err)
+		log.Fatalf("Error creating kube client: %s", err)
 	}
 
 	// run main scheduler logic

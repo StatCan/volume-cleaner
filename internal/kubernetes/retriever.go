@@ -23,7 +23,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 	})
 	if err != nil {
 		// nothing can be done without namespaces so crash the program
-		log.Fatalf("[ERROR] Failed to list namespaces: %s", err)
+		log.Fatalf("Error listing namespaces: %s", err)
 	}
 	if ns == nil {
 		return make([]corev1.Namespace, 0)
@@ -37,7 +37,7 @@ func NsList(kube kubernetes.Interface) []corev1.Namespace {
 func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeClaim {
 	pvcs, err := kube.CoreV1().PersistentVolumeClaims(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Printf("[ERROR] Failed to list volume claims: %s", err)
+		log.Printf("Error listing volume claims: %s", err)
 	}
 	if pvcs == nil {
 		return make([]corev1.PersistentVolumeClaim, 0)
@@ -50,7 +50,7 @@ func PvcList(kube kubernetes.Interface, name string) []corev1.PersistentVolumeCl
 func StsList(kube kubernetes.Interface, name string) []appv1.StatefulSet {
 	sts, err := kube.AppsV1().StatefulSets(name).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		log.Printf("[ERROR] Failed to list stateful sets: %s", err)
+		log.Printf("Error listing stateful sets: %s", err)
 	}
 	if sts == nil {
 		return make([]appv1.StatefulSet, 0)
@@ -72,7 +72,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 	// list of pvc objects to be concated with the pvcs of each namespace
 	fullList := make([]corev1.PersistentVolumeClaim, 0)
 
-	log.Print("[INFO] Scanning namespaces...")
+	log.Print("Scanning namespaces...")
 
 	for _, namespace := range NsList(kube) {
 		// skip if not in configured namespace
@@ -80,8 +80,8 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			continue
 		}
 
-		log.Printf("[INFO] Found namespace: %s", namespace.Name)
-		log.Print("[INFO] Scanning persistent volume claims...")
+		log.Printf("Found namespace: %s", namespace.Name)
+		log.Print("Scanning persistent volume claims...")
 
 		allPVCs := structInternal.NewSet()
 		attachedPVCs := structInternal.NewSet()
@@ -89,9 +89,6 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 		// on first pass, add all pvcs to a set
 
 		for _, claim := range PvcList(kube, namespace.Name) {
-			// claim.Spec.VolumeName will be an empty string if not bound
-			log.Printf("[INFO] Found PVC: %s, PV: %s", claim.Name, claim.Spec.VolumeName)
-
 			// skip if storage class doesn't match config
 			if claim.Spec.StorageClassName == nil {
 				if cfg.StorageClass != "" {
@@ -104,16 +101,19 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			// azure disk will have the same name as the volume
 			// e.g pvc-11cabba3-59ba-4671-8561-b871e2657fa6
 
+			// claim.Spec.VolumeName will be an empty string if not bound
+			log.Printf("PVC: %s, PV: %s", claim.Name, claim.Spec.VolumeName)
+
 			allPVCs.Add(claim.Name)
 			pvcObjects[claim.Name] = claim
 		}
 
-		log.Print("[INFO] Scanning stateful sets...")
+		log.Print("Scanning stateful sets...")
 
 		// on second pass, add all pvcs attached to sts to a set
 
 		for _, statefulset := range StsList(kube, namespace.Name) {
-			log.Printf("[INFO] Found stateful set: %s", statefulset.Name)
+			log.Printf("Found stateful set: %s", statefulset.Name)
 
 			// Spec.Volumes will find all the attached PVCs, not PVs
 
@@ -123,7 +123,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 				}
 				claim := volumes.PersistentVolumeClaim.ClaimName
 
-				log.Printf("[INFO] Found attached PVC: %s", claim)
+				log.Printf("pvc attached to sts: %s", claim)
 
 				attachedPVCs.Add(claim)
 			}
@@ -142,8 +142,8 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			fullList = append(fullList, pvcObjects[pvc])
 		}
 
-		log.Printf("[INFO] Found %d total PVCs.", allPVCs.Length())
-		log.Printf("[INFO] Found %d unattached PVCs.", unattachedPVCs.Length())
+		log.Printf("Found %d total volume claims.", allPVCs.Length())
+		log.Printf("Found %d unattached volume claims.", unattachedPVCs.Length())
 
 	}
 
