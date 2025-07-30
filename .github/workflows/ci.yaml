@@ -4,7 +4,7 @@ name: CI Pipeline
 on: [push, pull_request]
 
 env:
-  REGISTRY: docker.io
+  DOCKER_HUB: docker.io
   ACR_SERVER: k8scc01covidacr.azurecr.io
 
 jobs:
@@ -103,7 +103,7 @@ jobs:
           if: ${{ !env.ACT }}
           uses: docker/login-action@v3
           with:
-            registry: ${{ env.REGISTRY }}
+            registry: ${{ env.DOCKER_HUB }}
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -112,16 +112,16 @@ jobs:
           with:
             context: .
             file: ./docker/${{ matrix.image }}/Dockerfile
-            tags: ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+            tags: ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
             push: ${{ env.ACT && 'false' || 'true' }}
 
         # push to ACR
 
         - name: Pull image
-          run: docker pull ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+          run: docker pull ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Tag image
-          run: docker tag ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
+          run: docker tag ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Login to ACR
           if: ${{ !env.ACT }}
