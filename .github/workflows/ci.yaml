@@ -107,14 +107,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and Push Image ${{ matrix.image }} to Docker Hub
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./docker/${{ matrix.image }}/Dockerfile
-          tags: ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
-          push: ${{ env.ACT && 'false' || 'true' }}
-
       - name: Login to ACR
         if: ${{ !env.ACT }}
         uses: azure/docker-login@v1
@@ -123,12 +115,14 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and Push Image ${{ matrix.image }} to ACR
+      - name: Build and Push Image ${{ matrix.image }}
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./docker/${{ matrix.image }}/Dockerfile
-          tags: ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
+          tags: |
+            ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+            ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
           push: ${{ env.ACT && 'false' || 'true' }}
 
   # Calling Reusable Workflows for Trivy Docker Image Scans
