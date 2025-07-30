@@ -179,9 +179,8 @@ func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.Schedule
 		if float64(cfg.NotifTimes[currNotif]) >= daysLeft {
 			log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
 			return true, nil
-		} else {
-			log.Printf("[INFO] Time until next email: %v days", daysLeft-float64(cfg.NotifTimes[currNotif]))
 		}
+		log.Printf("[INFO] Time until next email: %v days", daysLeft-float64(cfg.NotifTimes[currNotif]))
 	}
 
 	return false, nil
