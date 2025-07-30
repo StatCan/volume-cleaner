@@ -122,7 +122,6 @@ jobs:
             file: ./docker/${{ matrix.image }}/Dockerfile
             tags: |
               ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
-              ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
             push: ${{ env.ACT && 'false' || 'true' }}
 
   # Calling Reusable Workflows for Trivy Docker Image Scans
