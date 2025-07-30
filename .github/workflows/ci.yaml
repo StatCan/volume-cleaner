@@ -5,7 +5,6 @@ on: [push, pull_request]
 
 env:
   REGISTRY: docker.io
-  ACR_SERVER: k8scc01covidacr.azurecr.io
 
 jobs:
   lint:
@@ -107,7 +106,7 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and Push Image ${{ matrix.image }} to Docker Hub
+      - name: Build and Push Image ${{ matrix.image }}
         uses: docker/build-push-action@v5
         with:
           context: .
