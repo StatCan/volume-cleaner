@@ -107,22 +107,33 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
-        # - name: Login to ACR
-        #   if: ${{ !env.ACT }}
-        #   uses: azure/docker-login@v1
-        #   with:
-        #     login-server: ${{ env.ACR_SERVER }}
-        #     username: ${{ secrets.ACR_USERNAME }}
-        #     password: ${{ secrets.ACR_PASSWORD }}
-
         - name: Build and Push Image ${{ matrix.image }}
           uses: docker/build-push-action@v5
           with:
             context: .
             file: ./docker/${{ matrix.image }}/Dockerfile
-            tags: |
-              ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+            tags: ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
             push: ${{ env.ACT && 'false' || 'true' }}
+
+        # push to ACR
+
+        - name: Pull image
+          run: docker pull ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+
+        - name: Tag image
+          run: docker tag ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest \
+               ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
+
+        - name: Login to ACR
+          if: ${{ !env.ACT }}
+          uses: azure/docker-login@v1
+          with:
+            login-server: ${{ env.ACR_SERVER }}
+            username: ${{ secrets.ACR_USERNAME }}
+            password: ${{ secrets.ACR_PASSWORD }}
+
+        - name: Push image to ACR
+          run: docker push ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
 
   # Calling Reusable Workflows for Trivy Docker Image Scans
   call-trivy-scan:
