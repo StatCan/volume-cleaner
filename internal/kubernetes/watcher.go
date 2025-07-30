@@ -85,6 +85,25 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 	log.Print("[INFO] Initial scan complete.")
 }
 
+// scans all pvcs and removes all volume-cleaner related labels
+func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
+	log.Print("Resetting labels...")
+
+	for _, namespace := range NsList(kube) {
+		for _, pvc := range PvcList(kube, namespace.Name) {
+			_, ok := pvc.Labels[cfg.TimeLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.TimeLabel, namespace.Name, pvc.Name)
+			}
+			_, ok = pvc.Labels[cfg.NotifLabel]
+			if ok {
+				RemovePvcLabel(kube, cfg.NotifLabel, namespace.Name, pvc.Name)
+			}
+
+		}
+	}
+}
+
 // triggered on sts creation event
 // will remove labels from all associated pvcs
 

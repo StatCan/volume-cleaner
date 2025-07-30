@@ -33,6 +33,7 @@ type ControllerConfig struct {
 	NotifLabel   string
 	TimeFormat   string
 	StorageClass string
+	ResetRun     bool
 }
 
 type SchedulerConfig struct {

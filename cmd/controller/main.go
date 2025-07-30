@@ -34,6 +34,7 @@ func main() {
 		NotifLabel:   os.Getenv("NOTIF_LABEL"),
 		TimeFormat:   os.Getenv("TIME_FORMAT"),
 		StorageClass: os.Getenv("STORAGE_CLASS"),
+		ResetRun:     os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
 	}
 
 	// init client to interact with k8s cluster
@@ -45,7 +46,12 @@ func main() {
 		log.Fatalf("[ERROR] Failed to create kube client: %s", err)
 	}
 
-	// scans pvcs to find already unattached pvcs
+	if cfg.ResetRun {
+		kubeInternal.ResetLabels(kubeClient, cfg)
+	}
+
+	// scans pvcs to find already unattached ones
+
 	kubeInternal.InitialScan(kubeClient, cfg)
 
 	// watches stateful sets to discover newly unattached pvcs

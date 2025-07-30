@@ -148,8 +148,6 @@ func TestInitialScan(t *testing.T) {
 		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, false)
 
-		ctx := context.Background()
-
 		cfg := structInternal.ControllerConfig{
 			Namespace:  "test",
 			TimeLabel:  "volume-cleaner/unattached-time",
@@ -177,7 +175,72 @@ func TestInitialScan(t *testing.T) {
 		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, true)
 
-		ctx.Done()
+	})
+}
+
+func TestResetLabels(t *testing.T) {
+
+	t.Run("successful resetting of labels on controller startup", func(t *testing.T) {
+		// create fake client
+		kube := testInternal.NewFakeClient()
+
+		labels := map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}
+		if namespaceErr := kube.CreateNamespace(context.TODO(), "test", labels); namespaceErr != nil {
+			t.Fatalf("Error injecting namespace add: %v", namespaceErr)
+		}
+
+		names := []string{"pvc1", "pvc2"}
+
+		// inject fake pvcs
+		for _, name := range names {
+			if _, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), name, "test"); pvcErr != nil {
+				t.Fatalf("Error injecting pvc add: %v", pvcErr)
+			}
+		}
+
+		cfg := structInternal.ControllerConfig{
+			Namespace:  "test",
+			TimeLabel:  "volume-cleaner/unattached-time",
+			NotifLabel: "volume-cleaner/notification-count",
+			TimeFormat: "2006-01-02_15-04-05Z",
+		}
+
+		InitialScan(kube, cfg)
+
+		// pvcs should be labelled
+		pvcs := PvcList(kube, "test")
+
+		_, ok := pvcs[0].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, true)
+
+		ResetLabels(kube, cfg)
+
+		time.Sleep(2 * time.Second)
+
+		// should have all labels removed
+
+		pvcs = PvcList(kube, "test")
+
+		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
 
 	})
 }
