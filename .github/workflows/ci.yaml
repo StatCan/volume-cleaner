@@ -107,13 +107,13 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      # - name: Login to ACR
-      #   if: ${{ !env.ACT }}
-      #   uses: azure/docker-login@v1
-      #   with:
-      #     acr-server: ${{ env.ACR_SERVER }}
-      #     username: ${{ secrets.ACR_USERNAME }}
-      #     password: ${{ secrets.ACR_PASSWORD }}
+      - name: Login to ACR
+        if: ${{ !env.ACT }}
+        uses: azure/docker-login@v1
+        with:
+          acr-server: ${{ env.ACR_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and Push Image ${{ matrix.image }}
         uses: docker/build-push-action@v5
