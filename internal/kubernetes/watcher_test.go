@@ -244,3 +244,96 @@ func TestResetLabels(t *testing.T) {
 
 	})
 }
+
+func TestIgnoreStorageClass(t *testing.T) {
+	getPtr := func(str string) *string {
+		variable := str
+		return &variable
+	}
+	tests := []struct {
+		name         string
+		input        *string
+		storageClass []string
+		expected     bool
+	}{
+		{
+			name:         "single value",
+			input:        getPtr("standard"),
+			storageClass: []string{"standard"},
+			expected:     false,
+		},
+		{
+			name:         "two values",
+			input:        getPtr("standard"),
+			storageClass: []string{"standard", "default"},
+			expected:     false,
+		},
+		{
+			name:         "accept all",
+			input:        getPtr("standard"),
+			storageClass: []string{},
+			expected:     false,
+		},
+		{
+			name:         "accept all",
+			input:        nil,
+			storageClass: []string{},
+			expected:     false,
+		},
+		{
+			name:         "accept all",
+			input:        getPtr("default"),
+			storageClass: []string{},
+			expected:     false,
+		},
+		{
+			name:         "reject single value",
+			input:        getPtr("standard"),
+			storageClass: []string{"default"},
+			expected:     true,
+		},
+		{
+			name:         "reject two value",
+			input:        getPtr("test"),
+			storageClass: []string{"standard", "default"},
+			expected:     true,
+		},
+		{
+			name:         "empty value",
+			input:        getPtr(""),
+			storageClass: []string{""},
+			expected:     false,
+		},
+		{
+			name:         "accept nil value",
+			input:        nil,
+			storageClass: []string{""},
+			expected:     false,
+		},
+		{
+			name:         "accept nil value",
+			input:        nil,
+			storageClass: []string{"default", "standard", ""},
+			expected:     false,
+		},
+		{
+			name:         "reject nil value",
+			input:        nil,
+			storageClass: []string{"default"},
+			expected:     true,
+		},
+		{
+			name:         "reject nil value",
+			input:        nil,
+			storageClass: []string{" "},
+			expected:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := IgnoreStorageClass(tt.input, tt.storageClass)
+			assert.Equal(t, tt.expected, actual, "for input: %q", tt.input)
+		})
+	}
+}
