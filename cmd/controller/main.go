@@ -9,6 +9,7 @@ import (
 	// internal Packages
 	kubeInternal "volume-cleaner/internal/kubernetes"
 	structInternal "volume-cleaner/internal/structure"
+	utilsInternal "volume-cleaner/internal/utils"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 		TimeLabel:    os.Getenv("TIME_LABEL"),
 		NotifLabel:   os.Getenv("NOTIF_LABEL"),
 		TimeFormat:   os.Getenv("TIME_FORMAT"),
-		StorageClass: os.Getenv("STORAGE_CLASS"),
+		StorageClass: utilsInternal.ParseStrList(os.Getenv("STORAGE_CLASS")),
 		ResetRun:     os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
 	}
 
