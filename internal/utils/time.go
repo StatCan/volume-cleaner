@@ -32,7 +32,7 @@ func ParseNotifTimes(str string) []int {
 		intSlice = append(intSlice, converted)
 	}
 
-	sort.Ints(intSlice)
+	sort.Sort(sort.Reverse(sort.IntSlice(intSlice)))
 
 	return intSlice
 }

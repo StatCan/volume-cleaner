@@ -4,9 +4,7 @@ import (
 	// standard packages
 	"context"
 	"log"
-	"math"
 	"net/http"
-	"sort"
 	"strconv"
 	"time"
 
@@ -25,19 +23,13 @@ import (
 
 // main scheduler logic to find stale pvcs, send emails and delete them
 
-func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
-
+func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (int, int) {
 	// One http client is created for emailing users
 	client := &http.Client{Timeout: 10 * time.Second}
 
 	errCount := 0
 	deleteCount := 0
 	emailCount := 0
-
-	// Sort in descending order
-	sort.Slice(cfg.NotifTimes, func(i, j int) bool {
-		return cfg.NotifTimes[i] > cfg.NotifTimes[j]
-	})
 
 	log.Print("[INFO] Scanning for stale PVCS...")
 
@@ -100,6 +92,10 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 				continue
 			}
 
+			if len(cfg.NotifTimes) == 0 {
+				continue
+			}
+
 			shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
 			if mailError != nil {
 				log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
@@ -140,6 +136,9 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) {
 	log.Printf("[INFO] Job errors: %d", errCount)
 	log.Printf("[INFO] Emails sent: %d", emailCount)
 	log.Printf("[INFO] Pvcs deleted: %d", deleteCount)
+
+	return deleteCount, emailCount
+
 }
 
 // determines if the grace period is greater than a given timestamp
@@ -155,7 +154,10 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 
 	log.Printf("[INFO] Parsed timestamp: %f days.", diff)
 
-	stale := int(diff) > gracePeriod
+	stale := diff > float64(gracePeriod)
+	if !stale {
+		log.Printf("[INFO] Time until deletion: %f days", float64(gracePeriod)-diff)
+	}
 
 	return stale, nil
 }
@@ -163,20 +165,22 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 // checks email times and determines if this pvc's owner should be emailed
 
 func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
-	log.Print("[INFO] Checking email times...")
-
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
 		return false, err
 	}
-	daysLeft := cfg.GracePeriod - int(math.Floor(time.Since(timeObj).Hours()/24))
+	daysLeft := float64(cfg.GracePeriod) - time.Since(timeObj).Hours()/24
 
 	// this logic ensures that emails are eventually sent even if the
 	// scheduler is down and misses a few days
+	// logic has been triple checked, it's correct
 
-	if currNotif < len(cfg.NotifTimes) && cfg.NotifTimes[currNotif] >= daysLeft {
-		log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
-		return true, nil
+	if currNotif < len(cfg.NotifTimes) {
+		if float64(cfg.NotifTimes[currNotif]) >= daysLeft {
+			log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
+			return true, nil
+		}
+		log.Printf("[INFO] Time until next email: %v days", daysLeft-float64(cfg.NotifTimes[currNotif]))
 	}
 
 	return false, nil

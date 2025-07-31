@@ -63,6 +63,7 @@ func TestWatcherLabelling(t *testing.T) {
 		assert.Equal(t, ok, false)
 
 		// mock a stateful set attached to a pvc1
+
 		if stsErr := kube.CreateStatefulSetWithPvc(context.TODO(), "sts1", "test", "pvc1"); stsErr != nil {
 			t.Fatalf("Error injecting sts add: %v", stsErr)
 		}
@@ -101,6 +102,27 @@ func TestWatcherLabelling(t *testing.T) {
 
 		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
 		assert.Equal(t, ok, true)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[1].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
+
+		// add back sts1
+		if stsErr := kube.CreateStatefulSetWithPvc(context.TODO(), "sts1", "test", "pvc1"); stsErr != nil {
+			t.Fatalf("Error injecting sts add: %v", stsErr)
+		}
+
+		time.Sleep(2 * time.Second)
+
+		pvcs = PvcList(kube, "test")
+
+		_, ok = pvcs[0].Labels["volume-cleaner/unattached-time"]
+		assert.Equal(t, ok, false)
+
+		_, ok = pvcs[0].Labels["volume-cleaner/notification-count"]
+		assert.Equal(t, ok, false)
 
 		_, ok = pvcs[1].Labels["volume-cleaner/unattached-time"]
 		assert.Equal(t, ok, false)
