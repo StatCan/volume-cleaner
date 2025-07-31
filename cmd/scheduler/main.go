@@ -26,6 +26,7 @@ func main() {
 	// there is also a config for the controller
 	cfg := structInternal.SchedulerConfig{
 		Namespace:   os.Getenv("NAMESPACE"),
+		NsLabel:     os.Getenv("NS_LABEL"),
 		TimeLabel:   os.Getenv("TIME_LABEL"),
 		NotifLabel:  os.Getenv("NOTIF_LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),

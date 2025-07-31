@@ -6,6 +6,7 @@ metadata:
   namespace: das
 data:
   NAMESPACE: "anray-liu"
+  NS_LABEL: "app.kubernetes.io/part-of=kubeflow-profile"
   TIME_LABEL: "volume-cleaner/unattached-time"
   NOTIF_LABEL: "volume-cleaner/notification-count"
   TIME_FORMAT: "2006-01-02_15-04-05Z"
