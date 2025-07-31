@@ -4,6 +4,7 @@ import (
 	// standard packages
 	"context"
 	"log"
+	"slices"
 	"time"
 
 	// external packages
@@ -123,12 +124,8 @@ func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig,
 		}
 		log.Printf("[INFO] Found PVC object %s", pvcObj.Name)
 
-		// ignore if incorrect storage class
-		if pvcObj.Spec.StorageClassName == nil {
-			if cfg.StorageClass != "" {
-				continue
-			}
-		} else if *pvcObj.Spec.StorageClassName != cfg.StorageClass {
+		// ignore if storage class not in config
+		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClass) {
 			continue
 		}
 
@@ -168,12 +165,8 @@ func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfi
 
 		log.Printf("[INFO] Found PVC object %s", pvcObj.Name)
 
-		// ignore if incorrect storage class
-		if pvcObj.Spec.StorageClassName == nil {
-			if cfg.StorageClass != "" {
-				continue
-			}
-		} else if *pvcObj.Spec.StorageClassName != cfg.StorageClass {
+		// ignore if storage class not in config
+		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClass) {
 			continue
 		}
 
@@ -181,4 +174,14 @@ func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfi
 		SetPvcLabel(kube, cfg.TimeLabel, time.Now().Format(cfg.TimeFormat), sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 		SetPvcLabel(kube, cfg.NotifLabel, "0", sts.Namespace, vol.PersistentVolumeClaim.ClaimName)
 	}
+}
+
+func IgnoreStorageClass(name *string, storageClasses []string) bool {
+	if len(storageClasses) == 0 {
+		return false
+	}
+	if name == nil {
+		return !slices.Contains(storageClasses, "")
+	}
+	return !slices.Contains(storageClasses, *name)
 }

@@ -152,11 +152,36 @@ func TestFindUnattachedPVCs(t *testing.T) {
 		if err := kube.CreateNamespace(context.TODO(), "test2", labels); err != nil {
 			t.Fatalf("Error injecting namespace add: %v", err)
 		}
+
 		// create unattached pvc for second namespace
 		if _, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), "pvc3", "test2"); pvcErr != nil {
 			t.Fatalf("Error injecting pvc add: %v", pvcErr)
 		}
 
 		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{Namespace: "test"})), 1)
+	})
+}
+
+func TestStorageClassFilter(t *testing.T) {
+
+	t.Run("successfully skip unconfigured storage", func(t *testing.T) {
+		// create fake client
+		kube := testInternal.NewFakeClient()
+
+		labels := map[string]string{"app.kubernetes.io/part-of": "kubeflow-profile"}
+		if namespaceErr := kube.CreateNamespace(context.TODO(), "test", labels); namespaceErr != nil {
+			t.Fatalf("Error injecting namespace add: %v", namespaceErr)
+		}
+
+		names := []string{"pvc1", "pvc2"}
+
+		// inject fake pvcs
+		for _, name := range names {
+			if _, pvcErr := kube.CreatePersistentVolumeClaim(context.TODO(), name, "test"); pvcErr != nil {
+				t.Fatalf("Error injecting pvc add: %v", pvcErr)
+			}
+		}
+
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{StorageClass: []string{"non-existent-storage-class"}})), 0)
 	})
 }
