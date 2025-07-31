@@ -19,7 +19,9 @@ import (
 // Watches for when statefulsets are created or deleted
 
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
-	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{})
+	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{
+		LabelSelector: cfg.NsLabel,
+	})
 	if err != nil {
 		log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
 	}
@@ -89,7 +91,12 @@ func InitialScan(kube kubernetes.Interface, cfg structInternal.ControllerConfig)
 func ResetLabels(kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
 	log.Print("Resetting labels...")
 
-	for _, namespace := range NsList(kube) {
+	for _, namespace := range NsList(kube, cfg.NsLabel) {
+		// skip if not in configured namespace
+		if namespace.Name != cfg.Namespace && cfg.Namespace != "" {
+			continue
+		}
+
 		for _, pvc := range PvcList(kube, namespace.Name) {
 			_, ok := pvc.Labels[cfg.TimeLabel]
 			if ok {
