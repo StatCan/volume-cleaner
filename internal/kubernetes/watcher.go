@@ -182,7 +182,6 @@ func IgnoreStorageClass(name *string, storageClasses []string) bool {
 	}
 	if name == nil {
 		return !slices.Contains(storageClasses, "")
-	} else {
-		return !slices.Contains(storageClasses, *name)
 	}
+	return !slices.Contains(storageClasses, *name)
 }
