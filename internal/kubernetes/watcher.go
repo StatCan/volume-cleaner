@@ -19,47 +19,54 @@ import (
 // Watches for when statefulsets are created or deleted
 
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
-	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{
-		LabelSelector: cfg.NsLabel,
-	})
-	if err != nil {
-		log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
-	}
-
-	log.Print("[INFO] Watching for statefulset events...")
-
-	// create a channel to capture sts events in the cluster
-	events := watcher.ResultChan()
-
-	for {
-		select {
-
-		// context used to kill loop
-		// used during unit tests
-		case <-ctx.Done():
-			return
-
-		// sts was added or deleted
-		case event := <-events:
-			sts, ok := event.Object.(*appsv1.StatefulSet)
-
-			// Skip this event if it can't be parsed into a sts
-			if !ok {
-				continue
-			}
-
-			switch event.Type {
-
-			case watch.Added:
-				// sts added
-				handleAdded(kube, cfg, sts)
-			case watch.Deleted:
-				// sts deleted
-				handleDeleted(kube, cfg, sts)
-			}
+	// iterate through all pvcs in configured namespace(s)
+	for _, ns := range NsList(kube, cfg.NsLabel) {
+		// skip if not in configured namespace
+		if ns.Name != cfg.Namespace && cfg.Namespace != "" {
+			continue
 		}
-	}
 
+		go func() {
+			watcher, err := kube.AppsV1().StatefulSets(ns.Name).Watch(ctx, metav1.ListOptions{})
+			if err != nil {
+				log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
+			}
+
+			log.Print("[INFO] Watching for statefulset events...")
+
+			// create a channel to capture sts events in the cluster
+			events := watcher.ResultChan()
+
+			for {
+				select {
+
+				// context used to kill loop
+				// used during unit tests
+				case <-ctx.Done():
+					return
+
+				// sts was added or deleted
+				case event := <-events:
+					sts, ok := event.Object.(*appsv1.StatefulSet)
+
+					// Skip this event if it can't be parsed into a sts
+					if !ok {
+						continue
+					}
+
+					switch event.Type {
+
+					case watch.Added:
+						// sts added
+						handleAdded(kube, cfg, sts)
+					case watch.Deleted:
+						// sts deleted
+						handleDeleted(kube, cfg, sts)
+					}
+				}
+			}
+		}()
+	}
 }
 
 // scan performed on controller startup to find unattached pvcs and assign labels to them
