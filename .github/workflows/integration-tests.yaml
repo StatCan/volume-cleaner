@@ -43,6 +43,10 @@ jobs:
             -f manifests/serviceaccount.yaml \
             -f manifests/netpol.yaml
 
+      - name: Label namespace
+        run: |
+          kubectl label namespace das app.kubernetes.io/part-of=kubeflow-profile
+
       - name: Apply configs
         run: |
           kubectl apply -f manifests/controller/controller_config.yaml \
