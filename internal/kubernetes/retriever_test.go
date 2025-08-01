@@ -31,7 +31,7 @@ func TestNsList(t *testing.T) {
 			}
 		}
 
-		list := NsList(kube)
+		list := NsList(kube, "app.kubernetes.io/part-of=kubeflow-profile")
 
 		// check right length
 		assert.Equal(t, len(list), len(names))

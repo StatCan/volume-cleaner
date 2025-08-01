@@ -15,7 +15,7 @@ func ParseNotifTimes(str string) []int {
 	var intSlice []int
 
 	if str == "" {
-		return []int{}
+		return make([]int, 0)
 	}
 
 	// use fields() and join() to get rid of all whitespace

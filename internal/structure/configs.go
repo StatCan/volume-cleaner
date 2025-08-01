@@ -29,6 +29,7 @@ API_KEY: "Random APIKEY",
 
 type ControllerConfig struct {
 	Namespace    string
+	NsLabel      string
 	TimeLabel    string
 	NotifLabel   string
 	TimeFormat   string
@@ -38,6 +39,7 @@ type ControllerConfig struct {
 
 type SchedulerConfig struct {
 	Namespace   string
+	NsLabel     string
 	TimeLabel   string
 	NotifLabel  string
 	TimeFormat  string

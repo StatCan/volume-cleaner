@@ -43,6 +43,10 @@ jobs:
             -f manifests/serviceaccount.yaml \
             -f manifests/netpol.yaml
 
+      - name: Label namespace
+        run: |
+          kubectl label namespace anray-liu app.kubernetes.io/part-of=kubeflow-profile
+
       - name: Apply configs
         run: |
           kubectl apply -f manifests/controller/controller_config.yaml \
@@ -89,6 +93,9 @@ jobs:
         run: |
           kubectl apply -f testing/sts.yaml
           sleep 5
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500 
+          kubectl get pvc pvc1 -n anray-liu -o yaml
+          kubectl get ns anray-liu -o yaml
 
       - name: Test label removed
         run: |
