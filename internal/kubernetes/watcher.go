@@ -19,9 +19,7 @@ import (
 // Watches for when statefulsets are created or deleted
 
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
-	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{
-		LabelSelector: cfg.NsLabel,
-	})
+	watcher, err := kube.AppsV1().StatefulSets(cfg.Namespace).Watch(ctx, metav1.ListOptions{})
 	if err != nil {
 		log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
 	}

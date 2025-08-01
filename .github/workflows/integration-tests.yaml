@@ -93,6 +93,8 @@ jobs:
         run: |
           kubectl apply -f testing/sts.yaml
           sleep 5
+          kubectl logs -l app=volume-cleaner-controller -n das --tail 500 
+          kubectl get pvc pvc1 -n anray-liu -o yaml
 
       - name: Test label removed
         run: |
