@@ -24,6 +24,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 	// iterate through all pvcs in configured namespace(s)
 	for _, ns := range NsList(kube, cfg.NsLabel) {
+		log.Println(ns.Name)
 		// skip if not in configured namespace
 		if ns.Name != cfg.Namespace && cfg.Namespace != "" {
 			continue
