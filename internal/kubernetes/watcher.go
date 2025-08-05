@@ -24,18 +24,13 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 	// iterate through all pvcs in configured namespace(s)
 	for _, ns := range NsList(kube, cfg.NsLabel) {
-		log.Println(ns.Name)
-		log.Println(cfg.Namespace)
 		// skip if not in configured namespace
 		if ns.Name != cfg.Namespace && cfg.Namespace != "" {
 			continue
 		}
 
-		log.Println("starting thread")
-
 		wg.Add(1)
 		go func() {
-			log.Print("inside thread")
 			defer log.Printf("[INFO] Watcher for NS %s finished.", ns.Name)
 			defer wg.Done()
 
@@ -78,8 +73,6 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				}
 			}
 		}()
-
-		log.Print("outside thread")
 
 		wg.Wait()
 	}
