@@ -4,6 +4,7 @@ import (
 	// standard packages
 	"context"
 	"log"
+	"sync"
 	"time"
 
 	// external packages
@@ -19,6 +20,8 @@ import (
 // Watches for when statefulsets are created or deleted
 
 func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal.ControllerConfig) {
+	var wg sync.WaitGroup
+
 	// iterate through all pvcs in configured namespace(s)
 	for _, ns := range NsList(kube, cfg.NsLabel) {
 		// skip if not in configured namespace
@@ -26,7 +29,10 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 			continue
 		}
 
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
+
 			watcher, err := kube.AppsV1().StatefulSets(ns.Name).Watch(ctx, metav1.ListOptions{})
 			if err != nil {
 				log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
