@@ -31,6 +31,8 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 			continue
 		}
 
+		log.Println("starting thread")
+
 		wg.Add(1)
 		go func() {
 			defer log.Printf("[INFO] Watcher for NS %s finished.", ns.Name)
