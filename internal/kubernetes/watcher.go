@@ -31,6 +31,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 		wg.Add(1)
 		go func() {
+			defer log.Printf("[INFO] Watcher for NS %s finished.", ns.Name)
 			defer wg.Done()
 
 			watcher, err := kube.AppsV1().StatefulSets(ns.Name).Watch(ctx, metav1.ListOptions{})
@@ -38,7 +39,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				log.Fatalf("[ERROR] Failed to create watcher for statefulsets: %s", err)
 			}
 
-			log.Print("[INFO] Watching for statefulset events...")
+			log.Printf("[INFO] Watching NS %s for statefulset events...", ns.Name)
 
 			// create a channel to capture sts events in the cluster
 			events := watcher.ResultChan()
