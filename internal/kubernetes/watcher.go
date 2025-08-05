@@ -80,6 +80,8 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 		}()
 
 		log.Print("outside thread")
+
+		wg.Wait()
 	}
 }
 
