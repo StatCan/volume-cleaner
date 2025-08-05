@@ -35,6 +35,7 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 
 		wg.Add(1)
 		go func() {
+			log.Print("inside thread")
 			defer log.Printf("[INFO] Watcher for NS %s finished.", ns.Name)
 			defer wg.Done()
 
@@ -77,6 +78,8 @@ func WatchSts(ctx context.Context, kube kubernetes.Interface, cfg structInternal
 				}
 			}
 		}()
+
+		log.Print("outside thread")
 	}
 }
 
