@@ -31,12 +31,30 @@ func TestNsList(t *testing.T) {
 			}
 		}
 
+		// check with correct label
+
 		list := NsList(kube, "app.kubernetes.io/part-of=kubeflow-profile")
 
 		// check right length
 		assert.Equal(t, len(list), len(names))
 
 		// check that each namespace is found
+		for i, ns := range list {
+			assert.Equal(t, ns.Name, names[i])
+		}
+
+		// check with incorrect label
+
+		list = NsList(kube, "bad-label")
+
+		assert.Equal(t, len(list), 0)
+
+		// check with empty label
+
+		list = NsList(kube, "")
+
+		assert.Equal(t, len(list), len(names))
+
 		for i, ns := range list {
 			assert.Equal(t, ns.Name, names[i])
 		}
