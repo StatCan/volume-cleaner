@@ -48,7 +48,7 @@ func TestParseNotifTimes(t *testing.T) {
 		{
 			name:     "empty string",
 			input:    "",
-			expected: []int{}, // Assuming empty string results in an empty slice
+			expected: make([]int, 0), // Assuming empty string results in an empty slice
 		},
 	}
 

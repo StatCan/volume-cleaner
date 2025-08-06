@@ -17,9 +17,9 @@ import (
 
 // returns a slice of corev1.Namespace structs
 
-func NsList(kube kubernetes.Interface) []corev1.Namespace {
+func NsList(kube kubernetes.Interface, label string) []corev1.Namespace {
 	ns, err := kube.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{
-		LabelSelector: "app.kubernetes.io/part-of=kubeflow-profile",
+		LabelSelector: label,
 	})
 	if err != nil {
 		// nothing can be done without namespaces so crash the program
@@ -74,7 +74,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 
 	log.Print("[INFO] Scanning namespaces...")
 
-	for _, namespace := range NsList(kube) {
+	for _, namespace := range NsList(kube, cfg.NsLabel) {
 		// skip if not in configured namespace
 		if namespace.Name != cfg.Namespace && cfg.Namespace != "" {
 			continue

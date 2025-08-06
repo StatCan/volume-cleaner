@@ -74,19 +74,16 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 // given a pvc, this function will aquire the details related to the pvc such as the owner of the pvc, their email, the bounded volume name and ID, and details about its deletion
 
 func EmailDetails(kube kubernetes.Interface, pvc corev1.PersistentVolumeClaim, gracePeriod int) (string, structInternal.Personalisation) {
-	ns := pvc.Namespace
-	vol := pvc.Spec.VolumeName
-
 	// Acquire User Email
-	email := nsEmail(kube, ns)
+	email := nsEmail(kube, pvc.Namespace)
 
 	// Calculate DeletionDate
 	now := time.Now()
 	futureTime := now.Add(time.Duration(gracePeriod) * 24 * time.Hour)
 
 	personal := structInternal.Personalisation{
-		Name:         ns,
-		VolumeName:   vol,
+		Name:         pvc.Namespace,
+		VolumeName:   pvc.Spec.VolumeName,
 		GracePeriod:  fmt.Sprintf("%d", gracePeriod),
 		DeletionDate: futureTime.Format(time.UnixDate),
 	}

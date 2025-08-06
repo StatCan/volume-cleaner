@@ -34,101 +34,107 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 	log.Print("[INFO] Scanning for stale PVCS...")
 
 	// iterate through all pvcs in configured namespace(s)
-
-	for _, pvc := range PvcList(kube, cfg.Namespace) {
-		log.Printf("[INFO] Found PVC %s from NS %s", pvc.Name, pvc.Namespace)
-
-		// check if label exists (meaning pvc is unattached)
-		// if pvc is attached to a sts, it would've had its label removed by the controller
-
-		timestamp, ok := pvc.Labels[cfg.TimeLabel]
-		if !ok {
-			log.Printf("[INFO] Label %s not found. Skipping.", cfg.TimeLabel)
+	for _, ns := range NsList(kube, cfg.NsLabel) {
+		// skip if not in configured namespace
+		if ns.Name != cfg.Namespace && cfg.Namespace != "" {
 			continue
 		}
 
-		// check if pvc should be deleted
-		stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
-		if staleError != nil {
-			log.Printf("[ERROR] Failed to parse timestamp: %s", staleError)
-			errCount++
-			continue
-		}
+		for _, pvc := range PvcList(kube, ns.Name) {
+			log.Printf("[INFO] Found PVC %s from NS %s", pvc.Name, pvc.Namespace)
 
-		// stale means grace period has passed, can be deleted
-		if stale {
-			if cfg.DryRun {
-				log.Printf("[DRY RUN] Delete PVC %s", pvc.Name)
-				deleteCount++
-				continue
-			}
+			// check if label exists (meaning pvc is unattached)
+			// if pvc is attached to a sts, it would've had its label removed by the controller
 
-			err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
-			if err != nil {
-				log.Printf("[ERROR] Failed to delete PVC %s: %s", pvc.Name, err)
-				errCount++
-				continue
-			}
-
-			log.Print("[INFO] PVC successfully deleted.")
-			deleteCount++
-
-		} else {
-			// not stale yet, handle email logic here
-
-			log.Print("[INFO] Grace period not passed.")
-
-			notifCount, ok := pvc.Labels[cfg.NotifLabel]
+			timestamp, ok := pvc.Labels[cfg.TimeLabel]
 			if !ok {
-				log.Printf("[INFO] Label %s not found. Skipping.", cfg.NotifLabel)
+				log.Printf("[INFO] Label %s not found. Skipping.", cfg.TimeLabel)
+				continue
+			}
+
+			// check if pvc should be deleted
+			stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
+			if staleError != nil {
+				log.Printf("[ERROR] Failed to parse timestamp: %s", staleError)
 				errCount++
 				continue
 			}
 
-			currNotif, countErr := strconv.Atoi(notifCount)
-			if countErr != nil {
-				log.Printf("[ERROR] Failed to parse notification count: %v", countErr)
-				errCount++
-				continue
-			}
-
-			if len(cfg.NotifTimes) == 0 {
-				continue
-			}
-
-			shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
-			if mailError != nil {
-				log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
-				errCount++
-				continue
-			}
-
-			if shouldSend {
+			// stale means grace period has passed, can be deleted
+			if stale {
 				if cfg.DryRun {
-					log.Print("[DRY RUN] Email owner.")
-					emailCount++
+					log.Printf("[DRY RUN] Delete PVC %s", pvc.Name)
+					deleteCount++
 					continue
 				}
 
-				// personal consists of details passed into the email template as variables while email is
-				// the email address that is consistent regardless of the template
-
-				email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
-
-				err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
+				err := kube.CoreV1().PersistentVolumeClaims(pvc.Namespace).Delete(context.TODO(), pvc.Name, metav1.DeleteOptions{})
 				if err != nil {
-					log.Printf("[Error] Unable to send an email to %s at %s", personal.Name, email)
+					log.Printf("[ERROR] Failed to delete PVC %s: %s", pvc.Name, err)
 					errCount++
 					continue
 				}
 
-				// Update Email Count
-				emailCount++
+				log.Print("[INFO] PVC successfully deleted.")
+				deleteCount++
 
-				// Increment notification count by 1
-				newNotifCount := strconv.Itoa(currNotif + 1)
-				SetPvcLabel(kube, cfg.NotifLabel, newNotifCount, pvc.Namespace, pvc.Name)
+			} else {
+				// not stale yet, handle email logic here
 
+				log.Print("[INFO] Grace period not passed.")
+
+				notifCount, ok := pvc.Labels[cfg.NotifLabel]
+				if !ok {
+					log.Printf("[INFO] Label %s not found. Skipping.", cfg.NotifLabel)
+					errCount++
+					continue
+				}
+
+				currNotif, countErr := strconv.Atoi(notifCount)
+				if countErr != nil {
+					log.Printf("[ERROR] Failed to parse notification count: %v", countErr)
+					errCount++
+					continue
+				}
+
+				if len(cfg.NotifTimes) == 0 {
+					continue
+				}
+
+				shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
+				if mailError != nil {
+					log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
+					errCount++
+					continue
+				}
+
+				if shouldSend {
+					if cfg.DryRun {
+						log.Print("[DRY RUN] Email owner.")
+						emailCount++
+						continue
+					}
+
+					// personal consists of details passed into the email template as variables while email is
+					// the email address that is consistent regardless of the template
+
+					email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
+
+					err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
+					if err != nil {
+						log.Printf("[Error] Unable to send an email to %s at %s", personal.Name, email)
+						errCount++
+						continue
+					}
+
+					// Update Email Count
+					emailCount++
+
+					// Increment notification count by 1
+					newNotifCount := strconv.Itoa(currNotif + 1)
+					SetPvcLabel(kube, cfg.NotifLabel, newNotifCount, pvc.Namespace, pvc.Name)
+
+				}
 			}
 		}
 	}
