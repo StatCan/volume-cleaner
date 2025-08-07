@@ -32,7 +32,7 @@ type ControllerConfig struct {
 	TimeLabel    string
 	NotifLabel   string
 	TimeFormat   string
-	StorageClass string
+	StorageClass []string
 	ResetRun     bool
 }
 

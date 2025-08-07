@@ -2,6 +2,7 @@ package utils
 
 import (
 	// standard Packages
+
 	"log"
 	"sort"
 	"strconv"
@@ -49,4 +50,11 @@ func ParseGracePeriod(value string) int {
 		log.Fatal("[ERROR] For safety reasons, grace period cannot be lower than one day.")
 	}
 	return days
+}
+
+func ParseStrList(str string) []string {
+	if str == "" {
+		return []string{}
+	}
+	return strings.Split(strings.Join(strings.Fields(str), ""), ",")
 }

@@ -81,3 +81,45 @@ func TestParseGracePeriod(t *testing.T) {
 		})
 	}
 }
+
+func TestParseStrList(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected []string
+	}{
+		{
+			name:     "single value",
+			input:    "standard",
+			expected: []string{"standard"},
+		},
+		{
+			name:     "two values",
+			input:    "standard,default",
+			expected: []string{"standard", "default"},
+		},
+		{
+			name:     "whitespaces",
+			input:    "			   standard 	,      default	, test,foo bar",
+			expected: []string{"standard", "default", "test", "foobar"},
+		},
+		{
+			name:     "nothing",
+			input:    "",
+			expected: []string{},
+		},
+
+		{
+			name:     "empty value",
+			input:    ",",
+			expected: []string{"", ""},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := ParseStrList(tt.input)
+			assert.Equal(t, tt.expected, actual, "for input: %q", tt.input)
+		})
+	}
+}
