@@ -133,7 +133,7 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
-        - name: Push image to ACR
+        - name: Push image to Docker Hub
           run: docker push ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
 
   # Calling Reusable Workflows for Trivy Docker Image Scans
