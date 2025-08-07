@@ -117,8 +117,10 @@ jobs:
 
         # push to ACR
 
-        - name: Pull image
-          run: docker pull ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
+        - name: debug/test docker images list
+          run: |
+            docker images ls
+            # docker pull ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Tag image
           run: docker tag ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest ${{ env.ACR_SERVER }}/volume-cleaner-${{ matrix.image }}:latest
