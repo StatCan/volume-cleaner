@@ -115,7 +115,7 @@ func TestWatcherLabelling(t *testing.T) {
 
 func TestWatcherStorageClassFilter(t *testing.T) {
 
-	t.Run("successful skipping ofunconfigured storage classes", func(t *testing.T) {
+	t.Run("successful skipping of unconfigured storage classes", func(t *testing.T) {
 		// create fake client
 		kube := testInternal.NewFakeClient()
 
