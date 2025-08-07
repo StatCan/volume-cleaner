@@ -113,7 +113,8 @@ jobs:
             context: .
             file: ./docker/${{ matrix.image }}/Dockerfile
             tags: ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
-            push: ${{ env.ACT && 'false' || 'true' }}
+            push: false
+            load: true
 
         # push to ACR
 
