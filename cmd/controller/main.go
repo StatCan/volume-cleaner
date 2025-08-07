@@ -11,6 +11,8 @@ import (
 	structInternal "volume-cleaner/internal/structure"
 )
 
+// trigger build, remove if see
+
 func main() {
 	/*
 		It took me a while to figure this out because there wasn't much documentation about this
