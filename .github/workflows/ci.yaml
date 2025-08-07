@@ -119,7 +119,7 @@ jobs:
 
         - name: debug/test docker images list
           run: |
-            docker images ls
+            docker image ls
             # docker pull ${{ env.DOCKER_HUB }}/statcan/volume-cleaner-${{ matrix.image }}:latest
 
         - name: Tag image
