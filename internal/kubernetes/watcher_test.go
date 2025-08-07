@@ -334,19 +334,19 @@ func TestIgnoreStorageClass(t *testing.T) {
 			expected:     false,
 		},
 		{
-			name:         "accept all",
+			name:         "accept all with standard",
 			input:        getPtr("standard"),
 			storageClass: []string{},
 			expected:     false,
 		},
 		{
-			name:         "accept all",
+			name:         "accept all with empty",
 			input:        nil,
 			storageClass: []string{},
 			expected:     false,
 		},
 		{
-			name:         "accept all",
+			name:         "accept all with default",
 			input:        getPtr("default"),
 			storageClass: []string{},
 			expected:     false,
@@ -376,7 +376,7 @@ func TestIgnoreStorageClass(t *testing.T) {
 			expected:     false,
 		},
 		{
-			name:         "accept nil value",
+			name:         "accept multiple values",
 			input:        nil,
 			storageClass: []string{"default", "standard", ""},
 			expected:     false,
@@ -388,7 +388,7 @@ func TestIgnoreStorageClass(t *testing.T) {
 			expected:     true,
 		},
 		{
-			name:         "reject nil value",
+			name:         "reject whitespace",
 			input:        nil,
 			storageClass: []string{" "},
 			expected:     true,
