@@ -125,7 +125,7 @@ func handleAdded(kube kubernetes.Interface, cfg structInternal.ControllerConfig,
 		log.Printf("[INFO] Found PVC object %s", pvcObj.Name)
 
 		// ignore if storage class not in config
-		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClass) {
+		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClasses) {
 			continue
 		}
 
@@ -166,7 +166,7 @@ func handleDeleted(kube kubernetes.Interface, cfg structInternal.ControllerConfi
 		log.Printf("[INFO] Found PVC object %s", pvcObj.Name)
 
 		// ignore if storage class not in config
-		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClass) {
+		if IgnoreStorageClass(pvcObj.Spec.StorageClassName, cfg.StorageClasses) {
 			continue
 		}
 

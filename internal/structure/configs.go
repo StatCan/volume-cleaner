@@ -9,7 +9,7 @@ NAMESPACE: "anray-liu"
 TIME_LABEL: "volume-cleaner/unattached-time"
 NOTIF_LABEL: "volume-cleaner/notification-count"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
-STORAGE_CLASS: "default"
+STORAGE_CLASSES: "default"
 
 scheduler:
 
@@ -28,12 +28,12 @@ API_KEY: "Random APIKEY",
 */
 
 type ControllerConfig struct {
-	Namespace    string
-	TimeLabel    string
-	NotifLabel   string
-	TimeFormat   string
-	StorageClass []string
-	ResetRun     bool
+	Namespace      string
+	TimeLabel      string
+	NotifLabel     string
+	TimeFormat     string
+	StorageClasses []string
+	ResetRun       bool
 }
 
 type SchedulerConfig struct {
