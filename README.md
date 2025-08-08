@@ -15,7 +15,7 @@
   </a>
 </p>
 
-A Kubernetes CronJob that automatically identifies and cleans up stale Persistent Volume Claims and Persistent Volumes (K8S) linked to an associated Azure disk.
+A Kubernetes CronJob that automatically identifies and cleans up unused Persistent Volume Claims and Persistent Volumes (K8S).
 
 ## Contents
 
@@ -32,7 +32,7 @@ A Kubernetes CronJob that automatically identifies and cleans up stale Persisten
 
 This project was designed to integrate with Statistic Canada’s [The Zone](https://zone.pages.cloud.statcan.ca/docs/en/) platform. In The Zone, users can create individual workspaces with Kubeflow Notebooks. To persist their work, users can attach volumes to their notebooks. These volumes are not automatically deleted when a notebook is deleted. Users are free to move them or to reuse them. As a result, over time, users tend to amass several unused volumes. These volumes sit on the cloud and result in unnecessary costs. The purpose of this project is to design an automatic system that detects these unused volumes and safely removes them, reducing unnecessary expenditure. 
 
-Despite being primarily designed for Statistics Canada, this project strongly values open-source practices. The codebase is available for public use on the [Github repository](https://github.com/StatCan/volume-cleaner), and the entire development process is documented on the [issues](https://github.com/StatCan/volume-cleaner/issues) page. The volume cleaner was designed to have as little coupling as possible so it can easily integrate into projects outside Statistics Canada. Using open-source and being open-source was an important development philosophy.
+Despite being primarily designed for Statistics Canada, this project strongly values open-source practices. The codebase is available for public use and the entire development process is documented on the [issues](https://github.com/StatCan/volume-cleaner/issues) page. The volume cleaner was designed to have as little coupling as possible so it can easily integrate into projects outside Statistics Canada. Using open-source and being open-source was an important development philosophy.
 
 ### Architectural Structure
 
@@ -106,42 +106,50 @@ cd volume-cleaner
 
 2. Customize the behavior of the Controller in `manifests/controller/controller_config.yaml`
 
-   * `metadata.namespace`: Target namespace to deploy the controller
-   * `data.NAMESPACE`: Target namespace to monitor (e.g., "kubeflow-profile" namespaces), leave this value as an empty string to scan all namespaces 
-   * `data.TIME_LABEL`: Label key for storing unattached timestamp (default: "volume-cleaner/unattached-time") 
-   * `data.NOTIF_LABEL`: Label key for notification count tracking (default: "volume-cleaner/notification-count")
-   * `data.TIME_FORMAT`: Timestamp format for labels (default: "2006-01-02_15-04-05Z")
+   * `NAMESPACE`: Target namespace to monitor (e.g., "kubeflow-profile" namespaces). Leave this value as an empty string to scan all namespaces
+   * `TIME_LABEL`: Label key for storing unattached timestamp (e.g.: "volume-cleaner/unattached-time") 
+   * `NOTIF_LABEL`: Label key for notification count tracking (e.g.: "volume-cleaner/notification-count")
+   * `TIME_FORMAT`: Timestamp format for labels (e.g: "2006-01-02_15-04-05Z")
+   * `STORAGE_CLASSES`: Comma-separated list of target storage classes to filter by (e.g., "standard")
+   * `RESET_RUN`: Set to "true" to remove all volume cleaner related labels from cluster before starting
 
 3. Customize the behavior of the Scheduler in `manifests/scheduler/scheduler_config.yaml` 
 
-   * `metadata.namespace`: Target namespace to deploy the scheduler
-   * `data.NAMESPACE`: Target namespace to scan for stale PVCs, leave this value as an empty string to scan all namespaces 
-   * `data.TIME_LABEL`: Must match controller's time label
-   * `data.NOTIF_LABEL`: Must match controller's notification label
-   * `data.GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
-   * `data.TIME_FORMAT`: Must match controller's time format
-   * `data.DRY_RUN`: Set to "true" for testing without actual deletion 
-   * `data.NOTIF_TIMES`: Comma-separated days before deletion to send notifications (e.g., "1, 2, 3, 4, 7, 30")
-   * `data.BASE_URL`: GC Notify API base URL 
-   * `data.ENDPOINT`: Email notification endpoint 
+   * `NAMESPACE`: Target namespace to scan for unused PVCs, leave this value as an empty string to scan all namespaces 
+   * `TIME_LABEL`: Must match controller's time label
+   * `NOTIF_LABEL`: Must match controller's notification label
+   * `GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
+   * `TIME_FORMAT`: Must match controller's time format
+   * `DRY_RUN`: Set to "true" for testing without actual deletion 
+   * `NOTIF_TIMES`: Comma-separated days before deletion to send notifications (e.g., "1, 2, 3, 4, 7, 30")
+   * `BASE_URL`: GC Notify API base URL 
+   * `ENDPOINT`: Email notification endpoint 
 
 4. Set Secrets in `manifests/scheduler/scheduler_secret.yaml` 
 
    * `EMAIL_TEMPLATE_ID`: GC notify email template ID 
    * `API_KEY`: GC Notify API authentication key, do not push API keys to this repository
+  
+5. If you're building the image yourself, configure the pull target in `manifests/controller/controller_deployment.yaml` and `manifests/scheduler/scheduler_job.yaml`. 
+   E.g `image: docker.io/statcan/volume-cleaner-controller:latest`
 
-5. Run the controller & scheduler using the Make command
+6. Run the controller & scheduler using the Make command
 
 ```bash
 make run_controller
 make run_scheduler
 ```
 
-6. Remove the scheduler and controller (optional)
+7. Remove the scheduler and controller (optional)
 
 ```bash
 make clean 
 ```
+8. Trigger scheduler run immediately (optional)
+```bash
+kubectl create job volume-cleaner-scheduler --from=cronjob/volume-cleaner-scheduler -n ${JOB_NAMESPACE_HERE}
+```
+Read [this](https://github.com/StatCan/volume-cleaner/blob/main/docs/project_outline.docx) document for more information.
 
 ## How to Contribute
 
@@ -180,7 +188,7 @@ ______________________
   </a>
 </p>
 
-Un CronJob Kubernetes qui identifie automatiquement et nettoie les Persistent Volume Claims et Persistent Volumes (K8S) obsolètes liés à un disque Azure associé.
+Un CronJob Kubernetes qui identifie automatiquement et nettoie les Persistent Volume Claims et Persistent Volumes (K8S).
 
 ## Contenu
 
@@ -196,7 +204,7 @@ Un CronJob Kubernetes qui identifie automatiquement et nettoie les Persistent Vo
 
 Ce projet a été conçu pour s'intégrer à la plateforme [The Zone](https://zone.pages.cloud.statcan.ca/docs/en/) de Statistique Canada. Dans The Zone, les utilisateurs peuvent créer des espaces de travail individuels avec des notebooks Kubeflow. Pour conserver leur travail, ils peuvent associer des volumes à leurs notebooks. Ces volumes ne sont pas supprimés automatiquement lors de la suppression d'un notebook. Les utilisateurs peuvent les déplacer ou les réutiliser. En conséquence, au fil du temps, de nombreux volumes inutilisés s'accumulent, entraînant des coûts cloud superflus. L'objectif de ce projet est de mettre en place un système automatique qui détecte ces volumes inutilisés et les supprime en toute sécurité, réduisant ainsi les dépenses inutiles.
 
-Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valorise fortement les pratiques open source. Le code est disponible publiquement sur le [dépôt GitHub](https://github.com/StatCan/volume-cleaner), et tout le processus de développement est documenté sur la page des [issues](https://github.com/StatCan/volume-cleaner/issues). Le nettoyeur de volumes a été conçu pour avoir un couplage minimal afin de pouvoir s'intégrer facilement dans d'autres projets. L'utilisation et la contribution en open source ont été des principes directeurs importants.
+Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valorise fortement les pratiques open source. Le code est disponible publiquement et tout le processus de développement est documenté sur la page des [issues](https://github.com/StatCan/volume-cleaner/issues). Le nettoyeur de volumes a été conçu pour avoir un couplage minimal afin de pouvoir s'intégrer facilement dans d'autres projets. L'utilisation et la contribution en open source ont été des principes directeurs importants.
 
 ### Structure architecturale
 
@@ -262,42 +270,50 @@ Le volume-cleaner est composé de 2 composants principaux :
 
 2. Personnalisez le comportement du Contrôleur dans `manifests/controller/controller_config.yaml` :
 
-   * `metadata.namespace` : Espace de noms cible pour déployer le contrôleur
-   * `data.NAMESPACE` : Espace de noms à surveiller (par ex. les namespaces “kubeflow-profile”); laissez cette valeur vide pour scanner tous les namespaces
-   * `data.TIME_LABEL` : Clé du label pour stocker l’horodatage des PVC non attachés (par défaut : `volume-cleaner/unattached-time`)
-   * `data.NOTIF_LABEL` : Clé du label pour le suivi du nombre de notifications (par défaut : `volume-cleaner/notification-count`)
-   * `data.TIME_FORMAT` : Format de l’horodatage pour les labels (par défaut : `2006-01-02_15-04-05Z`)
+   * `NAMESPACE` : Espace de noms à surveiller (par ex. les namespaces “kubeflow-profile”); laissez cette valeur vide pour scanner tous les namespaces
+   * `TIME_LABEL` : Clé du label pour stocker l’horodatage des PVC non attachés (par ex. `volume-cleaner/unattached-time`)
+   * `NOTIF_LABEL` : Clé du label pour le suivi du nombre de notifications (par ex. `volume-cleaner/notification-count`)
+   * `TIME_FORMAT` : Format de l’horodatage pour les labels (par défaut : `2006-01-02_15-04-05Z`)
+   * `STORAGE_CLASSES` : Liste des classes de stockage cibles à filtrer, séparée par des virgules (p. ex. "standard")
+   * `RESET_RUN` : Définir sur 'true' pour retirer tous les labels liés au volume cleaner du cluster avant le démarrage.
 
 3. Personnalisez le comportement du Planificateur dans `manifests/scheduler/scheduler_config.yaml` :
 
-   * `metadata.namespace` : Espace de noms cible pour déployer le planificateur
-   * `data.NAMESPACE` : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les namespaces
-   * `data.TIME_LABEL` : Doit correspondre au `TIME_LABEL` du contrôleur
-   * `data.NOTIF_LABEL` : Doit correspondre au `NOTIF_LABEL` du contrôleur
-   * `data.GRACE_PERIOD` : Nombre de jours avant suppression du PVC (par ex. `"180"`)
-   * `data.TIME_FORMAT` : Doit correspondre au `TIME_FORMAT` du contrôleur
-   * `data.DRY_RUN` : À `"true"` pour tester sans suppression réelle
-   * `data.NOTIF_TIMES` : Jours avant suppression pour envoyer des notifications (par ex. `"1,2,3,4,7,30"`)
-   * `data.BASE_URL` : URL de base de l’API GC Notify
-   * `data.ENDPOINT` : Point de terminaison pour l’envoi des e‑mails
+   * `NAMESPACE` : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les namespaces
+   * `TIME_LABEL` : Doit correspondre au `TIME_LABEL` du contrôleur
+   * `NOTIF_LABEL` : Doit correspondre au `NOTIF_LABEL` du contrôleur
+   * `GRACE_PERIOD` : Nombre de jours avant suppression du PVC (par ex. `"180"`)
+   * `TIME_FORMAT` : Doit correspondre au `TIME_FORMAT` du contrôleur
+   * `DRY_RUN` : À `"true"` pour tester sans suppression réelle
+   * `NOTIF_TIMES` : Jours avant suppression pour envoyer des notifications (par ex. `"1,2,3,4,7,30"`)
+   * `BASE_URL` : URL de base de l’API GC Notify
+   * `ENDPOINT` : Point de terminaison pour l’envoi des e‑mails
 
 4. Définissez les Secrets dans `manifests/scheduler/scheduler_secret.yaml` :
 
    * `EMAIL_TEMPLATE_ID` : ID du modèle d’e‑mail GC Notify
    * `API_KEY` : Clé d’authentification GC Notify, ne pas pousser les clés API dans ce dépôt
 
-5. Lancez le Contrôleur et le Planificateur avec Make :
+5. Si vous construisez l'image vous-même, configurez la cible de pull dans `manifests/controller/controller_deployment.yaml` et `manifests/scheduler/scheduler_job.yaml`.
+Ex. `image: docker.io/statcan/volume-cleaner-controller:latest`.
+
+6. Lancez le Contrôleur et le Planificateur avec Make :
 
    ```bash
    make run_controller
    make run_scheduler
    ```
 
-6. Supprimez le planificateur et le contrôleur (optionnel) :
+7. Supprimez le planificateur et le contrôleur (optionnel) :
 
    ```bash
    make clean
    ```
+8. Déclencher immédiatement l'exécution du scheduler (optionnel)
+```bash
+kubectl create job volume-cleaner-scheduler --from=cronjob/volume-cleaner-scheduler -n ${NOM_ESPACE_DE_NOMS_ICI}
+```
+Lisez [ce](https://github.com/StatCan/volume-cleaner/blob/main/docs/project_outline.docx) document pour plus d'informations (version en anglais seulement).
 
 ## Comment contribuer
 
