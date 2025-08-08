@@ -54,9 +54,6 @@ This project does not use a test folder, `_test.go` files are kept in their pack
 ```
 // Unit and Integration Testing
 go test -v -race ./...
-
-// End-to-End Testing
-act --rm
 ```
 
 ### Practices 
@@ -150,9 +147,6 @@ Ce projet n'utilise pas de dossier de test ; les fichiers `_test.go` restent da
 
 // Unit and Integration Testing
 go test -v -race ./...
-
-// End-to-End Testing
-act --rm
 
 ```
 

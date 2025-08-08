@@ -182,6 +182,6 @@ func TestStorageClassFilter(t *testing.T) {
 			}
 		}
 
-		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{StorageClass: []string{"non-existent-storage-class"}})), 0)
+		assert.Equal(t, len(FindUnattachedPVCs(kube, structure.ControllerConfig{StorageClasses: []string{"non-existent-storage-class"}})), 0)
 	})
 }

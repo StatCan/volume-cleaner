@@ -93,7 +93,7 @@ func FindUnattachedPVCs(kube kubernetes.Interface, cfg structInternal.Controller
 			log.Printf("[INFO] Found PVC: %s, PV: %s", claim.Name, claim.Spec.VolumeName)
 
 			// ignore if storage class not in config
-			if IgnoreStorageClass(claim.Spec.StorageClassName, cfg.StorageClass) {
+			if IgnoreStorageClass(claim.Spec.StorageClassName, cfg.StorageClasses) {
 				continue
 			}
 

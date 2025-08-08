@@ -30,12 +30,12 @@ func main() {
 	// there is also a config for the scheduler
 
 	cfg := structInternal.ControllerConfig{
-		Namespace:    os.Getenv("NAMESPACE"),
-		TimeLabel:    os.Getenv("TIME_LABEL"),
-		NotifLabel:   os.Getenv("NOTIF_LABEL"),
-		TimeFormat:   os.Getenv("TIME_FORMAT"),
-		StorageClass: utilsInternal.ParseStrList(os.Getenv("STORAGE_CLASS")),
-		ResetRun:     os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
+		Namespace:      os.Getenv("NAMESPACE"),
+		TimeLabel:      os.Getenv("TIME_LABEL"),
+		NotifLabel:     os.Getenv("NOTIF_LABEL"),
+		TimeFormat:     os.Getenv("TIME_FORMAT"),
+		StorageClasses: utilsInternal.ParseStrList(os.Getenv("STORAGE_CLASSES")),
+		ResetRun:       os.Getenv("RESET_RUN") == "true" || os.Getenv("RESET_RUN") == "1",
 	}
 
 	// init client to interact with k8s cluster

@@ -158,11 +158,11 @@ func TestWatcherStorageClassFilter(t *testing.T) {
 		ctx := context.Background()
 
 		cfg := structInternal.ControllerConfig{
-			Namespace:    "test",
-			TimeLabel:    "volume-cleaner/unattached-time",
-			NotifLabel:   "volume-cleaner/notification-count",
-			TimeFormat:   "2006-01-02_15-04-05Z",
-			StorageClass: []string{"non-existent-storage-class"},
+			Namespace:      "test",
+			TimeLabel:      "volume-cleaner/unattached-time",
+			NotifLabel:     "volume-cleaner/notification-count",
+			TimeFormat:     "2006-01-02_15-04-05Z",
+			StorageClasses: []string{"non-existent-storage-class"},
 		}
 
 		go WatchSts(ctx, kube, cfg)
@@ -338,88 +338,88 @@ func TestIgnoreStorageClass(t *testing.T) {
 		return &variable
 	}
 	tests := []struct {
-		name         string
-		input        *string
-		storageClass []string
-		expected     bool
+		name           string
+		input          *string
+		storageClasses []string
+		expected       bool
 	}{
 		{
-			name:         "single value",
-			input:        getPtr("standard"),
-			storageClass: []string{"standard"},
-			expected:     false,
+			name:           "single value",
+			input:          getPtr("standard"),
+			storageClasses: []string{"standard"},
+			expected:       false,
 		},
 		{
-			name:         "two values",
-			input:        getPtr("standard"),
-			storageClass: []string{"standard", "default"},
-			expected:     false,
+			name:           "two values",
+			input:          getPtr("standard"),
+			storageClasses: []string{"standard", "default"},
+			expected:       false,
 		},
 		{
-			name:         "accept all with standard",
-			input:        getPtr("standard"),
-			storageClass: []string{},
-			expected:     false,
+			name:           "accept all with standard",
+			input:          getPtr("standard"),
+			storageClasses: []string{},
+			expected:       false,
 		},
 		{
-			name:         "accept all with empty",
-			input:        nil,
-			storageClass: []string{},
-			expected:     false,
+			name:           "accept all with empty",
+			input:          nil,
+			storageClasses: []string{},
+			expected:       false,
 		},
 		{
-			name:         "accept all with default",
-			input:        getPtr("default"),
-			storageClass: []string{},
-			expected:     false,
+			name:           "accept all with default",
+			input:          getPtr("default"),
+			storageClasses: []string{},
+			expected:       false,
 		},
 		{
-			name:         "reject single value",
-			input:        getPtr("standard"),
-			storageClass: []string{"default"},
-			expected:     true,
+			name:           "reject single value",
+			input:          getPtr("standard"),
+			storageClasses: []string{"default"},
+			expected:       true,
 		},
 		{
-			name:         "reject two value",
-			input:        getPtr("test"),
-			storageClass: []string{"standard", "default"},
-			expected:     true,
+			name:           "reject two value",
+			input:          getPtr("test"),
+			storageClasses: []string{"standard", "default"},
+			expected:       true,
 		},
 		{
-			name:         "empty value",
-			input:        getPtr(""),
-			storageClass: []string{""},
-			expected:     false,
+			name:           "empty value",
+			input:          getPtr(""),
+			storageClasses: []string{""},
+			expected:       false,
 		},
 		{
-			name:         "accept nil value",
-			input:        nil,
-			storageClass: []string{""},
-			expected:     false,
+			name:           "accept nil value",
+			input:          nil,
+			storageClasses: []string{""},
+			expected:       false,
 		},
 		{
-			name:         "accept multiple values",
-			input:        nil,
-			storageClass: []string{"default", "standard", ""},
-			expected:     false,
+			name:           "accept multiple values",
+			input:          nil,
+			storageClasses: []string{"default", "standard", ""},
+			expected:       false,
 		},
 		{
-			name:         "reject nil value",
-			input:        nil,
-			storageClass: []string{"default"},
-			expected:     true,
+			name:           "reject nil value",
+			input:          nil,
+			storageClasses: []string{"default"},
+			expected:       true,
 		},
 		{
-			name:         "reject whitespace",
-			input:        nil,
-			storageClass: []string{" "},
-			expected:     true,
+			name:           "reject whitespace",
+			input:          nil,
+			storageClasses: []string{" "},
+			expected:       true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := IgnoreStorageClass(tt.input, tt.storageClass)
+			actual := IgnoreStorageClass(tt.input, tt.storageClasses)
 			assert.Equal(t, tt.expected, actual, "for input: %q", tt.input)
 		})
 	}
