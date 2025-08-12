@@ -8,7 +8,7 @@ run_scheduler:
 	@make -C scripts/scheduler run_scheduler
 
 create_job:
-	@kubectl create job volume-cleaner-scheduler --from=cronjob/volume-cleaner-scheduler -n aaw
+	@kubectl create job volume-cleaner-scheduler --from=cronjob/volume-cleaner-scheduler -n das
 
 test:
 	go test -v -coverprofile cover.out ./...

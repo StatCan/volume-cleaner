@@ -22,6 +22,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: default
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -34,6 +35,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: default
 ---
 apiVersion: apps/v1
 kind: StatefulSet
