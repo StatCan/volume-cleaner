@@ -40,7 +40,7 @@ Despite being primarily designed for Statistics Canada, this project strongly va
 <img width="3005" height="1836" alt="DevOps Build Process Diagram" src="https://github.com/user-attachments/assets/07d69a08-f164-4f17-b83f-2bb5fe66fa4a" />
 
 **In-Cluster Running Process**
-<img width="2748" height="1672" alt="Volume Cleaner Architectural Diagram" src="https://github.com/user-attachments/assets/8270c26d-dae3-437c-b134-880ccac756ed" />
+<img width="2770" height="1782" alt="Volume Cleaner Architectural Diagram" src="https://github.com/user-attachments/assets/b50b905e-49dd-4747-bfd6-906afcb02494" />
 
 ## Requirements
 
@@ -212,7 +212,7 @@ Bien qu'il soit principalement conçu pour Statistique Canada, ce projet valoris
 <img width="3005" height="1836" alt="Processus de build DevOps du volume-cleaner" src="https://github.com/user-attachments/assets/07d69a08-f164-4f17-b83f-2bb5fe66fa4a" />
 
 **Processus en cours d’exécution dans le cluster**
-<img width="2748" height="1672" alt="Schéma d'architecture du volume-cleaner" src="https://github.com/user-attachments/assets/8270c26d-dae3-437c-b134-880ccac756ed" />
+<img width="2770" height="1782" alt="Schéma d'architecture du volume-cleaner" src="https://github.com/user-attachments/assets/b50b905e-49dd-4747-bfd6-906afcb02494" />
 
 ## Prérequis
 
