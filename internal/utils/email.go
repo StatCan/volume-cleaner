@@ -56,15 +56,6 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		defer response.Body.Close()
 	}
 
-	log.Print(personal.DeletionDate)
-	log.Print(personal.GracePeriod)
-	log.Print(personal.Name)
-	log.Print(personal.VolumeName)
-
-	if request != nil {
-		log.Print(request.Header)
-	}
-
 	if err != nil {
 		log.Printf("[ERROR] Failed to create HTTP POST request: %v", err)
 
