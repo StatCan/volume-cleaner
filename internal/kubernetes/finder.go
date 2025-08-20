@@ -25,7 +25,7 @@ import (
 
 func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (int, int) {
 	// One http client is created for emailing users
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: 60 * time.Second}
 
 	errCount := 0
 	deleteCount := 0
