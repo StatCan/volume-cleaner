@@ -117,7 +117,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 
 				err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
 				if err != nil {
-					log.Printf("[Error] Unable to send an email to %s at %s", personal.Name, email)
+					log.Printf("[Error] Unable to send an email to %s at %s: %s", personal.Name, email, err)
 					errCount++
 					continue
 				}
