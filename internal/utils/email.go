@@ -49,6 +49,8 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		log.Printf("[INFO] Successfully created HTTP request.")
 	}
 
+	log.Printf("[DEBUG] request: %s", request.URL)
+
 	// Send Request
 	response, err := client.Do(request)
 
