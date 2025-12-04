@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	// external packages
@@ -49,7 +50,11 @@ func SendNotif(client *http.Client, conf structInternal.EmailConfig, email strin
 		log.Printf("[INFO] Successfully created HTTP request.")
 	}
 
-	log.Printf("[DEBUG] request: %s", request.URL)
+	dump, err := httputil.DumpRequestOut(request, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("[DEBUG] request dump: %s", dump)
 
 	// Send Request
 	response, err := client.Do(request)
