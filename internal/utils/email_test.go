@@ -50,7 +50,6 @@ func TestSendingNotif(t *testing.T) {
 
 // TestEmailDetails covers multiple scenarios for retrieving email and personalisation data from Kubernetes objects.
 func TestEmailDetails(t *testing.T) {
-	return // skip this test for now because it was originally written incorrectly
 	tests := []struct {
 		name                    string
 		namespace               *corev1.Namespace
@@ -80,7 +79,7 @@ func TestEmailDetails(t *testing.T) {
 			expectedEmail: "test@example.com",
 			expectedPersonalisation: structInternal.Personalisation{
 				Name:       "test-namespace",
-				VolumeName: "test-namespace",
+				VolumeName: "test-pvc",
 			},
 		},
 		{
@@ -105,7 +104,7 @@ func TestEmailDetails(t *testing.T) {
 			expectedEmail: "", // Should be empty if owner annotation is missing
 			expectedPersonalisation: structInternal.Personalisation{
 				Name:       "no-owner-ns",
-				VolumeName: "no-owner-ns",
+				VolumeName: "test-pvc-no-owner",
 			},
 		},
 		{
@@ -123,7 +122,7 @@ func TestEmailDetails(t *testing.T) {
 			expectedEmail: "", // Should be empty if namespace is not found
 			expectedPersonalisation: structInternal.Personalisation{
 				Name:       "non-existent-ns", // The name from PVC is used even if namespace isn't found
-				VolumeName: "non-existent-ns",
+				VolumeName: "test-pvc-non-existent-ns",
 			},
 		},
 	}
