@@ -383,7 +383,7 @@ func TestShouldSendMail(t *testing.T) {
 		}
 
 		for _, test := range testCases {
-			v, err := ShouldSendMail(test.timestamp, test.currNotif, cfg)
+			v, _, err := ShouldSendMail(test.timestamp, test.currNotif, cfg)
 			if err != nil {
 				t.Fatal("ShouldSendMail failed.")
 			}

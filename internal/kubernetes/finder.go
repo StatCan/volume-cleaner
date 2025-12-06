@@ -96,7 +96,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 				continue
 			}
 
-			shouldSend, mailError := ShouldSendMail(timestamp, currNotif, cfg)
+			shouldSend, daysLeft, mailError := ShouldSendMail(timestamp, currNotif, cfg)
 			if mailError != nil {
 				log.Printf("[ERROR] Failed to parse timestamp: %s", mailError)
 				errCount++
@@ -113,7 +113,7 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 				// personal consists of details passed into the email template as variables while email is
 				// the email address that is consistent regardless of the template
 
-				email, personal := utilsInternal.EmailDetails(kube, pvc, cfg.GracePeriod)
+				email, personal := utilsInternal.EmailDetails(kube, pvc, daysLeft)
 
 				err := utilsInternal.SendNotif(client, cfg.EmailCfg, email, personal)
 				if err != nil {
@@ -152,7 +152,7 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 	// difference in days
 	diff := time.Since(timeObj).Hours() / 24
 
-	log.Printf("[INFO] Parsed timestamp: %f days.", diff)
+	log.Printf("[INFO] Time passed since detachment: %f days.", diff)
 
 	stale := diff > float64(gracePeriod)
 	if !stale {
@@ -164,24 +164,25 @@ func IsStale(timestamp string, format string, gracePeriod int) (bool, error) {
 
 // checks email times and determines if this pvc's owner should be emailed
 
-func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, error) {
+func ShouldSendMail(timestamp string, currNotif int, cfg structInternal.SchedulerConfig) (bool, float64, error) {
 	timeObj, err := time.Parse(cfg.TimeFormat, timestamp)
 	if err != nil {
-		return false, err
+		return false, 0.0, err
 	}
 	daysLeft := float64(cfg.GracePeriod) - time.Since(timeObj).Hours()/24
 
 	// this logic ensures that emails are eventually sent even if the
 	// scheduler is down and misses a few days
-	// logic has been triple checked, it's correct
+
+	log.Printf("[INFO] Emails already sent: %d", currNotif)
 
 	if currNotif < len(cfg.NotifTimes) {
 		if float64(cfg.NotifTimes[currNotif]) >= daysLeft {
-			log.Printf("[INFO] Chosen email time: %v", cfg.NotifTimes[currNotif])
-			return true, nil
+			log.Printf("[INFO] Closest email interval: %v days", cfg.NotifTimes[currNotif])
+			return true, daysLeft, nil
 		}
 		log.Printf("[INFO] Time until next email: %v days", daysLeft-float64(cfg.NotifTimes[currNotif]))
 	}
 
-	return false, nil
+	return false, daysLeft, nil
 }
