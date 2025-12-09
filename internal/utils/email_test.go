@@ -141,6 +141,9 @@ func TestEmailDetails(t *testing.T) {
 				assert.Equal(t, tt.expectedPersonalisation.Name, personal.Name, "Personalisation Name should match")
 				assert.Equal(t, tt.expectedPersonalisation.VolumeName, personal.VolumeName, "Personalisation VolumeName should match")
 
+				// not that important of a value to test
+				assert.Equal(t, personal.DaysLeft, "0.000000")
+
 			} else {
 				// For the "Non-existent Namespace" case, create a client without the namespace
 				kubeClient := fake.NewClientset()
@@ -149,6 +152,8 @@ func TestEmailDetails(t *testing.T) {
 				assert.Equal(t, tt.expectedEmail, email, "Email should be empty for non-existent namespace")
 				assert.Equal(t, tt.expectedPersonalisation.Name, personal.Name, "Personalisation Name should match for non-existent namespace")
 				assert.Equal(t, tt.expectedPersonalisation.VolumeName, personal.VolumeName, "Personalisation VolumeName should match for non-existent namespace")
+
+				assert.Equal(t, personal.DaysLeft, "0.000000")
 			}
 		})
 	}
