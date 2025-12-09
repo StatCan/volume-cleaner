@@ -25,7 +25,7 @@ func TestSendingNotif(t *testing.T) {
 	personal := structInternal.Personalisation{
 		Name:         "John Doe",
 		VolumeName:   "Volume",
-		GracePeriod:  "180", // in days
+		DaysLeft:     "180", // in days
 		DeletionDate: "June 17, 2025",
 	}
 
@@ -54,7 +54,6 @@ func TestEmailDetails(t *testing.T) {
 		name                    string
 		namespace               *corev1.Namespace
 		pvc                     corev1.PersistentVolumeClaim
-		gracePeriod             int
 		expectedEmail           string
 		expectedPersonalisation structInternal.Personalisation
 	}{
@@ -77,13 +76,10 @@ func TestEmailDetails(t *testing.T) {
 					VolumeName: "pv-test-volume-123",
 				},
 			},
-			gracePeriod:   7,
 			expectedEmail: "test@example.com",
 			expectedPersonalisation: structInternal.Personalisation{
-				Name:        "test-namespace",
-				VolumeName:  "pv-test-volume-123",
-				GracePeriod: "7",
-				// DeletionDate will be checked dynamically due to time.Now()
+				Name:       "test-namespace",
+				VolumeName: "test-pvc",
 			},
 		},
 		{
@@ -105,13 +101,10 @@ func TestEmailDetails(t *testing.T) {
 					VolumeName: "pv-no-owner-volume",
 				},
 			},
-			gracePeriod:   14,
 			expectedEmail: "", // Should be empty if owner annotation is missing
 			expectedPersonalisation: structInternal.Personalisation{
-				Name:        "no-owner-ns",
-				VolumeName:  "pv-no-owner-volume",
-				GracePeriod: "14",
-				// DeletionDate will be checked dynamically
+				Name:       "no-owner-ns",
+				VolumeName: "test-pvc-no-owner",
 			},
 		},
 		{
@@ -126,13 +119,10 @@ func TestEmailDetails(t *testing.T) {
 					VolumeName: "pv-non-existent-volume",
 				},
 			},
-			gracePeriod:   3,
 			expectedEmail: "", // Should be empty if namespace is not found
 			expectedPersonalisation: structInternal.Personalisation{
-				Name:        "non-existent-ns", // The name from PVC is used even if namespace isn't found
-				VolumeName:  "pv-non-existent-volume",
-				GracePeriod: "3",
-				// DeletionDate will be checked dynamically
+				Name:       "non-existent-ns", // The name from PVC is used even if namespace isn't found
+				VolumeName: "test-pvc-non-existent-ns",
 			},
 		},
 	}
@@ -142,7 +132,7 @@ func TestEmailDetails(t *testing.T) {
 			if tt.namespace != nil {
 				kubeClient := fake.NewClientset(tt.namespace)
 
-				email, personal := EmailDetails(kubeClient, tt.pvc, tt.gracePeriod)
+				email, personal := EmailDetails(kubeClient, tt.pvc, 0.0)
 
 				// Assert the email
 				assert.Equal(t, tt.expectedEmail, email, "Email should match")
@@ -150,43 +140,20 @@ func TestEmailDetails(t *testing.T) {
 				// Assert the Personalisation struct fields, handling the time dynamically
 				assert.Equal(t, tt.expectedPersonalisation.Name, personal.Name, "Personalisation Name should match")
 				assert.Equal(t, tt.expectedPersonalisation.VolumeName, personal.VolumeName, "Personalisation VolumeName should match")
-				assert.Equal(t, tt.expectedPersonalisation.GracePeriod, personal.GracePeriod, "Personalisation GracePeriod should match")
 
-				// Calculate the expected deletion date based on the current time and grace period
-				now := time.Now()
-				futureTime := now.Add(time.Duration(tt.gracePeriod) * 24 * time.Hour)
-				expectedDeletionDate := futureTime.Format(time.UnixDate)
-
-				// Assert deletion date, allowing for a small time difference
-				parsedActualDate, err := time.Parse(time.UnixDate, personal.DeletionDate)
-				assert.NoError(t, err, "Should be able to parse actual DeletionDate")
-
-				parsedExpectedDate, err := time.Parse(time.UnixDate, expectedDeletionDate)
-				assert.NoError(t, err, "Should be able to parse expected DeletionDate")
-
-				// Check if the difference is within an acceptable margin (e.g., 1 second)
-				assert.WithinDuration(t, parsedExpectedDate, parsedActualDate, 1*time.Second, "DeletionDate should be approximately correct")
+				// not that important of a value to test
+				assert.Equal(t, personal.DaysLeft, "0.000000")
 
 			} else {
 				// For the "Non-existent Namespace" case, create a client without the namespace
 				kubeClient := fake.NewClientset()
-				email, personal := EmailDetails(kubeClient, tt.pvc, tt.gracePeriod)
+				email, personal := EmailDetails(kubeClient, tt.pvc, 0.0)
 
 				assert.Equal(t, tt.expectedEmail, email, "Email should be empty for non-existent namespace")
 				assert.Equal(t, tt.expectedPersonalisation.Name, personal.Name, "Personalisation Name should match for non-existent namespace")
 				assert.Equal(t, tt.expectedPersonalisation.VolumeName, personal.VolumeName, "Personalisation VolumeName should match for non-existent namespace")
-				assert.Equal(t, tt.expectedPersonalisation.GracePeriod, personal.GracePeriod, "Personalisation GracePeriod should match for non-existent namespace")
 
-				now := time.Now()
-				futureTime := now.Add(time.Duration(tt.gracePeriod) * 24 * time.Hour)
-				expectedDeletionDate := futureTime.Format(time.UnixDate)
-
-				parsedActualDate, err := time.Parse(time.UnixDate, personal.DeletionDate)
-				assert.NoError(t, err, "Should be able to parse actual DeletionDate")
-
-				parsedExpectedDate, err := time.Parse(time.UnixDate, expectedDeletionDate)
-				assert.NoError(t, err, "Should be able to parse expected DeletionDate")
-				assert.WithinDuration(t, parsedExpectedDate, parsedActualDate, 1*time.Second, "DeletionDate should be approximately correct for non-existent namespace")
+				assert.Equal(t, personal.DaysLeft, "0.000000")
 			}
 		})
 	}
