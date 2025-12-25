@@ -16,6 +16,7 @@ scheduler:
 NAMESPACE: "anray-liu"
 TIME_LABEL: "volume-cleaner/unattached-time"
 NOTIF_LABEL: "volume-cleaner/notification-count"
+IGNORE_LABEL: "volume-cleaner/ignore"
 GRACE_PERIOD: "180"
 TIME_FORMAT: "2006-01-02_15-04-05Z"
 DRY_RUN: "true"
@@ -40,6 +41,7 @@ type SchedulerConfig struct {
 	Namespace   string
 	TimeLabel   string
 	NotifLabel  string
+	IgnoreLabel string
 	TimeFormat  string
 	GracePeriod int
 	DryRun      bool
