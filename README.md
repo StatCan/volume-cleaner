@@ -118,6 +118,7 @@ cd volume-cleaner
    * `NAMESPACE`: Target namespace to scan for unused PVCs, leave this value as an empty string to scan all namespaces 
    * `TIME_LABEL`: Must match controller's time label
    * `NOTIF_LABEL`: Must match controller's notification label
+   * `IGNORE_LABEL`: If this label is found on a PVC, the scheduler will skip it (e.g.: "volume-cleaner/ignore")
    * `GRACE_PERIOD`: Days before PVC deletion (e.g., "180") 
    * `TIME_FORMAT`: Must match controller's time format
    * `DRY_RUN`: Set to "true" for testing without actual deletion 
@@ -286,6 +287,7 @@ Le volume-cleaner est composé de 2 composants principaux :
    * `NAMESPACE` : Espace de noms à scanner pour les PVC périmés; laissez cette valeur vide pour scanner tous les espaces de noms
    * `TIME_LABEL` : Doit correspondre au `TIME_LABEL` du contrôleur
    * `NOTIF_LABEL` : Doit correspondre au `NOTIF_LABEL` du contrôleur
+   * `IGNORE_LABEL` : Si cette étiquette est présente sur un PVC, le planificateur l’ignorera (par exemple : `volume-cleaner/ignore`).
    * `GRACE_PERIOD` : Nombre de jours avant suppression du PVC (par ex. `"180"`)
    * `TIME_FORMAT` : Doit correspondre au `TIME_FORMAT` du contrôleur
    * `DRY_RUN` : À `"true"` pour tester sans suppression réelle
