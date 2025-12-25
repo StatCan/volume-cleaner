@@ -23,6 +23,7 @@ jobs:
         uses: super-linter/super-linter@v7
         env:
           DEFAULT_BRANCH: main
+          GOCYCLO_COMPLEXITY: 16
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_GITHUB_ACTIONS: true
