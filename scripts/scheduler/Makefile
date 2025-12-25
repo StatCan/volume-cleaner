@@ -6,5 +6,5 @@ run_scheduler:
 		-f ../../manifests/netpol.yaml \
 		-f ../../manifests/scheduler/scheduler_config.yaml \
 		-f ../../manifests/scheduler/scheduler_secret.yaml
-	@kubectl -n zone apply -f ../../manifests/scheduler/scheduler_job.yaml
+	@kubectl -n das apply -f ../../manifests/scheduler/scheduler_job.yaml
 	@echo "Ready to go!"

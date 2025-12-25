@@ -3,11 +3,13 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: volume-cleaner-controller-egress
-  namespace: zone
+  namespace: das
 spec:
   podSelector:
     matchLabels:
       app: volume-cleaner-controller
+  egress:
+    - {}
   policyTypes:
     - Egress
 ---
@@ -15,14 +17,12 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: volume-cleaner-scheduler-egress
-  namespace: zone
+  namespace: das
 spec:
   podSelector:
     matchLabels:
       app: volume-cleaner-scheduler
   egress:
-    - ports:
-      - port: 443
-        protocol: TCP
+    - {}
   policyTypes:
     - Egress

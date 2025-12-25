@@ -5,5 +5,5 @@ run_controller:
 		-f ../../manifests/serviceaccount.yaml \
 		-f ../../manifests/netpol.yaml \
 		-f ../../manifests/controller/controller_config.yaml
-	@kubectl -n zone apply -f ../../manifests/controller/controller_deployment.yaml
+	@kubectl -n das apply -f ../../manifests/controller/controller_deployment.yaml
 	@echo "Ready to go!"

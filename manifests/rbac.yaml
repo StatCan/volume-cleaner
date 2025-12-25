@@ -21,7 +21,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: volume-cleaner
-    namespace: zone
+    namespace: das
 roleRef:
   kind: ClusterRole
   name: volume-cleaner

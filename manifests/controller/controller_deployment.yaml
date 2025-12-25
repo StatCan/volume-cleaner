@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: volume-cleaner-controller
-  namespace: zone
+  namespace: das
 spec:
   replicas: 1
   selector:
