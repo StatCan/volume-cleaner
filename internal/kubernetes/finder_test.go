@@ -66,6 +66,16 @@ func TestFindStale(t *testing.T) {
 		assert.Equal(t, deleted, 2)
 		assert.Equal(t, emailed, 0)
 
+		SetPvcLabel(kube, "volume-cleaner/ignore", "true", "test", "pvc1")
+
+		deleted, emailed = FindStale(kube, schedulerCfg)
+
+		// now pvc1 should be skipped
+		assert.Equal(t, deleted, 1)
+		assert.Equal(t, emailed, 0)
+
+		RemovePvcLabel(kube, "volume-cleaner/ignore", "test", "pvc1")
+
 		schedulerCfg.GracePeriod = 5
 
 		deleted, emailed = FindStale(kube, schedulerCfg)
