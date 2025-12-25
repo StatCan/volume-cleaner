@@ -47,8 +47,8 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 			continue
 		}
 
-		_, ok = pvc.Labels[cfg.IgnoreLabel]
-		if ok {
+		ignore, ok := pvc.Labels[cfg.IgnoreLabel]
+		if ok && ignore == "true" {
 			log.Printf("[INFO][IGNORE] Label %s found. Skipping.", cfg.IgnoreLabel)
 			continue
 		}
