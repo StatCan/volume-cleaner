@@ -29,7 +29,6 @@ jobs:
           VALIDATE_GO_MODULES: true
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
-          GO_CONFIG_FILE: .golangci.yaml
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
