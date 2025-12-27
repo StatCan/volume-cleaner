@@ -26,6 +26,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_GITHUB_ACTIONS: true
+          GO_CONFIG_FILE: ${{ GITHUB_WORKSPACE }}/.github/linters/.golangci.yaml
           VALIDATE_GO_MODULES: true
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
