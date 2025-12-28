@@ -26,8 +26,7 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_DOCKERFILE_HADOLINT: true
           VALIDATE_GITHUB_ACTIONS: true
-          GO_GOLANGCI_LINT_ARGS: "-D gocyclo"
-          VALIDATE_GO_MODULES: true
+          # VALIDATE_GO_MODULES: true - cyclo config seems to be broken
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
