@@ -47,6 +47,12 @@ func FindStale(kube kubernetes.Interface, cfg structInternal.SchedulerConfig) (i
 			continue
 		}
 
+		ignore, ok := pvc.Labels[cfg.IgnoreLabel]
+		if ok && ignore == "true" {
+			log.Printf("[INFO][IGNORE] Label %s found. Skipping.", cfg.IgnoreLabel)
+			continue
+		}
+
 		// check if pvc should be deleted
 		stale, staleError := IsStale(timestamp, cfg.TimeFormat, cfg.GracePeriod)
 		if staleError != nil {

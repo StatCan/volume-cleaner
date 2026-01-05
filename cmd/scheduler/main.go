@@ -28,6 +28,7 @@ func main() {
 		Namespace:   os.Getenv("NAMESPACE"),
 		TimeLabel:   os.Getenv("TIME_LABEL"),
 		NotifLabel:  os.Getenv("NOTIF_LABEL"),
+		IgnoreLabel: os.Getenv("IGNORE_LABEL"),
 		TimeFormat:  os.Getenv("TIME_FORMAT"),
 		GracePeriod: utilsInternal.ParseGracePeriod(os.Getenv("GRACE_PERIOD")),
 		DryRun:      os.Getenv("DRY_RUN") == "true" || os.Getenv("DRY_RUN") == "1",
