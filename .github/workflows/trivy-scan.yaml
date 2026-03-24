@@ -34,7 +34,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Security Scan Image ${{ matrix.image }}
-        uses: aquasecurity/trivy-action@0.31.0
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
           severity: "CRITICAL"
