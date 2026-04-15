@@ -33,10 +33,54 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - name: Prepare Docker auth for Trivy
+        run: |
+          mkdir -p "${{ github.workspace }}/.trivy-docker"
+          cp "$HOME/.docker/config.json" "${{ github.workspace }}/.trivy-docker/config.json"
+
       - name: Security Scan Image ${{ matrix.image }}
-        uses: aquasecurity/trivy-action@0.35.0
-        with:
-          image-ref: ${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest
-          severity: "CRITICAL"
-          ignore-unfixed: true
-          exit-code: 1  # Fail the job if critical unfixed vulnerabilities are found
+        env:
+          TRIVY_VERSION: "0.69.3"          
+          TRIVY_DIGEST: "sha256:7228e304ae0f610a1fad937baa463598cadac0c2ac4027cc68f3a8b997115689"
+          TRIVY_DB_REPOSITORIES: '"ghcr.io/aquasecurity/trivy-db:2","public.ecr.aws/aquasecurity/trivy-db"'
+          TRIVY_JAVA_DB_REPOSITORIES: '"ghcr.io/aquasecurity/trivy-java-db:1","public.ecr.aws/aquasecurity/trivy-java-db"'
+          TRIVY_MAX_RETRIES: "5"
+          TRIVY_RETRY_DELAY: "20"
+        run: |
+          set +e
+
+          IMAGE_REF="${{ env.REGISTRY }}/statcan/volume-cleaner-${{ matrix.image }}:latest"
+
+          for ((i=0; i<${TRIVY_MAX_RETRIES}; i++)); do
+            echo "Attempt $((i + 1)) of ${TRIVY_MAX_RETRIES}..."
+
+            docker run --rm \
+              -v "${{ github.workspace }}/.trivycache:/root/.cache" \
+              -v "${{ github.workspace }}/.trivy-docker:/root/.docker:ro" \
+              aquasec/trivy:${TRIVY_VERSION}@${TRIVY_DIGEST} \
+              image \
+                --image-src remote \
+                --db-repository ${TRIVY_DB_REPOSITORIES} \
+                --java-db-repository ${TRIVY_JAVA_DB_REPOSITORIES} \
+                --scanners vuln \
+                --severity CRITICAL \
+                --format table \
+                --timeout 20m \
+                --exit-code 1 \
+                "${IMAGE_REF}"
+            EXIT_CODE=$?
+
+            if [[ $EXIT_CODE -eq 0 ]]; then
+              echo "Trivy scan completed successfully."
+              exit 0
+            elif [[ $EXIT_CODE -eq 1 ]]; then
+              echo "Trivy found vulnerabilities meeting the configured threshold."
+              exit 1
+            elif [[ $i -lt $((TRIVY_MAX_RETRIES - 1)) ]]; then
+              echo "Unexpected Trivy error. Retrying in ${TRIVY_RETRY_DELAY} seconds..."
+              sleep "${TRIVY_RETRY_DELAY}"
+            else
+              echo "Unexpected Trivy error persisted after ${TRIVY_MAX_RETRIES} attempts."
+              exit 1
+            fi
+          done
