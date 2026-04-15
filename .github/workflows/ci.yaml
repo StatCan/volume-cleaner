@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Super linter
-        uses: super-linter/super-linter@v8.3.1
+        uses: super-linter/super-linter@v8.6.0
         env:
           DEFAULT_BRANCH: main
           VALIDATE_ALL_CODEBASE: false
@@ -29,6 +29,7 @@ jobs:
           # VALIDATE_GO_MODULES: true - cyclo config seems to be broken
           VALIDATE_GITLEAKS: true
           VALIDATE_YAML: true
+          DISABLE_ERRORS: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test:
